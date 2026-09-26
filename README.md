@@ -32,6 +32,7 @@ After that it runs by itself every day at about 9:17 AM Pakistan time.
 - **`data/leads.csv`:** every lead ever found. GitHub shows it as a table.
 - **`data/last-run.json`:** numbers from the latest run.
 - **`data/seen.json`:** every business already checked, so nothing is checked or sent twice.
+- **`data/osm-cache.json`:** OpenStreetMap data saved for a week, so the bot keeps working when those servers are busy.
 
 ## Categories for `config.js`
 

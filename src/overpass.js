@@ -1,5 +1,7 @@
 // Layer 1 — OpenStreetMap: find named businesses in the area that have no website tag.
 
+import fs from 'node:fs';
+import path from 'node:path';
 import { businessProfile, compact } from './matching.js';
 import { botUserAgent, sleep } from './util.js';
 
@@ -63,7 +65,7 @@ export function buildOverpassQuery({ defs, area, skipChains }) {
       seen.add(line);
     }
   }
-  const header = ['[out:json][timeout:180];'];
+  const header = ['[out:json][timeout:120];'];
   if (area.type === 'area') header.push(`area(id:${area.areaId})->.searchArea;`);
   if (area.type === 'name' && area.country) {
     // Only places with that name inside the chosen country, not every "Hyderabad" in the world.
@@ -78,16 +80,22 @@ export function buildOverpassQuery({ defs, area, skipChains }) {
   return [...header, '(', ...lines, ');', 'out center;'].join('\n');
 }
 
-async function runOverpass(query, ep, log) {
+/**
+ * Tries each server once (twice if there's time), best server first.
+ * Returns the elements, or null if every server failed. Moves the server that worked to the front.
+ */
+async function runOverpass(query, servers, log, deadline, retryDelayMs) {
   for (let round = 1; round <= 2; round += 1) {
-    for (const endpoint of ep.overpass) {
+    for (const endpoint of [...servers]) {
+      const left = deadline - Date.now();
+      if (left < 15000) return null;
       const host = endpoint.replace(/^https?:\/\//, '').split('/')[0];
       try {
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'User-Agent': botUserAgent(), 'Content-Type': 'application/x-www-form-urlencoded' },
           body: `data=${encodeURIComponent(query)}`,
-          signal: AbortSignal.timeout(200000),
+          signal: AbortSignal.timeout(Math.min(135000, left)),
         });
         if (!res.ok) {
           log(`   Overpass ${host}: HTTP ${res.status}, trying another server…`);
@@ -98,15 +106,49 @@ async function runOverpass(query, ep, log) {
           log(`   Overpass ${host}: ${json.remark.slice(0, 120)}, trying another server…`);
           continue;
         }
+        servers.splice(servers.indexOf(endpoint), 1);
+        servers.unshift(endpoint);
         return json.elements || [];
       } catch (err) {
         log(`   Overpass ${host}: ${err.message}, trying another server…`);
       }
     }
-    if (round === 1) await sleep(30000);
+    if (round === 1 && deadline - Date.now() > 60000) await sleep(retryDelayMs);
   }
-  throw new Error('Could not reach any OpenStreetMap (Overpass) server. It will retry next run.');
+  return null;
 }
+
+// ── OpenStreetMap cache (data/osm-cache.json) ──
+// Shops change slowly, so each category is downloaded at most once a week. If the servers are down,
+// an older copy (up to STALE_DAYS) is used instead, so a bad day for OpenStreetMap doesn't stop the bot.
+const CACHE_FILE = 'osm-cache.json';
+const FRESH_DAYS = 7;
+const STALE_DAYS = 60;
+const LAYER1_BUDGET_MS = 15 * 60000;
+
+function loadCache(dir) {
+  try {
+    const cache = JSON.parse(fs.readFileSync(path.join(dir, CACHE_FILE), 'utf8'));
+    if (cache && typeof cache === 'object') return cache;
+  } catch {
+    // no cache yet
+  }
+  return {};
+}
+
+function saveCache(dir, cache) {
+  fs.mkdirSync(dir, { recursive: true });
+  const file = path.join(dir, CACHE_FILE);
+  // One element per line keeps the weekly git diff small.
+  const entries = Object.entries(cache).map(([key, { fetched, elements }]) => {
+    const rows = elements.map((el) => `   ${JSON.stringify(el)}`).join(',\n');
+    return ` ${JSON.stringify(key)}: {"fetched": ${JSON.stringify(fetched)}, "elements": [\n${rows}\n ]}`;
+  });
+  fs.writeFileSync(`${file}.tmp`, `{\n${entries.join(',\n')}\n}\n`);
+  fs.renameSync(`${file}.tmp`, file);
+}
+
+const slim = (el) => ({ type: el.type, id: el.id, lat: el.lat, lon: el.lon, center: el.center, tags: el.tags });
 
 function formatAddress(t) {
   if (t['addr:full']) return t['addr:full'];
@@ -182,10 +224,51 @@ export function toCandidates(elements, { defs, cfg }) {
   return out;
 }
 
-export async function fetchCandidates({ cfg, area, defs, ep, log = () => {} }) {
-  const query = buildOverpassQuery({ defs, area, skipChains: cfg.skipChains });
-  const elements = await runOverpass(query, ep, log);
-  return toCandidates(elements, { defs, cfg });
+/**
+ * Layer 1: one small Overpass query per category (one big query for a whole city times out).
+ * Returns { candidates, notes }. Throws only when no category could be loaded at all.
+ */
+export async function fetchCandidates({ cfg, area, defs, ep, dataDir = null, save = false, log = () => {}, retryDelayMs = 20000 }) {
+  const cache = dataDir ? loadCache(dataDir) : {};
+  const place = [cfg.city, cfg.country, cfg.radiusKm, cfg.center ? `${cfg.center.lat},${cfg.center.lon}` : ''].join('|');
+  const servers = [...ep.overpass];
+  const deadline = Date.now() + LAYER1_BUDGET_MS;
+  const elements = [];
+  const stale = [];
+  const missing = [];
+  let changed = false;
+
+  for (const def of defs) {
+    const key = `${place}|${cfg.skipChains ? 'no-chains' : 'all'}|${def.tags.map((t) => `${t.key}=${t.value}`).join(',')}`;
+    const cached = cache[key];
+    const ageDays = cached ? (Date.now() - Date.parse(cached.fetched)) / 86400000 : Infinity;
+    if (ageDays < FRESH_DAYS) {
+      elements.push(...cached.elements);
+      continue;
+    }
+    log(`   OpenStreetMap: loading ${def.label}…`);
+    const query = buildOverpassQuery({ defs: [def], area, skipChains: cfg.skipChains });
+    const got = await runOverpass(query, servers, log, deadline, retryDelayMs);
+    if (got) {
+      cache[key] = { fetched: new Date().toISOString(), elements: got.map(slim) };
+      elements.push(...got);
+      changed = true;
+    } else if (cached && ageDays < STALE_DAYS) {
+      elements.push(...cached.elements);
+      stale.push(def.label);
+    } else {
+      missing.push(def.label);
+    }
+  }
+
+  if (missing.length === defs.length) {
+    throw new Error('Could not reach any OpenStreetMap (Overpass) server. It will retry next run.');
+  }
+  if (changed && save && dataDir) saveCache(dataDir, cache);
+  const notes = [];
+  if (stale.length) notes.push(`OpenStreetMap servers were busy, so older saved data was used for: ${stale.join(', ')}.`);
+  if (missing.length) notes.push(`OpenStreetMap servers were busy, so these were skipped this run: ${missing.join(', ')}.`);
+  return { candidates: toCandidates(elements, { defs, cfg }), notes };
 }
 
 /** Businesses with a phone number / address are easier to pitch, so they go first. */

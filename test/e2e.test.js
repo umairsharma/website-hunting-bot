@@ -59,8 +59,10 @@ test('full run: 3 layers, Google blocked mid-run → falls back, Discord gets le
     assert.equal(result.error, null, logText);
     // Layer 1: 10 OSM elements → 6 real candidates (chain, has-website, unnamed and duplicate filtered out)
     assert.equal(result.candidates, 6, logText);
-    assert.ok(server.requests.overpass[0].includes('area(id:3607431040)->.searchArea;'));
-    assert.ok(server.requests.overpass[0].includes('nwr["shop"="tailor"]'));
+    // One query per category (5 categories), each for the whole city
+    assert.equal(server.requests.overpass.length, 5);
+    assert.ok(server.requests.overpass.every((q) => q.includes('area(id:3607431040)->.searchArea;')));
+    assert.ok(server.requests.overpass.some((q) => q.includes('nwr["shop"="tailor"]')));
 
     assert.equal(result.checked, 6, logText);
     assert.equal(result.hasWebsite, 2, logText); // Ali Bakers (Maps button), Haveli (web search)
@@ -121,6 +123,7 @@ test('full run: 3 layers, Google blocked mid-run → falls back, Discord gets le
     assert.equal(again.checked, 0);
     assert.equal(again.leads.length, 0);
     assert.equal(server.requests.maps.length, mapsCalls);
+    assert.equal(server.requests.overpass.length, 5); // OpenStreetMap data came from the weekly cache
     assert.equal(server.requests.discord.length, 2);
     assert.match(server.requests.discord[1].content, /No new leads/);
     assert.match(server.requests.discord[1].content, /already been checked/);

@@ -7,7 +7,7 @@ import path from 'node:path';
 import {
   analyzeResults, businessProfile, classifyUrl, namesMatch, toWhatsApp, unwrapRedirect,
 } from '../src/matching.js';
-import { buildOverpassQuery, pickQueue, toCandidates } from '../src/overpass.js';
+import { buildOverpassQuery, fetchCandidates, pickQueue, toCandidates } from '../src/overpass.js';
 import { resolveCategories } from '../src/categories.js';
 import { buildMessages, leadEmbed, sendMessages } from '../src/discord.js';
 import { normalizeConfig } from '../src/run.js';
@@ -121,7 +121,7 @@ test('toWhatsApp builds links only for plausible mobile numbers', () => {
 test('Overpass query: whole city', () => {
   const { defs } = resolveCategories(['restaurant', 'shop=bicycle']);
   const q = buildOverpassQuery({ defs, area: { type: 'area', areaId: 3600012345 }, skipChains: true });
-  assert.match(q, /^\[out:json\]\[timeout:180\];/);
+  assert.match(q, /^\[out:json\]\[timeout:120\];/);
   assert.match(q, /area\(id:3600012345\)->\.searchArea;/);
   assert.ok(q.includes('nwr["amenity"="restaurant"]["name"][!"website"][!"contact:website"][!"url"][!"brand:wikidata"](area.searchArea);'));
   assert.ok(q.includes('nwr["shop"="bicycle"]'));
@@ -284,6 +284,60 @@ test('Discord: a rejected message is resent card by card', async () => {
     assert.deepEqual(result, { sent: 3, total: 4 }); // summary + 2 good cards; only the bad card is lost
     assert.equal(bodies.length, 5);
     assert.deepEqual(bodies.slice(1).map((b) => b.content || b.embeds[0].title), ['summary', 'Good 1', 'Bad', 'Good 2']);
+  } finally {
+    server.close();
+  }
+});
+
+test('OpenStreetMap: one query per category, cached for a week, old copy used when servers are down', async () => {
+  let down = false;
+  const queries = [];
+  const server = http.createServer((req, res) => {
+    let data = '';
+    req.on('data', (c) => { data += c; });
+    req.on('end', () => {
+      queries.push(new URLSearchParams(data).get('data'));
+      if (down) {
+        res.writeHead(504);
+        res.end();
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ elements: [
+        { type: 'node', id: 1, lat: 31.5, lon: 74.3, tags: { name: 'Ali Bakers', shop: 'bakery' } },
+        { type: 'node', id: 2, lat: 31.6, lon: 74.4, tags: { name: 'Cafe Aylanto', amenity: 'cafe' } },
+      ] }));
+    });
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'whb-osm-'));
+  const { defs } = resolveCategories(['bakery', 'cafe']);
+  const cfg = { city: 'Lahore', country: 'Pakistan', radiusKm: 0, center: null, skipChains: true };
+  const ep = { overpass: [`http://127.0.0.1:${server.address().port}/a`, `http://127.0.0.1:${server.address().port}/b`] };
+  const area = { type: 'area', areaId: 3600000001 };
+  const opts = { cfg, area, defs, ep, dataDir: dir, save: true, retryDelayMs: 0 };
+  try {
+    const first = await fetchCandidates(opts);
+    assert.equal(queries.length, 2); // one per category
+    assert.ok(queries[0].includes('shop"="bakery') && !queries[0].includes('amenity"="cafe'));
+    assert.deepEqual(first.candidates.map((c) => c.key), ['node/1', 'node/2']);
+    assert.deepEqual(first.notes, []);
+
+    const cached = await fetchCandidates(opts);
+    assert.equal(queries.length, 2); // fresh cache → no new downloads
+    assert.equal(cached.candidates.length, 2);
+
+    // Make the cache 10 days old and take the servers down: the old copy is used, with a note.
+    const file = path.join(dir, 'osm-cache.json');
+    const old = new Date(Date.now() - 10 * 86400000).toISOString();
+    fs.writeFileSync(file, fs.readFileSync(file, 'utf8').replace(/"fetched": "[^"]+"/g, `"fetched": "${old}"`));
+    down = true;
+    const stale = await fetchCandidates(opts);
+    assert.equal(stale.candidates.length, 2);
+    assert.match(stale.notes[0], /older saved data was used for: Bakery \/ sweets, Café/);
+
+    // No cache and servers down → the run fails with a clear error.
+    await assert.rejects(fetchCandidates({ ...opts, dataDir: fs.mkdtempSync(path.join(os.tmpdir(), 'whb-osm-')) }), /Could not reach any OpenStreetMap/);
   } finally {
     server.close();
   }
