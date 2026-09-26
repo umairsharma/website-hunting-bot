@@ -1,0 +1,19 @@
+{
+  "name": "website-hunting-bot",
+  "version": "1.0.0",
+  "description": "Finds local businesses without a website (OpenStreetMap → Google Maps → web search) and sends them to Discord.",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dry-run": "node src/index.js --dry-run",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "playwright": "^1.56.0"
+  }
+}

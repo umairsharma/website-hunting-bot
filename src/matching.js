@@ -1,0 +1,284 @@
+// Text + URL helpers that decide "does this business already have a website?"
+
+// Words that don't identify a business on their own ("Ali Bakers" → "ali" is the distinctive part).
+const GENERIC_WORDS = new Set([
+  'the', 'and', 'of', 'by', 'at', 'in', 'pvt', 'ltd', 'llc', 'inc', 'co', 'company', 'limited', 'official', 'new', 'best',
+  'restaurant', 'restaurants', 'cafe', 'coffee', 'bakery', 'bakers', 'bakes', 'sweets', 'sweet', 'food', 'foods',
+  'kitchen', 'grill', 'bbq', 'hotel', 'motel', 'inn', 'guest', 'house', 'shop', 'store', 'stores', 'mart', 'market',
+  'center', 'centre', 'clinic', 'hospital', 'medical', 'dental', 'dentist', 'pharmacy', 'chemist', 'chemists',
+  'salon', 'saloon', 'beauty', 'parlour', 'parlor', 'spa', 'gym', 'fitness', 'club', 'auto', 'autos', 'motors',
+  'garage', 'service', 'services', 'traders', 'trading', 'enterprises', 'enterprise', 'point', 'corner', 'hub',
+  'express', 'international', 'studio', 'boutique', 'collection', 'tailors', 'tailor', 'clothing', 'fashion',
+  'electronics', 'mobile', 'mobiles', 'agency', 'agent', 'associates', 'group', 'brothers', 'bros', 'sons',
+]);
+
+const STOP_WORDS = new Set(['the', 'and', 'pvt', 'ltd', 'llc', 'inc', 'company', 'limited']);
+
+export function normalizeText(s) {
+  return String(s ?? '')
+    .normalize('NFKD').replace(/\p{M}+/gu, '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/['’`]/g, '')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
+export const compact = (s) => normalizeText(s).replace(/ /g, '');
+
+const tokensOf = (s) => normalizeText(s).split(' ').filter(Boolean);
+
+/** Is `candidate` (e.g. a Google Maps title) the same business as any of `names`? */
+export function namesMatch(candidate, names) {
+  const list = Array.isArray(names) ? names : [names];
+  return list.some((n) => nameSimilar(candidate, n));
+}
+
+function nameSimilar(a, b) {
+  const na = normalizeText(a);
+  const nb = normalizeText(b);
+  if (!na || !nb) return false;
+  if (na === nb) return true;
+  const ca = na.replace(/ /g, '');
+  const cb = nb.replace(/ /g, '');
+  const [short, long] = ca.length <= cb.length ? [ca, cb] : [cb, ca];
+  if (long.includes(short) && (short.length >= 5 || short.length >= 0.6 * long.length)) return true;
+  const words = (s) => new Set(s.split(' ').filter((t) => t.length >= 3 && !STOP_WORDS.has(t)));
+  const ta = words(na);
+  const tb = words(nb);
+  if (!ta.size || !tb.size) return false;
+  const shared = [...ta].filter((t) => tb.has(t));
+  // Sharing only a generic word ("Cafe X" vs "Cafe Y") doesn't count.
+  if (!shared.some((t) => !GENERIC_WORDS.has(t))) return false;
+  return shared.length / Math.min(ta.size, tb.size) >= 0.6;
+}
+
+/** Pre-computes the name forms used to recognise a business's own domain. */
+export function businessProfile(names, city) {
+  const cityTokens = new Set(tokensOf(city));
+  const keys = new Set();
+  const tokenSets = [];
+  for (const name of names) {
+    const toks = tokensOf(name);
+    if (!toks.length) continue;
+    keys.add(toks.join(''));
+    keys.add(toks.filter((t) => t !== 'and').join(''));
+    const distinctive = toks.filter((t) => t.length >= 3 && !GENERIC_WORDS.has(t) && !cityTokens.has(t));
+    if (distinctive.length) tokenSets.push(distinctive);
+  }
+  return { keys: [...keys].filter((k) => k.length >= 4), tokenSets, cityTokens };
+}
+
+/** Strong match: the domain is clearly named after the business (alibakers.pk for "Ali Bakers"). */
+export function siteMatchesBusiness(siteKey, profile) {
+  if (!siteKey || siteKey.length < 3) return false;
+  if (GENERIC_WORDS.has(siteKey) || profile.cityTokens.has(siteKey)) return false;
+  for (const key of profile.keys) {
+    if (siteKey.includes(key)) return true;
+    if (siteKey.length >= 5 && key.includes(siteKey) && siteKey.length >= key.length * 0.5) return true;
+  }
+  return profile.tokenSets.some(
+    (tokens) => tokens.join('').length >= 5 && tokens.every((t) => siteKey.includes(t)),
+  );
+}
+
+function titleStartsWithName(title, names) {
+  const t = normalizeText(title);
+  return names.some((n) => {
+    const nn = normalizeText(n);
+    return nn.length >= 4 && t.startsWith(nn);
+  });
+}
+
+function titleMentionsName(title, profile) {
+  const t = compact(title);
+  if (profile.keys.some((k) => k.length >= 5 && t.includes(k))) return true;
+  return profile.tokenSets.some((tokens) => tokens.join('').length >= 5 && tokens.every((x) => t.includes(x)));
+}
+
+// ── URL classification ──────────────────────────────────────────────────────
+
+const brandPattern = (brands) => new RegExp(`(^|\\.)(${brands.join('|')})\\.[a-z.]{2,12}$`);
+
+// Pages that are NOT the business's own website.
+const SOCIAL = brandPattern([
+  'facebook', 'fb', 'instagram', 'instagr', 'twitter', 'x', 'tiktok', 'youtube', 'youtu', 'linkedin', 'pinterest',
+  'snapchat', 'threads', 'whatsapp', 'wa', 'telegram', 't', 'linktr', 'linktree', 'beacons', 'bio', 'taplink', 'lnk',
+  'msha', 'about', 'tumblr', 'vk', 'weibo', 'line',
+]);
+const DELIVERY = brandPattern([
+  'foodpanda', 'ubereats', 'doordash', 'grubhub', 'deliveroo', 'talabat', 'zomato', 'swiggy', 'justeat', 'just-eat',
+  'menulog', 'careem', 'cheetay', 'glovoapp', 'glovo', 'wolt', 'rappi', 'postmates', 'seamless', 'skipthedishes',
+  'hungerstation', 'jahez', 'lieferando', 'thuisbezorgd', 'pedidosya', 'ifood', 'foodora', 'grab',
+]);
+const BOOKING = brandPattern([
+  'booking', 'agoda', 'expedia', 'hotels', 'trivago', 'airbnb', 'kayak', 'makemytrip', 'goibibo', 'bookme',
+  'sastaticket', 'practo', 'marham', 'oladoc', 'sehat', 'fresha', 'treatwell', 'vagaro', 'booksy', 'mindbody',
+  'mindbodyonline', 'opentable', 'resy', 'tablecheck', 'eatapp', 'classpass', 'zocdoc', 'doctolib', 'healthgrades',
+  'hotelscombined', 'trip', 'yatra', 'ixigo', 'cleartrip', 'hostelworld',
+]);
+const DIRECTORY = brandPattern([
+  'yelp', 'tripadvisor', 'foursquare', 'yellowpages', 'yell', 'cylex', 'infobel', 'hotfrog', 'kompass',
+  'restaurantguru', 'sluurpy', 'justdial', 'sulekha', 'wikipedia', 'wikimapia', 'wikidata', 'mapcarta', 'trustpilot',
+  'glassdoor', 'indeed', 'olx', 'daraz', 'zameen', 'graana', 'businesslist', 'pakbiz', 'brownbook', 'cybo', 'manta',
+  'bbb', 'chamberofcommerce', 'mapquest', 'nextdoor', 'angi', 'angieslist', 'houzz', 'thumbtack', 'checkatrade',
+  'scoot', 'freeindex', 'n49', 'yellow', 'top-rated', 'restaurantji', 'menupages', 'allmenus', 'wanderlog',
+  'lonelyplanet', 'timeout', 'reddit', 'quora', 'openstreetmap', 'waze', 'here', 'bing', 'duckduckgo', 'yahoo',
+  'yandex', '2gis', 'apple', 'findglocal', 'infoisinfo', 'locanto', 'rozee', 'mustakbil', 'dnb', 'opencorporates',
+  'bizapedia', 'zoominfo', 'crunchbase', 'placedigger', 'worldorgs', 'tuugo', 'ezlocal', 'citysquares',
+  'superpages', 'merchantcircle', 'storeboard', 'showmelocal', 'cataloxy', 'tradekey', 'alibaba', 'indiamart',
+]);
+// Google shut down business.site websites in 2024 — a link there means no working site.
+const DEAD = /(^|\.)business\.site$/;
+const GOOGLE = /(^|\.)google\.[a-z.]{2,8}$|(^|\.)(goo\.gl|g\.page|g\.co|share\.google)$/;
+
+// Free website builders put the business name in the subdomain (alibakers.wixsite.com).
+const PLATFORM_HOSTS = [
+  'wixsite.com', 'weebly.com', 'wordpress.com', 'blogspot.com', 'godaddysites.com', 'square.site', 'webflow.io',
+  'carrd.co', 'netlify.app', 'vercel.app', 'github.io', 'myshopify.com', 'jimdosite.com', 'mystrikingly.com',
+  'strikingly.com', 'site123.me', 'webnode.page', 'framer.website', 'my.canva.site', 'canva.site',
+];
+const SECOND_LEVEL = new Set(['com', 'net', 'org', 'co', 'edu', 'gov', 'ac', 'biz', 'gen', 'web', 'ltd', 'plc']);
+
+export function unwrapRedirect(raw) {
+  let u;
+  try {
+    u = new URL(raw);
+  } catch {
+    return raw;
+  }
+  const host = u.hostname.replace(/^www\./, '');
+  if (GOOGLE.test(host) && u.pathname === '/url') return u.searchParams.get('q') || u.searchParams.get('url') || raw;
+  if (host.endsWith('duckduckgo.com') && u.pathname.startsWith('/l/')) return u.searchParams.get('uddg') || raw;
+  if (host.endsWith('bing.com') && u.pathname.startsWith('/ck/')) {
+    const p = u.searchParams.get('u');
+    if (p && p.startsWith('a1')) {
+      const decoded = Buffer.from(p.slice(2).replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
+      if (/^https?:\/\//.test(decoded)) return decoded;
+    }
+  }
+  return raw;
+}
+
+export function hostOf(url) {
+  try {
+    return new URL(unwrapRedirect(url)).hostname.toLowerCase().replace(/^www\d?\./, '').replace(/^m\./, '');
+  } catch {
+    return '';
+  }
+}
+
+function registrableLabel(host) {
+  const labels = host.split('.');
+  if (labels.length >= 3 && SECOND_LEVEL.has(labels[labels.length - 2])) return labels[labels.length - 3];
+  return labels.length >= 2 ? labels[labels.length - 2] : labels[0];
+}
+
+function siteKeyFor(host, u) {
+  if (host === 'sites.google.com') return compact(u.pathname);
+  const platform = PLATFORM_HOSTS.find((p) => host.endsWith(`.${p}`));
+  if (platform) {
+    const sub = host.slice(0, -(platform.length + 1));
+    return compact(`${sub} ${platform === 'wixsite.com' ? u.pathname : ''}`);
+  }
+  return registrableLabel(host).replace(/-/g, '');
+}
+
+/** kind: website | social | delivery | booking | directory | maps | dead */
+export function classifyUrl(raw) {
+  let u;
+  try {
+    u = new URL(unwrapRedirect(raw));
+  } catch {
+    return null;
+  }
+  if (!/^https?:$/.test(u.protocol)) return null;
+  const host = u.hostname.toLowerCase().replace(/^www\d?\./, '').replace(/^m\./, '');
+  let kind = 'website';
+  if (host === 'sites.google.com') kind = 'website';
+  else if (DEAD.test(host)) kind = 'dead';
+  else if (SOCIAL.test(host)) kind = 'social';
+  else if (DELIVERY.test(host)) kind = 'delivery';
+  else if (BOOKING.test(host)) kind = 'booking';
+  else if (GOOGLE.test(host)) kind = 'maps';
+  else if (DIRECTORY.test(host) || /yellow-?pages/.test(host)) kind = 'directory';
+  return { kind, host, url: u.href, siteKey: siteKeyFor(host, u) };
+}
+
+const PRETTY = {
+  facebook: 'Facebook', fb: 'Facebook', instagram: 'Instagram', instagr: 'Instagram', tiktok: 'TikTok',
+  youtube: 'YouTube', youtu: 'YouTube', linkedin: 'LinkedIn', twitter: 'X (Twitter)', x: 'X (Twitter)',
+  wa: 'WhatsApp', whatsapp: 'WhatsApp', linktr: 'Linktree', foodpanda: 'Foodpanda', ubereats: 'Uber Eats',
+  doordash: 'DoorDash', marham: 'Marham', oladoc: 'Oladoc', booking: 'Booking.com', tripadvisor: 'Tripadvisor',
+  google: 'Google', business: 'Google Business',
+};
+export function prettySite(host) {
+  const label = registrableLabel(host || '');
+  return PRETTY[label] || (label ? label.charAt(0).toUpperCase() + label.slice(1) : 'link');
+}
+
+// ── Layer 3 decision ────────────────────────────────────────────────────────
+
+function pathDepth(url) {
+  try {
+    return new URL(url).pathname.split('/').filter(Boolean).length;
+  } catch {
+    return 99;
+  }
+}
+
+/**
+ * Looks at search results for one business.
+ * hasWebsite → a result's domain is clearly the business's own site.
+ * possible   → a homepage whose title starts with the business name, but the domain doesn't match (check manually).
+ * socials    → the business's own social pages (useful when pitching).
+ */
+export function analyzeResults(results, biz) {
+  const profile = biz.profile || businessProfile(biz.names, biz.city);
+  const socials = [];
+  const possible = [];
+  for (const r of results) {
+    const site = classifyUrl(r.url);
+    if (!site) continue;
+    if (site.kind === 'social') {
+      if (titleMentionsName(r.title, profile)) socials.push(site.url);
+      continue;
+    }
+    if (site.kind !== 'website') continue;
+    if (siteMatchesBusiness(site.siteKey, profile)) return { hasWebsite: true, website: site.url, socials, possible };
+    if (possible.length < 2 && pathDepth(site.url) <= 1 && titleStartsWithName(r.title, biz.names)) {
+      if (!possible.includes(site.host)) possible.push(site.host);
+    }
+  }
+  return { hasWebsite: false, website: null, socials, possible };
+}
+
+export function uniqueUrls(urls) {
+  const seen = new Set();
+  const out = [];
+  for (const url of urls) {
+    if (!url) continue;
+    const key = url.toLowerCase().replace(/^https?:\/\/(www\.|m\.)?/, '').replace(/\/+$/, '');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(url);
+  }
+  return out;
+}
+
+/** wa.me link from a phone number, using the country code for local numbers ("0300…" → "92300…"). */
+export function toWhatsApp(phone, countryCode = '') {
+  if (!phone) return null;
+  const first = String(phone).split(/[;,/]/)[0].trim();
+  let digits = first.replace(/\D/g, '');
+  if (!first.startsWith('+')) {
+    if (digits.startsWith('00')) digits = digits.slice(2);
+    else if (countryCode && digits.startsWith('0')) digits = countryCode + digits.slice(1);
+    else if (countryCode && !digits.startsWith(countryCode) && digits.length <= 10) digits = countryCode + digits;
+  }
+  if (digits.length < 10 || digits.length > 15) return null;
+  // Pakistan: only 03xx numbers are mobiles, so landlines don't get a WhatsApp link.
+  if (digits.startsWith('92') && countryCode === '92' && !digits.startsWith('923')) return null;
+  return `https://wa.me/${digits}`;
+}
