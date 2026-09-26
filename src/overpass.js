@@ -28,7 +28,7 @@ export async function resolveArea(cfg, ep, log = () => {}) {
   } catch (err) {
     // Place lookup is down — fall back to matching the city's name inside Overpass.
     log(`   Place lookup failed (${err.message}); matching "${cfg.city}" by name instead.`);
-    return { type: 'name', name: cfg.city, label: q };
+    return { type: 'name', name: cfg.city, country: cfg.country, label: q };
   }
 
   if (!Array.isArray(results) || !results.length) {
@@ -65,7 +65,16 @@ export function buildOverpassQuery({ defs, area, skipChains }) {
   }
   const header = ['[out:json][timeout:180];'];
   if (area.type === 'area') header.push(`area(id:${area.areaId})->.searchArea;`);
-  if (area.type === 'name') header.push(`(area["name"=${quote(area.name)}];area["name:en"=${quote(area.name)}];)->.searchArea;`);
+  if (area.type === 'name' && area.country) {
+    // Only places with that name inside the chosen country, not every "Hyderabad" in the world.
+    const c = quote(area.country);
+    const n = quote(area.name);
+    header.push(`(area["admin_level"="2"]["name"=${c}];area["admin_level"="2"]["name:en"=${c}];)->.country;`);
+    header.push(`(rel["name"=${n}](area.country);rel["name:en"=${n}](area.country););`);
+    header.push('map_to_area->.searchArea;');
+  } else if (area.type === 'name') {
+    header.push(`(area["name"=${quote(area.name)}];area["name:en"=${quote(area.name)}];)->.searchArea;`);
+  }
   return [...header, '(', ...lines, ');', 'out center;'].join('\n');
 }
 
@@ -109,9 +118,16 @@ function formatAddress(t) {
 function socialUrl(value, site) {
   if (!value) return null;
   const v = String(value).split(';')[0].trim();
-  if (/^https?:\/\//i.test(v)) return v;
-  if (/^(www\.)?(facebook|instagram)\.com\//i.test(v)) return `https://${v}`;
-  return `https://www.${site}.com/${v.replace(/^@/, '')}`;
+  let url;
+  if (/^https?:\/\//i.test(v)) url = v;
+  else if (/^(www\.)?(facebook|instagram)\.com\//i.test(v)) url = `https://${v}`;
+  else url = `https://www.${site}.com/${v.replace(/^@/, '')}`;
+  // Anyone can edit OpenStreetMap; a malformed link would make Discord reject the whole message.
+  try {
+    return new URL(url).href;
+  } catch {
+    return null;
+  }
 }
 
 /** OSM elements → candidate businesses (with safety filters in case a server ignores part of the query). */

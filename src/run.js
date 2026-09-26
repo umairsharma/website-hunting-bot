@@ -92,6 +92,7 @@ async function checkBusiness(biz, ctx) {
       if (!site || site.kind === 'website') return { status: 'has_website', layer: 2, website: site ? site.host : maps.website };
       notes.push(websiteNote(site));
     }
+    if (maps.temporarilyClosed) notes.push('Google Maps says it is temporarily closed');
     if (maps.claimable) notes.push('Their Google listing is unclaimed');
     if (maps.limitedView) notes.push('Google Maps showed a limited view, so double-check the listing before pitching');
   }

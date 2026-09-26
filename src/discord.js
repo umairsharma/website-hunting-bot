@@ -71,7 +71,10 @@ export function buildMessages(summaryText, leads) {
 export async function sendMessages(webhookUrl, messages, log = () => {}) {
   let sent = 0;
   const url = `${webhookUrl}${webhookUrl.includes('?') ? '&' : '?'}wait=true`;
-  for (const message of messages) {
+  const queue = [...messages];
+  let total = messages.length;
+  while (queue.length) {
+    const message = queue.shift();
     const body = JSON.stringify({ username: 'Website Hunting Bot', allowed_mentions: { parse: [] }, ...message });
     for (let attempt = 1; attempt <= 4; attempt += 1) {
       let res;
@@ -89,6 +92,16 @@ export async function sendMessages(webhookUrl, messages, log = () => {}) {
       }
       if (!res.ok) {
         const text = await res.text().catch(() => '');
+        const embeds = message.embeds || [];
+        if (res.status === 400 && (embeds.length > 1 || (message.content && embeds.length))) {
+          // One bad lead card makes Discord reject the whole message, so send the parts separately.
+          log(`   Discord rejected a message (HTTP 400), resending its ${embeds.length} card(s) one by one`);
+          const parts = embeds.map((e) => ({ embeds: [e] }));
+          if (message.content) parts.unshift({ content: message.content, embeds: [] });
+          queue.unshift(...parts);
+          total += parts.length - 1;
+          break;
+        }
         log(`   Discord rejected a message (HTTP ${res.status}): ${text.slice(0, 200)}`);
         if (res.status === 401 || res.status === 404) log('   → The DISCORD_WEBHOOK_URL secret looks wrong or the webhook was deleted.');
         break;
@@ -98,5 +111,5 @@ export async function sendMessages(webhookUrl, messages, log = () => {}) {
     }
     await sleep(600);
   }
-  return { sent, total: messages.length };
+  return { sent, total };
 }

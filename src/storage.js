@@ -31,10 +31,11 @@ const CSV_COLUMNS = [
   'google_maps', 'social_pages', 'notes', 'city', 'osm_link',
 ];
 
-function csvCell(value, { formulaSafe = true } = {}) {
+function csvCell(value) {
   let s = value == null ? '' : String(value);
   // Stop spreadsheet apps from treating a business name like "=HYPERLINK(...)" as a formula.
-  if (formulaSafe && /^(=|@|[+-](?!\d))/.test(s)) s = `'${s}`;
+  // Phone numbers like "+92 300…" still pass through unchanged.
+  if (/^(=|@|\t|\r|[+-](?!\d))/.test(s)) s = `'${s}`;
   return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
@@ -46,7 +47,7 @@ export function appendLead(dir, lead) {
     csvCell(lead.foundOn),
     csvCell(lead.name),
     csvCell(lead.categoryLabel),
-    csvCell(lead.phone, { formulaSafe: false }),
+    csvCell(lead.phone),
     csvCell(lead.whatsapp),
     csvCell(lead.email),
     csvCell(lead.address),

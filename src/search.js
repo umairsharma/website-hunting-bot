@@ -97,6 +97,7 @@ export function createSearcher({ page, order, ep, delay = () => 0, log = () => {
         log(`   ${engineLabel(name)} error: ${r.error}`);
         continue;
       }
+      st.errors = 0; // only errors in a row mean the engine is broken
       // Zero results is rare for a real business, so double-check with the next engine.
       if (!r.results.length && !emptyFrom) {
         emptyFrom = name;

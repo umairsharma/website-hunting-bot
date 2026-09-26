@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 import {
@@ -8,7 +9,7 @@ import {
 } from '../src/matching.js';
 import { buildOverpassQuery, pickQueue, toCandidates } from '../src/overpass.js';
 import { resolveCategories } from '../src/categories.js';
-import { buildMessages, leadEmbed } from '../src/discord.js';
+import { buildMessages, leadEmbed, sendMessages } from '../src/discord.js';
 import { normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
 
@@ -31,6 +32,9 @@ test('namesMatch: different businesses', () => {
   assert.ok(!namesMatch('Al Rehman Sweets', ['Al Rehman Bakers']));
   assert.ok(!namesMatch('Cafe Aylanto', ['Cafe']));
   assert.ok(!namesMatch('Pizza Hut', ['Pizza Point']));
+  assert.ok(!namesMatch('Salon Zara', ['Salon']));
+  assert.ok(!namesMatch('Ali Bakery Restaurant', ['Bakery Restaurant']));
+  assert.ok(namesMatch('Salon', ['Salon']));
 });
 
 test('classifyUrl sorts links into own sites vs everything else', () => {
@@ -105,7 +109,11 @@ test('toWhatsApp builds links only for plausible mobile numbers', () => {
   assert.equal(toWhatsApp('+92 300 1234567', '92'), 'https://wa.me/923001234567');
   assert.equal(toWhatsApp('+923001234567;042 111', '92'), 'https://wa.me/923001234567');
   assert.equal(toWhatsApp('042 35761234', '92'), null); // Lahore landline
-  assert.equal(toWhatsApp('+44 20 7946 0958', '92'), 'https://wa.me/442079460958');
+  assert.equal(toWhatsApp('+44 20 7946 0958', '92'), null); // London landline
+  assert.equal(toWhatsApp('+44 7700 900123', '92'), 'https://wa.me/447700900123');
+  assert.equal(toWhatsApp('011 2345 6789', '91'), null); // Delhi landline
+  assert.equal(toWhatsApp('098765 43210', '91'), 'https://wa.me/919876543210');
+  assert.equal(toWhatsApp('+1 212 555 0100', '92'), 'https://wa.me/12125550100'); // can't tell, so allowed
   assert.equal(toWhatsApp('12345', '92'), null);
   assert.equal(toWhatsApp('', '92'), null);
 });
@@ -133,6 +141,15 @@ test('Overpass query: city-name fallback', () => {
   assert.ok(q.includes('(area["name"="Lahore"];area["name:en"="Lahore"];)->.searchArea;'));
 });
 
+test('Overpass query: city-name fallback stays inside the country', () => {
+  const { defs } = resolveCategories(['cafe']);
+  const q = buildOverpassQuery({ defs, area: { type: 'name', name: 'Hyderabad', country: 'Pakistan' }, skipChains: true });
+  assert.ok(q.includes('(area["admin_level"="2"]["name"="Pakistan"];area["admin_level"="2"]["name:en"="Pakistan"];)->.country;'));
+  assert.ok(q.includes('(rel["name"="Hyderabad"](area.country);rel["name:en"="Hyderabad"](area.country););'));
+  assert.ok(q.includes('map_to_area->.searchArea;'));
+  assert.ok(q.indexOf('map_to_area') < q.indexOf('nwr['));
+});
+
 test('categories: unknown names are reported, raw tags accepted', () => {
   const { defs, unknown } = resolveCategories(['restaurant', 'spaceships', 'shop=bicycle', 'Dentist']);
   assert.deepEqual(defs.map((d) => d.id), ['restaurant', 'shop=bicycle', 'dentist']);
@@ -150,9 +167,11 @@ test('toCandidates: filters chains, websites, unnamed and duplicates', () => {
     { type: 'node', id: 5, lat: 31.5, lon: 74.3, tags: { shop: 'bakery' } },
     { type: 'node', id: 6, lat: 31.5, lon: 74.3, tags: { name: 'Book Stall', shop: 'books' } },
     { type: 'node', id: 7, lat: 31.5, lon: 74.3, tags: { name: 'لاہور کڑاہی', 'name:en': 'Lahore Karahi', amenity: 'restaurant', 'contact:facebook': 'lahorekarahi' } },
+    { type: 'node', id: 8, lat: 31.6, lon: 74.4, tags: { name: 'Bad Link Cafe', amenity: 'restaurant', 'contact:facebook': 'https://', 'contact:instagram': '@badlink' } },
   ];
   const out = toCandidates(elements, { defs, cfg });
-  assert.deepEqual(out.map((c) => c.key), ['node/1', 'node/7']);
+  assert.deepEqual(out.map((c) => c.key), ['node/1', 'node/7', 'node/8']);
+  assert.deepEqual(out[2].socials, ['https://www.instagram.com/badlink']); // the broken Facebook link is dropped
   assert.equal(out[0].phone, '042 35761234');
   assert.equal(out[0].address, 'Main Blvd, Lahore');
   assert.equal(out[0].categoryLabel, 'Bakery / sweets');
@@ -237,4 +256,35 @@ test('storage: state round-trips, CSV is escaped and formula-safe', () => {
   assert.ok(lines[1].includes(`"'=HYPERLINK(""x"")"`));
   assert.ok(lines[1].includes(',+92 300 1234567,'));
   assert.ok(lines[1].includes('"Shop 4, ""Main"" Road"'));
+
+  appendLead(dir, { foundOn: '2026-09-27', name: 'B', phone: '=cmd|x', address: '\tx' });
+  const row = fs.readFileSync(path.join(dir, 'leads.csv'), 'utf8').trim().split('\n')[2];
+  assert.ok(row.includes(",'=cmd|x,"), row);
+  assert.ok(row.includes(",'\tx,"), row);
+});
+
+test('Discord: a rejected message is resent card by card', async () => {
+  const bodies = [];
+  const server = http.createServer((req, res) => {
+    let data = '';
+    req.on('data', (c) => { data += c; });
+    req.on('end', () => {
+      const body = JSON.parse(data);
+      bodies.push(body);
+      const bad = (body.embeds || []).some((e) => e.title === 'Bad');
+      res.writeHead(bad ? 400 : 200, { 'Content-Type': 'application/json' });
+      res.end(bad ? '{"embeds":["invalid"]}' : '{}');
+    });
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  try {
+    const card = (name) => ({ name, categoryLabel: 'Cafe', checks: 'x', mapsUrl: 'https://maps.example/x' });
+    const messages = buildMessages('summary', [card('Good 1'), card('Bad'), card('Good 2')]);
+    const result = await sendMessages(`http://127.0.0.1:${server.address().port}/hook`, messages);
+    assert.deepEqual(result, { sent: 3, total: 4 }); // summary + 2 good cards; only the bad card is lost
+    assert.equal(bodies.length, 5);
+    assert.deepEqual(bodies.slice(1).map((b) => b.content || b.embeds[0].title), ['summary', 'Good 1', 'Bad', 'Good 2']);
+  } finally {
+    server.close();
+  }
 });

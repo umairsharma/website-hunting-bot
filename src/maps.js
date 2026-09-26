@@ -92,7 +92,8 @@ function readPlace(page) {
       if (rating !== null && reviews !== null) break;
     }
 
-    const mainText = main.innerText || '';
+    // Match the short status line exactly, so a review that says "permanently closed" doesn't count.
+    const status = (re) => Array.from(main.querySelectorAll('span, div')).some((el) => re.test((el.textContent || '').trim()));
     const phoneTel = phoneEl ? (phoneEl.getAttribute('data-item-id') || '').replace(/^phone:tel:/, '') : '';
     const phoneLabel = phoneEl ? (phoneEl.getAttribute('aria-label') || '').replace(/^Phone:\s*/i, '').trim() : '';
     return {
@@ -103,8 +104,9 @@ function readPlace(page) {
       address: addressEl ? (addressEl.getAttribute('aria-label') || '').replace(/^Address:\s*/i, '').trim() || null : null,
       rating,
       reviews,
-      permanentlyClosed: /permanently closed/i.test(mainText),
-      claimable: /claim this business/i.test(mainText),
+      permanentlyClosed: status(/^permanently closed[\s.·]*$/i),
+      temporarilyClosed: status(/^temporarily closed[\s.·]*$/i),
+      claimable: /claim this business/i.test(main.innerText || ''),
       limitedView: /limited view/i.test(document.body ? document.body.innerText : ''),
     };
   });
@@ -112,7 +114,7 @@ function readPlace(page) {
 
 /**
  * status: 'found' (listing opened), 'not_found', 'blocked' or 'error'.
- * When found: website, phone, address, rating, reviews, permanentlyClosed, claimable, mapsUrl.
+ * When found: website, phone, address, rating, reviews, permanentlyClosed, temporarilyClosed, claimable, mapsUrl.
  */
 export async function checkMaps(page, biz, { mapsBase, timeoutMs = 20000 }) {
   const searchUrl = mapsSearchUrl(mapsBase, biz);
@@ -123,8 +125,12 @@ export async function checkMaps(page, biz, { mapsBase, timeoutMs = 20000 }) {
     if (view === 'timeout' && (await isBlocked(page))) return { status: 'blocked' };
 
     if (view === 'list') {
-      const items = await page.$$eval('div[role="feed"] a[href*="/maps/place/"]', (links) =>
+      // The list box appears before its results are filled in, so wait for the result links.
+      const linkSelector = 'div[role="feed"] a[href*="/maps/place/"]';
+      await page.waitForSelector(linkSelector, { state: 'attached', timeout: 8000 }).catch(() => {});
+      const items = await page.$$eval(linkSelector, (links) =>
         links.map((a) => ({ href: a.href, label: a.getAttribute('aria-label') || a.textContent || '' })));
+      if (!items.length) return { status: 'error', reason: 'the results list did not load' };
       const hit = items.slice(0, 10).find((item) => namesMatch(item.label, biz.names));
       if (!hit) return { status: 'not_found', searchUrl };
       await gotoPage(page, withEnglish(hit.href));

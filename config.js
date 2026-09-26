@@ -9,7 +9,7 @@ export default {
   city: 'Lahore',
   country: 'Pakistan',
 
-  // 0 = the whole city.
+  // 0 = the whole city (or 5 km around `center` below, if you set one).
   // Or a number like 5 = only businesses within 5 km of the city centre (or of `center` below).
   radiusKm: 0,
 
