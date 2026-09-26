@@ -241,7 +241,7 @@ function engineWarnings(state) {
 function summaryText(cfg, stats, warnings, fatal) {
   const lines = [`🎯 **Website Hunting Bot** · ${cfg ? placeName(cfg) : 'setup problem'}`];
   if (fatal) {
-    lines.push(`❌ **Run failed:** ${fatal.message}`);
+    lines.push(`❌ **Run failed:** ${String(fatal.message).split('\n')[0].slice(0, 300)}`);
   } else {
     lines.push(stats.leads
       ? `✅ **${stats.leads} new lead${stats.leads === 1 ? '' : 's'}**: no website on OpenStreetMap, Google Maps or web search`
