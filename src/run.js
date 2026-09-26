@@ -285,7 +285,8 @@ export async function run({ config, dataDir, dryRun = false, webhookUrl = proces
     const area = await resolveArea(cfg, ep, log);
     areaLabel = area.label;
     log(`📍 Area: ${area.label}`);
-    const candidates = await fetchCandidates({ cfg, area, defs, ep, log });
+    const { candidates, notes: osmNotes } = await fetchCandidates({ cfg, area, defs, ep, dataDir, save: !dryRun, log });
+    warnings.push(...osmNotes);
     stats.candidates = candidates.length;
     log(`🗺️  Layer 1, OpenStreetMap: ${candidates.length} businesses with no website listed`);
     if (!candidates.length) {
