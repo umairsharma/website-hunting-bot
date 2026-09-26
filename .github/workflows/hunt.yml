@@ -19,16 +19,17 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Get the code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v5
         with:
           node-version: 22
-          package-manager-cache: false
+          cache: npm
 
       - name: Install packages
-        run: npm install --no-audit --no-fund
+        # Exact versions from package-lock.json, so a new Playwright release can't break the bot overnight.
+        run: npm ci --no-audit --no-fund
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
 
@@ -51,5 +52,15 @@ jobs:
             exit 0
           fi
           git commit -m "Update leads data"
-          git pull --rebase origin "$GITHUB_REF_NAME"
-          git push origin "HEAD:$GITHUB_REF_NAME"
+          # If this push is lost, the next run re-checks the same businesses and sends duplicate leads,
+          # so retry. On a clash in data/, this run's copy wins (-X theirs keeps the commit being replayed).
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase -X theirs origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME"; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            echo "Save attempt $attempt failed, retrying…"
+            sleep $((attempt * 10))
+          done
+          echo "::error::Couldn't save data/ back to the repo. The next run may send some leads again."
+          exit 1

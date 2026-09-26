@@ -7,6 +7,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { startMockServer } from './mock-server.js';
 import { run } from '../src/run.js';
+import { launchBrowser } from '../src/browser.js';
+import { checkMaps } from '../src/maps.js';
 
 const CONFIG = {
   city: 'Lahore',
@@ -75,6 +77,7 @@ test('full run: 3 layers, Google blocked mid-run → falls back, Discord gets le
     assert.equal(butt.address, 'Lakshmi Chowk, Lahore');
     assert.deepEqual(butt.socials, ['https://www.facebook.com/buttkarahihouse/']);
     assert.ok(butt.notes.some((n) => /unclaimed/.test(n)));
+    assert.ok(butt.notes.some((n) => /temporarily closed/.test(n))); // and a review mentioning "permanently closed" didn't count
     assert.match(butt.checks, /Google Maps ✓ · Google ✓/);
     assert.ok(butt.mapsUrl.startsWith(`${server.base}/maps/`));
 
@@ -155,5 +158,20 @@ test('Google Maps unreadable + requireMapsCheck: false → OSM + web search only
       assert.ok(lead.notes.some((n) => /Google Maps wasn't checked/.test(n)));
     }
     assert.equal(server.requests.maps.length, 2); // only the two self-test attempts
+  });
+});
+
+test('Google Maps: a results list that never fills in is an error, not "not on Maps"', { timeout: 60000 }, async () => {
+  await withServer({}, async (server) => {
+    const { browser, context } = await launchBrowser();
+    try {
+      const page = await context.newPage();
+      const biz = { searchName: 'Empty List Cafe', city: 'Lahore', names: ['Empty List Cafe'], lat: 31.5, lon: 74.3 };
+      const r = await checkMaps(page, biz, { mapsBase: `${server.base}/maps`, timeoutMs: 5000 });
+      assert.equal(r.status, 'error');
+      assert.match(r.reason, /results list/);
+    } finally {
+      await browser.close();
+    }
   });
 });

@@ -26,7 +26,7 @@ export const ELEMENTS = [
 const PLACES = {
   'eiffel-tower': { query: 'Eiffel Tower', title: 'Eiffel Tower', website: 'https://www.toureiffel.paris/', address: 'Av. Gustave Eiffel, 75007 Paris, France', rating: '4.7', reviews: '400,123' },
   'ali-bakers': { query: 'Ali Bakers', title: 'Ali Bakers', website: 'http://www.alibakers.pk/', phone: '+924235761234', phoneLabel: '042 35761234', address: '12 Main Blvd, Gulberg, Lahore' },
-  'butt-karahi': { query: 'Butt Karahi House', title: 'Butt Karahi House', phone: '+923001112222', phoneLabel: '0300 1112222', address: 'Lakshmi Chowk, Lahore', rating: '4.4', reviews: '320', claimable: true },
+  'butt-karahi': { query: 'Butt Karahi House', title: 'Butt Karahi House', phone: '+923001112222', phoneLabel: '0300 1112222', address: 'Lakshmi Chowk, Lahore', rating: '4.4', reviews: '320', claimable: true, tempClosed: true, review: 'I thought it was permanently closed, but it is open and great!' },
   'haveli-restaurant': { title: 'Haveli Restaurant', address: 'Fort Road Food Street, Lahore', rating: '4.2', reviews: '1,024' },
   'haveli-sweets': { title: 'Haveli Sweets', website: 'https://havelisweets.pk/', address: 'Mall Road, Lahore' },
   zamzam: { query: 'Zam Zam Tailors', title: 'Zam Zam Tailors', closed: true, address: 'Anarkali, Lahore' },
@@ -70,10 +70,12 @@ function placeHtml(p) {
     <h1 class="DUwDvf">${esc(p.title)}</h1>
     ${p.rating ? `<div class="F7nice"><span aria-hidden="true">${p.rating}</span><span role="img" aria-label="${p.rating} stars "></span><span role="img" aria-label="${p.reviews} reviews">(${p.reviews})</span></div>` : ''}
     ${p.closed ? '<div><span>Permanently closed</span></div>' : ''}
+    ${p.tempClosed ? '<div><span>Temporarily closed</span></div>' : ''}
     ${p.address ? `<button data-item-id="address" aria-label="Address: ${esc(p.address)}"><div>${esc(p.address)}</div></button>` : ''}
     ${p.website ? `<a data-item-id="authority" href="${esc(p.website)}" aria-label="Website: ${esc(host)}"><div>${esc(host)}</div></a>` : ''}
     ${p.phone ? `<button data-item-id="phone:tel:${esc(p.phone)}" aria-label="Phone: ${esc(p.phoneLabel)}"><div>${esc(p.phoneLabel)}</div></button>` : ''}
     ${p.claimable ? '<a href="#claim">Claim this business</a>' : ''}
+    ${p.review ? `<div class="jftiEf"><span class="wiI7pd">${esc(p.review)}</span></div>` : ''}
   </div>`;
 }
 
@@ -91,6 +93,7 @@ function listPage(q, items) {
 
 function mapsSearch(q, scenario) {
   if (q.startsWith('Eiffel Tower') && scenario.mapsCanaryBroken) return renderLater(placeHtml({ title: 'Eiffel Tower', address: 'Paris' }));
+  if (q.includes('Empty List')) return listPage(q, []);
   if (q.includes('Haveli Restaurant')) return listPage(q, [['Haveli Sweets', 'haveli-sweets'], ['Haveli Restaurant', 'haveli-restaurant']]);
   const place = Object.values(PLACES).find((p) => p.query && q.includes(p.query));
   if (place) return renderLater(placeHtml(place));

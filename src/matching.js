@@ -42,8 +42,10 @@ function nameSimilar(a, b) {
   if (na === nb) return true;
   const ca = na.replace(/ /g, '');
   const cb = nb.replace(/ /g, '');
-  const [short, long] = ca.length <= cb.length ? [ca, cb] : [cb, ca];
-  if (long.includes(short) && (short.length >= 5 || short.length >= 0.6 * long.length)) return true;
+  const [short, long, shortText] = ca.length <= cb.length ? [ca, cb, na] : [cb, ca, nb];
+  // "Salon" is inside "Salon Zara", but a name made only of generic words doesn't identify a business.
+  const distinctive = shortText.split(' ').some((t) => !GENERIC_WORDS.has(t) && !STOP_WORDS.has(t));
+  if (distinctive && long.includes(short) && (short.length >= 5 || short.length >= 0.6 * long.length)) return true;
   const words = (s) => new Set(s.split(' ').filter((t) => t.length >= 3 && !STOP_WORDS.has(t)));
   const ta = words(na);
   const tb = words(nb);
@@ -267,6 +269,34 @@ export function uniqueUrls(urls) {
   return out;
 }
 
+// Where mobile numbers can be told apart from landlines, only mobiles get a WhatsApp link.
+// Countries not listed here (e.g. USA/Canada, where they look the same) always get one.
+const MOBILE_PREFIXES = {
+  92: /^923/, // Pakistan
+  91: /^91[6-9]/, // India
+  880: /^8801[3-9]/, // Bangladesh
+  971: /^9715/, // UAE
+  966: /^9665/, // Saudi Arabia
+  974: /^974[3567]/, // Qatar
+  965: /^965[569]/, // Kuwait
+  968: /^968[79]/, // Oman
+  973: /^973[36]/, // Bahrain
+  44: /^447/, // UK
+  353: /^3538/, // Ireland
+  61: /^614/, // Australia
+  64: /^642/, // New Zealand
+  27: /^27[6-8]/, // South Africa
+  234: /^234[789]/, // Nigeria
+  254: /^254[17]/, // Kenya
+  20: /^201/, // Egypt
+  90: /^905/, // Turkey
+  62: /^628/, // Indonesia
+  63: /^639/, // Philippines
+  60: /^601/, // Malaysia
+  94: /^947/, // Sri Lanka
+  977: /^9779/, // Nepal
+};
+
 /** wa.me link from a phone number, using the country code for local numbers ("0300…" → "92300…"). */
 export function toWhatsApp(phone, countryCode = '') {
   if (!phone) return null;
@@ -278,7 +308,8 @@ export function toWhatsApp(phone, countryCode = '') {
     else if (countryCode && !digits.startsWith(countryCode) && digits.length <= 10) digits = countryCode + digits;
   }
   if (digits.length < 10 || digits.length > 15) return null;
-  // Pakistan: only 03xx numbers are mobiles, so landlines don't get a WhatsApp link.
-  if (digits.startsWith('92') && countryCode === '92' && !digits.startsWith('923')) return null;
+  // Country codes never share a prefix, so at most one entry matches.
+  const code = Object.keys(MOBILE_PREFIXES).find((c) => digits.startsWith(c));
+  if (code && !MOBILE_PREFIXES[code].test(digits)) return null;
   return `https://wa.me/${digits}`;
 }
