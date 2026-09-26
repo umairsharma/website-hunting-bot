@@ -1,6 +1,35 @@
 {
  "version": 1,
  "places": {
-
+  "node/12408630521": {"status":"closed","name":"Pizza Da Napoli, Lahore","checked":"2026-09-26"},
+  "node/13946160600": {"status":"has_website","name":"Manji Dental & Healthcare Centre","checked":"2026-09-26","website":"manjidental.com","layer":2},
+  "node/4400612990": {"status":"has_website","name":"Turkish Restaurant & Cafe","checked":"2026-09-26","website":"turkishairlines.com","layer":3},
+  "node/4469615189": {"status":"lead","name":"Dr. Nighat Tahira Consultant Acupuncturist","checked":"2026-09-26"},
+  "node/4523656630": {"status":"lead","name":"Hafiz Car WorkShop","checked":"2026-09-26"},
+  "node/6180693585": {"status":"lead","name":"Nawaz Hair Fashion","checked":"2026-09-26"},
+  "node/6300661985": {"status":"lead","name":"ZamZam Bakers And Sweets","checked":"2026-09-26"},
+  "node/11743300721": {"status":"lead","name":"Asif Fitness Club","checked":"2026-09-26"},
+  "node/4558031291": {"status":"lead","name":"LA ATRIUM","checked":"2026-09-26"},
+  "node/8018745638": {"status":"has_website","name":"Smile Hub Clinics","checked":"2026-09-26","website":"smilehubclinics.com","layer":2},
+  "node/4666716591": {"status":"lead","name":"Fam Flats","checked":"2026-09-26"},
+  "node/4490199294": {"status":"has_website","name":"Hijama Medication & Cupping Therapy","checked":"2026-09-26","website":"hijamamedication.com","layer":2},
+  "node/4602390092": {"status":"lead","name":"Saleem Autos","checked":"2026-09-26"},
+  "node/4533509193": {"status":"has_website","name":"Madni Traders","checked":"2026-09-26","website":"madnitraders.com.pk","layer":2},
+  "way/1155861278": {"status":"has_website","name":"Jalal Sons","checked":"2026-09-26","website":"jalalsons.com.pk","layer":2},
+  "node/11743300723": {"status":"lead","name":"Shape Up Fitness Studio","checked":"2026-09-26"},
+  "node/4659566189": {"status":"has_website","name":"the restaurant","checked":"2026-09-26","website":"fredtherestaurant.com","layer":3},
+  "node/11515510569": {"status":"lead","name":"Dentist","checked":"2026-09-26"},
+  "node/7130653492": {"status":"has_website","name":"Chaye Qawali","checked":"2026-09-26","website":"chayeqawali.pk","layer":2},
+  "node/5082508321": {"status":"has_website","name":"Al shifa medical centre","checked":"2026-09-26","website":"alshifamedicalcenter.com","layer":3},
+  "node/5565817322": {"status":"has_website","name":"Danish Traders","checked":"2026-09-26","website":"danishtraders.pk","layer":3},
+  "node/8406351664": {"status":"lead","name":"Beautello Ladies Salon","checked":"2026-09-26"},
+  "node/9235313992": {"status":"lead","name":"Pak Madina Bakers","checked":"2026-09-26"},
+  "node/13417439118": {"status":"lead","name":"Sky Gym","checked":"2026-09-26"},
+  "node/4666715291": {"status":"lead","name":"SHOKAT HOTEL","checked":"2026-09-26"},
+  "node/1750454167": {"status":"has_website","name":"Dr. Qazi and Associates","checked":"2026-09-26","website":"qazi.dental","layer":2},
+  "node/4691727591": {"status":"lead","name":"Mr.Chicks","checked":"2026-09-26"},
+  "node/6087117985": {"status":"lead","name":"Dr. Mehmood Ali Malik","checked":"2026-09-26"},
+  "node/9235314010": {"status":"lead","name":"Shahbaz Honda","checked":"2026-09-26"},
+  "node/5510381391": {"status":"lead","name":"Scissors","checked":"2026-09-26"}
  }
 }

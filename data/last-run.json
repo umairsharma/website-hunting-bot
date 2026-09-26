@@ -1,17 +1,24 @@
 {
-  "startedAt": "2026-09-26T18:30:31.931Z",
-  "finishedAt": "2026-09-26T18:44:41.340Z",
-  "minutes": 14.2,
+  "startedAt": "2026-09-26T18:55:32.168Z",
+  "finishedAt": "2026-09-26T19:18:51.645Z",
+  "minutes": 23.3,
   "place": "Lahore, Pakistan",
   "area": "Lahore District, Lahore Division, Punjab, Pakistan",
-  "candidates": 0,
-  "checked": 0,
-  "leads": 0,
-  "hasWebsite": 0,
-  "closed": 0,
+  "candidates": 726,
+  "checked": 30,
+  "leads": 18,
+  "hasWebsite": 11,
+  "closed": 1,
   "unverified": 0,
-  "pending": 0,
-  "searchEngines": {},
-  "warnings": [],
-  "error": "Could not reach any OpenStreetMap (Overpass) server. It will retry next run."
+  "pending": 696,
+  "searchEngines": {
+    "google": "broken",
+    "bing": "ok",
+    "duckduckgo": "untested"
+  },
+  "warnings": [
+    "OpenStreetMap servers were busy, so these were skipped this run: Clothes / tailor, Real estate agent.",
+    "Web search: Google didn't work, so it used Bing."
+  ],
+  "error": null
 }
