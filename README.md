@@ -24,7 +24,7 @@ Open `config.js` → tap ✏️ → change `city`, `country`, `categories` → *
 
 **3. Run it**
 **Actions** tab → **Website Hunting Bot** → **Run workflow** → **Run workflow**.
-After that it runs by itself every day at about 9:17 AM Pakistan time.
+After that it runs by itself every day at 9 AM UK time (GitHub sometimes starts scheduled runs a few minutes late).
 
 ## What you get
 
@@ -53,7 +53,7 @@ The Discord summary always says what happened. Common messages:
 | *config.js has a mistake* | You probably deleted a comma or quote mark. Undo your last edit. |
 
 - **Start over:** delete `data/seen.json`, and everything gets re-checked.
-- **Change the time:** edit the `cron` line in `.github/workflows/hunt.yml`. It's in UTC (Pakistan = UTC+5).
+- **Change the time:** edit the two `cron` lines and the matching times in the `time-check` job in `.github/workflows/hunt.yml`. They're in UTC (UK = UTC+1 in summer, UTC+0 in winter).
 - **Workflow shows a red ❌:** open it and read the "Hunt for leads" step. The error is at the bottom.
 
 ## Good to know
