@@ -6,8 +6,8 @@
 
 export default {
   // Where to hunt. Any city in the world works.
-  city: 'Lahore',
-  country: 'Pakistan',
+  city: 'Birmingham',
+  country: 'United Kingdom',
 
   // 0 = the whole city (or 5 km around `center` below, if you set one).
   // Or a number like 5 = only businesses within 5 km of the city centre (or of `center` below).
@@ -28,8 +28,8 @@ export default {
   // Skip big chains like KFC or McDonald's. They always have websites.
   skipChains: true,
 
-  // Your country's calling code, used to make WhatsApp links. Pakistan = '92'.
-  phoneCountryCode: '92',
+  // Your country's calling code, used to make WhatsApp links. UK = '44', Pakistan = '92'.
+  phoneCountryCode: '44',
 
   // Web search engines for layer 3, tried in this order. If one blocks the bot, it moves to the next.
   searchEngines: ['google', 'bing', 'duckduckgo'],
