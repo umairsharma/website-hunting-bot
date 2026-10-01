@@ -25,6 +25,9 @@ export function endpoints() {
     ]),
     maps: process.env.MAPS_BASE_URL || 'https://www.google.com/maps',
     google: process.env.GOOGLE_BASE_URL || 'https://www.google.com',
+    brave: process.env.BRAVE_BASE_URL || 'https://search.brave.com',
+    braveApi: process.env.BRAVE_API_URL || 'https://api.search.brave.com',
+    startpage: process.env.STARTPAGE_BASE_URL || 'https://www.startpage.com',
     bing: process.env.BING_BASE_URL || 'https://www.bing.com',
     duckduckgo: process.env.DDG_BASE_URL || 'https://html.duckduckgo.com',
   };

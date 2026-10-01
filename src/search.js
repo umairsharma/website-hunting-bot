@@ -1,5 +1,6 @@
 // Layer 3 — web search for "<business name> <city>" to catch websites that Google Maps doesn't link.
-// Google blocks bots often, so Bing and DuckDuckGo are automatic fallbacks.
+// Google blocks bots often, so Brave, Startpage, Bing and DuckDuckGo are automatic fallbacks.
+// Brave uses its official Search API when a BRAVE_API_KEY is set (never blocked), otherwise its website.
 
 import { gotoPage, isBlocked } from './browser.js';
 import { hostOf, unwrapRedirect } from './matching.js';
@@ -17,6 +18,31 @@ const ENGINES = {
       .filter((a) => a.querySelector('h3'))
       .map((a) => ({ url: a.href, title: a.querySelector('h3').textContent.trim() })),
   },
+  brave: {
+    label: 'Brave',
+    url: (ep, q) => `${ep.brave}/search?q=${encodeURIComponent(q)}&source=web`,
+    ready: '#results, main',
+    // Brave renames its CSS classes often, so take every outside link in the results area.
+    extract: () => {
+      const root = document.querySelector('#results') || document.querySelector('main') || document.body;
+      return Array.from(root.querySelectorAll('a[href^="http"]'))
+        .filter((a) => !/(^|\.)brave\.com$/i.test(a.hostname) && !a.closest('[data-type="ad"], .ad, [class*="sponsored"]'))
+        .map((a) => ({ url: a.href, title: ((a.querySelector('.title, [class*="title"]') || a).textContent || '').trim() }))
+        .filter((r) => r.title);
+    },
+  },
+  startpage: {
+    label: 'Startpage',
+    url: (ep, q) => `${ep.startpage}/sp/search?query=${encodeURIComponent(q)}&cat=web&language=english`,
+    ready: '.w-gl, .result, #main',
+    extract: () => {
+      const root = document.querySelector('.w-gl') || document.querySelector('#main') || document.body;
+      return Array.from(root.querySelectorAll('a[href^="http"]'))
+        .filter((a) => !/(^|\.)startpage\.com$/i.test(a.hostname) && !a.closest('[class*="ad-"], [class*="sponsored"]'))
+        .map((a) => ({ url: a.href, title: ((a.querySelector('h2, h3, .wgl-title, [class*="title"]') || a).textContent || '').trim() }))
+        .filter((r) => r.title);
+    },
+  },
   bing: {
     label: 'Bing',
     url: (ep, q) => `${ep.bing}/search?q=${encodeURIComponent(q)}&setlang=en`,
@@ -33,13 +59,39 @@ const ENGINES = {
   },
 };
 
-export const engineLabel = (name) => ENGINES[name]?.label || name;
+export const ENGINE_NAMES = Object.keys(ENGINES);
+
+export const engineLabel = (name) => (name === 'brave' && process.env.BRAVE_API_KEY ? 'Brave (API)' : ENGINES[name]?.label || name);
+
+/** Brave Search API: JSON over HTTPS, no browser, made for bots. */
+async function runBraveApi(query, ep, key) {
+  try {
+    const params = new URLSearchParams({ q: query, count: '10' });
+    const res = await fetch(`${ep.braveApi}/res/v1/web/search?${params}`, {
+      headers: { Accept: 'application/json', 'X-Subscription-Token': key },
+      signal: AbortSignal.timeout(20000),
+    });
+    if (res.status === 429) return { blocked: true }; // over the plan's limit
+    if (res.status === 401 || res.status === 403 || res.status === 422) {
+      return { error: `the BRAVE_API_KEY was refused (HTTP ${res.status})`, fatal: true };
+    }
+    if (!res.ok) return { error: `HTTP ${res.status}` };
+    const json = await res.json();
+    const results = (json.web?.results || [])
+      .filter((r) => /^https?:\/\//i.test(r.url || ''))
+      .map((r) => ({ url: r.url, title: String(r.title || '').replace(/<[^>]+>/g, '').trim() }));
+    return { results };
+  } catch (err) {
+    return { error: String(err.message || err).split('\n')[0] };
+  }
+}
 
 async function runEngine(page, name, query, ep) {
+  if (name === 'brave' && process.env.BRAVE_API_KEY) return runBraveApi(query, ep, process.env.BRAVE_API_KEY);
   const engine = ENGINES[name];
   try {
-    await gotoPage(page, engine.url(ep, query));
-    if (await isBlocked(page)) return { blocked: true };
+    const response = await gotoPage(page, engine.url(ep, query));
+    if (response?.status() === 429 || (await isBlocked(page))) return { blocked: true };
     await page.waitForSelector(engine.ready, { state: 'attached', timeout: 15000 }).catch(() => {});
     if (await isBlocked(page)) return { blocked: true };
     const raw = await page.evaluate(engine.extract);
@@ -93,7 +145,7 @@ export function createSearcher({ page, order, ep, delay = () => 0, log = () => {
       }
       if (r.error) {
         st.errors += 1;
-        if (st.errors >= 3) st.status = 'broken';
+        if (st.errors >= 3 || r.fatal) st.status = 'broken';
         log(`   ${engineLabel(name)} error: ${r.error}`);
         continue;
       }

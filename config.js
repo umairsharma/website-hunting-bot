@@ -32,7 +32,9 @@ export default {
   phoneCountryCode: '44',
 
   // Web search engines for layer 3, tried in this order. If one blocks the bot, it moves to the next.
-  searchEngines: ['google', 'bing', 'duckduckgo'],
+  // Options: 'google', 'brave', 'startpage', 'bing', 'duckduckgo'.
+  // Brave never blocks if you add a free BRAVE_API_KEY secret (see README).
+  searchEngines: ['google', 'brave', 'startpage', 'bing', 'duckduckgo'],
 
   // If Google Maps can't be read (blocked or changed):
   //   true  = check nothing that run, so you never get half-checked leads

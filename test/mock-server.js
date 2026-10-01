@@ -113,6 +113,15 @@ function ddgHtml(results) {
     `<div class="result results_links results_links_deep web-result"><div class="links_main result__body"><h2 class="result__title"><a rel="nofollow" class="result__a" href="//duckduckgo.com/l/?uddg=${encodeURIComponent(r.url)}&amp;rut=abc">${esc(r.title)}</a></h2></div></div>`).join('')}</div>`);
 }
 
+// Brave and Startpage: plausible markup with ads and the engine's own links mixed in, like the real pages.
+const braveHtml = (results) => page(`<main><div id="results">${results.map((r) =>
+  `<div class="snippet" data-type="web"><a href="${esc(r.url)}"><div class="title">${esc(r.title)}</div></a><a href="https://search.brave.com/goggles">More</a></div>`).join('')
+}<div data-type="ad"><a href="https://ads.example.com/"><div class="title">Sponsored</div></a></div></div></main>`);
+
+const startpageHtml = (results) => page(`<div id="main"><section class="w-gl">${results.map((r) =>
+  `<div class="result"><a class="result-link" href="${esc(r.url)}"><h2 class="wgl-title">${esc(r.title)}</h2></a><a href="https://www.startpage.com/av/proxy?u=x">Anonymous View</a></div>`).join('')
+}</section></div>`);
+
 function readBody(req) {
   return new Promise((resolve) => {
     let data = '';
@@ -122,10 +131,10 @@ function readBody(req) {
 }
 
 /**
- * scenario: { googleBlockOn?: string, bingWorks?: boolean, mapsCanaryBroken?: boolean }
+ * scenario: { googleBlockOn?: string, bingWorks?: boolean, mapsCanaryBroken?: boolean, braveWebBlocked?: boolean, startpageBlocked?: boolean }
  */
 export async function startMockServer(scenario = {}) {
-  const requests = { overpass: [], maps: [], google: [], bing: [], ddg: [], discord: [] };
+  const requests = { overpass: [], maps: [], google: [], brave: [], braveApi: [], startpage: [], bing: [], ddg: [], discord: [] };
   let discordCalls = 0;
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://mock');
@@ -162,6 +171,26 @@ export async function startMockServer(scenario = {}) {
     if (p.startsWith('/google/sorry')) {
       return html(page('<p>Our systems have detected unusual traffic from your computer network.</p>'), 429);
     }
+    if (p === '/brave/search') {
+      const q = url.searchParams.get('q');
+      requests.brave.push(q);
+      if (scenario.braveWebBlocked) return html(page('<p>Too many requests</p>'), 429);
+      return html(braveHtml(resultsFor(q)));
+    }
+    if (p === '/brave-api/res/v1/web/search') {
+      const q = url.searchParams.get('q');
+      requests.braveApi.push({ q, key: req.headers['x-subscription-token'] });
+      if (req.headers['x-subscription-token'] !== 'good-key') return send(401, 'application/json', '{"type":"ErrorResponse"}');
+      const results = resultsFor(q).map((r) => ({ url: r.url, title: r.title.replace('Eiffel', '<strong>Eiffel</strong>') }));
+      return send(200, 'application/json', JSON.stringify({ web: { results } }));
+    }
+    if (p === '/startpage/sp/search') {
+      const q = url.searchParams.get('query');
+      requests.startpage.push(q);
+      if (scenario.startpageBlocked) return send(302, 'text/plain', '', { Location: '/startpage/sp/captcha-block?x=1' });
+      return html(startpageHtml(resultsFor(q)));
+    }
+    if (p.startsWith('/startpage/sp/captcha-block')) return html(page('<p>Please confirm you are not a robot.</p>'));
     if (p === '/bing/search') {
       const q = url.searchParams.get('q');
       requests.bing.push(q);

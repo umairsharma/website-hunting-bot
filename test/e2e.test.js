@@ -9,6 +9,8 @@ import { startMockServer } from './mock-server.js';
 import { run } from '../src/run.js';
 import { launchBrowser } from '../src/browser.js';
 import { checkMaps } from '../src/maps.js';
+import { createSearcher } from '../src/search.js';
+import { endpoints } from '../src/util.js';
 
 const CONFIG = {
   city: 'Lahore',
@@ -28,6 +30,9 @@ async function withServer(scenario, fn) {
     MAPS_BASE_URL: `${server.base}/maps`,
     GOOGLE_BASE_URL: `${server.base}/google`,
     BING_BASE_URL: `${server.base}/bing`,
+    BRAVE_BASE_URL: `${server.base}/brave`,
+    BRAVE_API_URL: `${server.base}/brave-api`,
+    STARTPAGE_BASE_URL: `${server.base}/startpage`,
     DDG_BASE_URL: `${server.base}/ddg`,
   };
   const saved = {};
@@ -175,6 +180,81 @@ test('Google Maps: a results list that never fills in is an error, not "not on M
       assert.match(r.reason, /results list/);
     } finally {
       await browser.close();
+    }
+  });
+});
+
+const BIZ = { searchName: 'Rehman Dental Clinic', city: 'Lahore' };
+
+test('Brave website: results read, its own links and ads skipped; Startpage used when Brave blocks', { timeout: 120000 }, async () => {
+  await withServer({}, async () => {
+    const { browser, context } = await launchBrowser();
+    try {
+      const searcher = createSearcher({ page: await context.newPage(), order: ['brave'], ep: endpoints() });
+      const r = await searcher.search(BIZ);
+      assert.equal(r.status, 'ok');
+      assert.equal(r.engine, 'brave');
+      assert.deepEqual(r.results.map((x) => x.url), [
+        'https://www.marham.pk/doctors/lahore/dentist/dr-rehman', 'https://www.facebook.com/rehmandental', 'https://smilecare-lahore.com/',
+      ]);
+      assert.equal(r.results[2].title, 'Rehman Dental Clinic - Smile Care Lahore');
+    } finally {
+      await browser.close();
+    }
+  });
+  await withServer({ braveWebBlocked: true }, async (server) => {
+    const { browser, context } = await launchBrowser();
+    try {
+      const searcher = createSearcher({ page: await context.newPage(), order: ['brave', 'startpage'], ep: endpoints() });
+      const r = await searcher.search(BIZ);
+      assert.equal(searcher.state.brave.status, 'blocked'); // HTTP 429 counts as a block
+      assert.equal(r.engine, 'startpage');
+      assert.deepEqual(r.results.map((x) => x.url), [
+        'https://www.marham.pk/doctors/lahore/dentist/dr-rehman', 'https://www.facebook.com/rehmandental', 'https://smilecare-lahore.com/',
+      ]);
+      assert.equal(server.requests.startpage.length, 2); // self-test + the real search
+    } finally {
+      await browser.close();
+    }
+  });
+});
+
+test('Startpage captcha page counts as blocked', { timeout: 60000 }, async () => {
+  await withServer({ startpageBlocked: true }, async () => {
+    const { browser, context } = await launchBrowser();
+    try {
+      const searcher = createSearcher({ page: await context.newPage(), order: ['startpage'], ep: endpoints() });
+      const r = await searcher.search(BIZ);
+      assert.equal(r.status, 'unavailable');
+      assert.equal(r.allDead, true);
+      assert.equal(searcher.state.startpage.status, 'blocked');
+    } finally {
+      await browser.close();
+    }
+  });
+});
+
+test('Brave Search API: used when BRAVE_API_KEY is set (no browser needed); a bad key switches it off', { timeout: 30000 }, async () => {
+  await withServer({}, async (server) => {
+    const saved = process.env.BRAVE_API_KEY;
+    try {
+      process.env.BRAVE_API_KEY = 'good-key';
+      const searcher = createSearcher({ page: null, order: ['brave'], ep: endpoints() });
+      const r = await searcher.search(BIZ);
+      assert.equal(r.status, 'ok');
+      assert.equal(searcher.state.brave.status, 'ok');
+      assert.equal(r.results.length, 3);
+      assert.equal(server.requests.braveApi[0].q, 'Eiffel Tower official website'); // self-test first
+      assert.equal(server.requests.brave.length, 0); // the website was never touched
+
+      process.env.BRAVE_API_KEY = 'wrong-key';
+      const bad = createSearcher({ page: null, order: ['brave'], ep: endpoints() });
+      const r2 = await bad.search(BIZ);
+      assert.equal(r2.status, 'unavailable');
+      assert.equal(bad.state.brave.status, 'broken');
+    } finally {
+      if (saved === undefined) delete process.env.BRAVE_API_KEY;
+      else process.env.BRAVE_API_KEY = saved;
     }
   });
 });
