@@ -13,6 +13,18 @@ const clip = (value, max) => {
 };
 const safeUrl = (u) => String(u).replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/ /g, '%20');
 
+/** "📍 Google Maps" field: their listing when the bot found one, otherwise the spot on the map. */
+function mapsField(lead) {
+  let url = lead.mapsUrl && /^https?:\/\//.test(lead.mapsUrl) ? safeUrl(lead.mapsUrl) : null;
+  if (url && url.length > 900) {
+    // Too long for a Discord field: search Maps for the name instead.
+    url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([lead.name, lead.address || lead.city].filter(Boolean).join(', '))}`;
+  }
+  if (!url) return null;
+  const value = lead.onMaps ? `[Open their Google Maps listing](${url})` : `Not listed on Google Maps · [See the location](${url})`;
+  return { name: '📍 Google Maps', value };
+}
+
 export function leadEmbed(lead) {
   const hot = (lead.reviews || 0) >= HOT_REVIEWS;
   const fields = [{ name: 'Category', value: clip(lead.categoryLabel || '—', 1024), inline: true }];
@@ -25,6 +37,8 @@ export function leadEmbed(lead) {
     fields.push({ name: 'Google rating', value: `⭐ ${lead.rating}${count}`, inline: true });
   }
   if (lead.address) fields.push({ name: 'Address', value: clip(lead.address, 1024) });
+  const maps = mapsField(lead);
+  if (maps) fields.push(maps);
   if (lead.email) fields.push({ name: 'Email', value: clip(lead.email, 1024) });
   if (lead.socials?.length) {
     const links = lead.socials.map((u) => `[${prettySite(hostOf(u))}](${safeUrl(u)})`).join(' · ');

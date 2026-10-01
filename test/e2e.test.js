@@ -87,6 +87,7 @@ test('full run: 3 layers, Google blocked mid-run → falls back, Discord gets le
     assert.ok(butt.notes.some((n) => /temporarily closed/.test(n))); // and a review mentioning "permanently closed" didn't count
     assert.match(butt.checks, /Google Maps ✓ · Google ✓/);
     assert.ok(butt.mapsUrl.startsWith(`${server.base}/maps/`));
+    assert.equal(butt.onMaps, true);
 
     const rehman = result.leads.find((l) => l.name === 'Rehman Dental Clinic');
     assert.ok(rehman.notes.some((n) => /Facebook page/.test(n)), rehman.notes.join(' | '));
@@ -97,6 +98,7 @@ test('full run: 3 layers, Google blocked mid-run → falls back, Discord gets le
     const gone = result.leads.find((l) => l.name === 'Gone Store');
     assert.ok(gone.notes.some((n) => /Not on Google Maps/.test(n)));
     assert.equal(gone.mapsUrl, 'https://www.google.com/maps/search/?api=1&query=31.5,74.3');
+    assert.equal(gone.onMaps, false);
     assert.equal(gone.whatsapp, null);
 
     // Discord: first POST got a 429 and was retried; one message with the summary + 3 lead cards
@@ -107,6 +109,7 @@ test('full run: 3 layers, Google blocked mid-run → falls back, Discord gets le
     assert.match(msg.content, /Google blocked the bot, Bing didn't work, so it used DuckDuckGo/);
     assert.deepEqual(msg.allowed_mentions, { parse: [] });
     assert.ok(msg.embeds.find((e) => e.title === '🔥 Butt Karahi House'));
+    for (const e of msg.embeds) assert.ok(e.fields.some((f) => f.name === '📍 Google Maps'), `${e.title} has no Google Maps link`);
 
     // Saved state
     const seen = readJson(dataDir, 'seen.json');

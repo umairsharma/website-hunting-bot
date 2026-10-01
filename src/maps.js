@@ -31,6 +31,17 @@ function withEnglish(url) {
   }
 }
 
+/**
+ * A short, permanent link to a Google Maps listing. Listing URLs carry the place's ID
+ * ("!1s0x…:0x<id>"); maps.google.com/?cid=<id as a number> always opens that listing.
+ * Falls back to the URL as it is.
+ */
+export function shortMapsUrl(url) {
+  const m = String(url || '').match(/!1s0x[0-9a-f]+:0x([0-9a-f]+)/i);
+  if (!m) return url;
+  return `https://maps.google.com/?cid=${BigInt(`0x${m[1]}`).toString()}`;
+}
+
 /** 'list' (several results), 'place' (one listing open), 'empty' (no results) or null (still loading). */
 function detectView(page) {
   return page
@@ -146,7 +157,7 @@ export async function checkMaps(page, biz, { mapsBase, timeoutMs = 20000 }) {
       .catch(() => {});
     const info = await readPlace(page);
     if (!namesMatch(info.title, biz.names)) return { status: 'not_found', searchUrl, shownInstead: info.title };
-    return { status: 'found', ...info, mapsUrl: page.url() };
+    return { status: 'found', ...info, mapsUrl: shortMapsUrl(page.url()) };
   } catch (err) {
     if (await isBlocked(page).catch(() => false)) return { status: 'blocked' };
     return { status: 'error', reason: String(err.message || err).split('\n')[0] };

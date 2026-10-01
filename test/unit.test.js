@@ -11,6 +11,7 @@ import { buildOverpassQuery, fetchCandidates, pickQueue, toCandidates } from '..
 import { CATEGORIES, resolveCategories } from '../src/categories.js';
 import { applyRunInputs, callingCodeFor, DEFAULT_NICHE } from '../src/inputs.js';
 import { buildMessages, leadEmbed, sendMessages } from '../src/discord.js';
+import { shortMapsUrl } from '../src/maps.js';
 import { normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
 
@@ -385,4 +386,24 @@ test('Run workflow form: the business-type list matches the categories the bot k
   assert.equal(options[0], DEFAULT_NICHE);
   assert.ok(block.includes(`default: "${DEFAULT_NICHE}"`));
   assert.deepEqual(options.slice(1), Object.keys(CATEGORIES));
+});
+
+test('Google Maps link on every lead card: their listing, or the location when not listed', () => {
+  // A real listing URL becomes a short permanent ?cid= link.
+  const long = 'https://www.google.com/maps/place/Crusty+Cottage+Bakery/@52.4,-1.9,17z/data=!3m1!4b1!4m6!3m5!1s0x4870bc5f0d3bb1c3:0x8a5e3f44a2b1c0d9!8m2!3d52.4!4d-1.9?hl=en';
+  assert.equal(shortMapsUrl(long), `https://maps.google.com/?cid=${BigInt('0x8a5e3f44a2b1c0d9')}`);
+  assert.equal(shortMapsUrl('https://example.com/maps/place/x'), 'https://example.com/maps/place/x');
+
+  const base = { name: 'Crusty Cottage Bakery', categoryLabel: 'Bakery', checks: 'x', city: 'Birmingham' };
+  const listed = leadEmbed({ ...base, onMaps: true, mapsUrl: 'https://maps.google.com/?cid=123' });
+  assert.equal(listed.fields.find((f) => f.name === '📍 Google Maps').value, '[Open their Google Maps listing](https://maps.google.com/?cid=123)');
+  assert.equal(listed.url, 'https://maps.google.com/?cid=123'); // the title still links there too
+
+  const unlisted = leadEmbed({ ...base, onMaps: false, mapsUrl: 'https://www.google.com/maps/search/?api=1&query=52.4,-1.9' });
+  assert.match(unlisted.fields.find((f) => f.name === '📍 Google Maps').value, /^Not listed on Google Maps · \[See the location\]\(https:\/\/www\.google\.com\/maps\/search\//);
+
+  const huge = leadEmbed({ ...base, onMaps: true, address: '1 High St', mapsUrl: `https://www.google.com/maps/place/x/${'a'.repeat(1200)}` });
+  const value = huge.fields.find((f) => f.name === '📍 Google Maps').value;
+  assert.ok(value.length < 1024);
+  assert.ok(value.includes('query=Crusty%20Cottage%20Bakery%2C%201%20High%20St'));
 });
