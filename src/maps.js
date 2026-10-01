@@ -157,6 +157,9 @@ export async function checkMaps(page, biz, { mapsBase, timeoutMs = 20000 }) {
       .catch(() => {});
     const info = await readPlace(page);
     if (!namesMatch(info.title, biz.names)) return { status: 'not_found', searchUrl, shownInstead: info.title };
+    // When a search opens a listing directly, Maps swaps the address bar from /search/ to the listing's
+    // own /place/ link a moment later. Wait for it, so the lead links to the listing, not the search.
+    if (!/\/maps\/place\//.test(page.url())) await page.waitForURL(/\/maps\/place\//, { timeout: 5000 }).catch(() => {});
     return { status: 'found', ...info, mapsUrl: shortMapsUrl(page.url()) };
   } catch (err) {
     if (await isBlocked(page).catch(() => false)) return { status: 'blocked' };

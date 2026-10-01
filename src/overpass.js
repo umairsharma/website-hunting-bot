@@ -175,7 +175,7 @@ function socialUrl(value, site) {
 /** OSM elements → candidate businesses (with safety filters in case a server ignores part of the query). */
 export function toCandidates(elements, { defs, cfg }) {
   const out = [];
-  const seen = new Set();
+  const seen = new Map(); // name → positions already kept
   for (const el of elements) {
     const t = el.tags || {};
     if (!t.name) continue;
@@ -187,10 +187,12 @@ export function toCandidates(elements, { defs, cfg }) {
     const def = defs.find((d) => d.tags.some(({ key, value }) => t[key] === value));
     if (!def) continue;
 
-    // The same shop is sometimes mapped twice (a point and a building) — keep one.
-    const dupeKey = `${compact(t.name)}@${lat.toFixed(3)},${lon.toFixed(3)}`;
-    if (seen.has(dupeKey)) continue;
-    seen.add(dupeKey);
+    // The same shop is sometimes mapped twice (a point and a building, or two points) — keep one.
+    // Same name within about 150 m counts as the same shop.
+    const nameKey = compact(t.name);
+    const spots = seen.get(nameKey) || [];
+    if (spots.some(([a, b]) => Math.abs(a - lat) < 0.0014 && Math.abs(b - lon) * Math.cos((lat * Math.PI) / 180) < 0.0014)) continue;
+    seen.set(nameKey, [...spots, [lat, lon]]);
 
     const names = [...new Set(
       [t.name, t['name:en'], ...(t.alt_name || '').split(';'), t.official_name, t.short_name]

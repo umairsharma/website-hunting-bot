@@ -172,9 +172,14 @@ test('toCandidates: filters chains, websites, unnamed and duplicates', () => {
     { type: 'node', id: 6, lat: 31.5, lon: 74.3, tags: { name: 'Book Stall', shop: 'books' } },
     { type: 'node', id: 7, lat: 31.5, lon: 74.3, tags: { name: 'لاہور کڑاہی', 'name:en': 'Lahore Karahi', amenity: 'restaurant', 'contact:facebook': 'lahorekarahi' } },
     { type: 'node', id: 8, lat: 31.6, lon: 74.4, tags: { name: 'Bad Link Cafe', amenity: 'restaurant', 'contact:facebook': 'https://', 'contact:instagram': '@badlink' } },
+    // The same shop mapped twice, 5 m apart across a rounding boundary (31.5675|31.5674): one lead, not two.
+    { type: 'node', id: 9, lat: 31.567535, lon: 74.324944, tags: { name: 'shahbaz tikka house', amenity: 'restaurant' } },
+    { type: 'node', id: 10, lat: 31.567486, lon: 74.324956, tags: { name: 'Shahbaz Tikka House', amenity: 'restaurant' } },
+    // Same name, another branch 2 km away: kept.
+    { type: 'node', id: 11, lat: 31.585, lon: 74.324956, tags: { name: 'Shahbaz Tikka House', amenity: 'restaurant' } },
   ];
   const out = toCandidates(elements, { defs, cfg });
-  assert.deepEqual(out.map((c) => c.key), ['node/1', 'node/7', 'node/8']);
+  assert.deepEqual(out.map((c) => c.key), ['node/1', 'node/7', 'node/8', 'node/9', 'node/11']);
   assert.deepEqual(out[2].socials, ['https://www.instagram.com/badlink']); // the broken Facebook link is dropped
   assert.equal(out[0].phone, '042 35761234');
   assert.equal(out[0].address, 'Main Blvd, Lahore');

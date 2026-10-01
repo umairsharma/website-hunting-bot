@@ -89,7 +89,8 @@ test('full run: 3 layers, Google blocked mid-run → falls back, Discord gets le
     assert.ok(butt.notes.some((n) => /unclaimed/.test(n)));
     assert.ok(butt.notes.some((n) => /temporarily closed/.test(n))); // and a review mentioning "permanently closed" didn't count
     assert.match(butt.checks, /Google Maps ✓ · Google ✓/);
-    assert.ok(butt.mapsUrl.startsWith(`${server.base}/maps/`));
+    // Opened straight from the search, so the link is the listing's short permanent form.
+    assert.match(butt.mapsUrl, /^https:\/\/maps\.google\.com\/\?cid=\d+$/);
     assert.equal(butt.onMaps, true);
 
     const rehman = result.leads.find((l) => l.name === 'Rehman Dental Clinic');
