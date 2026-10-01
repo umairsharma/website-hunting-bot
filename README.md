@@ -26,6 +26,20 @@ Open `config.js` → tap ✏️ → change `city`, `country`, `categories` → *
 **Actions** tab → **Website Hunting Bot** → **Run workflow** → **Run workflow**.
 After that it runs by itself every day at 9 AM UK time (GitHub sometimes starts scheduled runs a few minutes late).
 
+## Run it yourself, anywhere, any business type
+
+Open the **Actions** tab → **Website Hunting Bot** → **Run workflow** (works in the GitHub phone app too). A small form appears:
+
+| Box | What to put | If you leave it empty |
+|---|---|---|
+| **City** | e.g. `Manchester` | uses the city in `config.js` |
+| **Country** | e.g. `United Kingdom` (always fill this in with a new city) | uses the country in `config.js` |
+| **Type of business** | pick one from the list, e.g. `dentist` | uses all the categories in `config.js` |
+
+Then tap the green **Run workflow** button. Results arrive in Discord in about 20–40 minutes, with a 🖐️ line showing what you picked.
+
+These settings are for that one run only. The daily 9 AM run always uses `config.js`, so change that file to change the daily hunt. Businesses already checked in any run are never checked or sent twice.
+
 ## What you get
 
 - **Discord:** a summary, then one card per lead with category, phone, a WhatsApp link, Google rating, address, social pages and notes. 🔥 means 50+ Google reviews (a busy business with no website, so the best leads).

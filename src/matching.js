@@ -307,6 +307,8 @@ export function toWhatsApp(phone, countryCode = '') {
     else if (countryCode && digits.startsWith('0')) digits = countryCode + digits.slice(1);
     else if (countryCode && !digits.startsWith(countryCode) && digits.length <= 10) digits = countryCode + digits;
   }
+  // Still a local number (no country code known), so wa.me can't use it.
+  if (digits.startsWith('0')) return null;
   if (digits.length < 10 || digits.length > 15) return null;
   // Country codes never share a prefix, so at most one entry matches.
   const code = Object.keys(MOBILE_PREFIXES).find((c) => digits.startsWith(c));

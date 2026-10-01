@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { run } from './run.js';
 import { buildMessages, sendMessages } from './discord.js';
+import { applyRunInputs } from './inputs.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dryRun = process.argv.includes('--dry-run');
@@ -25,5 +26,8 @@ try {
   process.exit(1);
 }
 
-const summary = await run({ config, dataDir, dryRun, webhookUrl });
+// City / country / niche typed into the "Run workflow" form (manual runs only).
+const { config: runConfig, label } = applyRunInputs(config);
+if (label) console.log(`🖐️ ${label}`);
+const summary = await run({ config: { ...runConfig, runLabel: label }, dataDir, dryRun, webhookUrl });
 process.exitCode = summary.error ? 1 : 0;

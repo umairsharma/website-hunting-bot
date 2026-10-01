@@ -6,7 +6,61 @@ on:
     # so both times are listed and the "time-check" job below lets through only the one that is 9 AM in London:
     - cron: "0 8 * * *" # 9 AM in summer (BST, UTC+1)
     - cron: "0 9 * * *" # 9 AM in winter (GMT, UTC+0)
-  workflow_dispatch: # adds a "Run workflow" button in the Actions tab
+  # The "Run workflow" button in the Actions tab (also in the GitHub mobile app).
+  # Leave the boxes empty to use config.js. Anything typed here applies to that one run only.
+  workflow_dispatch:
+    inputs:
+      city:
+        description: "City (optional, e.g. Manchester). Empty = city from config.js"
+        required: false
+        default: ""
+      country:
+        description: "Country (optional, e.g. United Kingdom). Fill this in with a new city"
+        required: false
+        default: ""
+      niche:
+        description: "Type of business (optional)"
+        type: choice
+        required: false
+        default: "(daily settings)"
+        options:
+          - "(daily settings)"
+          - restaurant
+          - cafe
+          - fast_food
+          - bakery
+          - salon
+          - dentist
+          - clinic
+          - pharmacy
+          - gym
+          - car_repair
+          - car_dealer
+          - motorcycle
+          - clothes
+          - shoes
+          - jewelry
+          - electronics
+          - furniture
+          - hardware
+          - grocery
+          - butcher
+          - optician
+          - florist
+          - hotel
+          - real_estate
+          - lawyer
+          - accountant
+          - travel_agency
+          - vet
+          - laundry
+          - printing
+          - photographer
+          - pet_shop
+          - books
+          - driving_school
+          - plumber
+          - electrician
 
 permissions:
   contents: write # lets the bot save data/ (leads.csv, seen.json) back to the repo
@@ -65,6 +119,10 @@ jobs:
         run: node src/index.js
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          # From the Run workflow form; empty on the daily run.
+          HUNT_CITY: ${{ inputs.city }}
+          HUNT_COUNTRY: ${{ inputs.country }}
+          HUNT_NICHE: ${{ inputs.niche }}
 
       - name: Save progress
         if: always()

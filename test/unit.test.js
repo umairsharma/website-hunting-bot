@@ -8,7 +8,8 @@ import {
   analyzeResults, businessProfile, classifyUrl, namesMatch, toWhatsApp, unwrapRedirect,
 } from '../src/matching.js';
 import { buildOverpassQuery, fetchCandidates, pickQueue, toCandidates } from '../src/overpass.js';
-import { resolveCategories } from '../src/categories.js';
+import { CATEGORIES, resolveCategories } from '../src/categories.js';
+import { applyRunInputs, callingCodeFor, DEFAULT_NICHE } from '../src/inputs.js';
 import { buildMessages, leadEmbed, sendMessages } from '../src/discord.js';
 import { normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
@@ -116,6 +117,8 @@ test('toWhatsApp builds links only for plausible mobile numbers', () => {
   assert.equal(toWhatsApp('+1 212 555 0100', '92'), 'https://wa.me/12125550100'); // can't tell, so allowed
   assert.equal(toWhatsApp('12345', '92'), null);
   assert.equal(toWhatsApp('', '92'), null);
+  assert.equal(toWhatsApp('07947 595940', ''), null); // local number and no country code known
+  assert.equal(toWhatsApp('+44 7947 595940', ''), 'https://wa.me/447947595940');
 });
 
 test('Overpass query: whole city', () => {
@@ -341,4 +344,44 @@ test('OpenStreetMap: one query per category, cached for a week, old copy used wh
   } finally {
     server.close();
   }
+});
+
+test('Run workflow form: city/country/niche apply to that run only, empty boxes keep config.js', () => {
+  const config = { city: 'Birmingham', country: 'United Kingdom', center: { lat: 52.4, lon: -1.9 }, phoneCountryCode: '44', categories: ['restaurant', 'cafe'] };
+
+  const none = applyRunInputs(config, { HUNT_CITY: '', HUNT_COUNTRY: '', HUNT_NICHE: DEFAULT_NICHE });
+  assert.deepEqual(none.config, config);
+  assert.equal(none.label, null);
+  assert.equal(applyRunInputs(config, {}).label, null); // the daily run sets nothing
+
+  const city = applyRunInputs(config, { HUNT_CITY: ' Lahore ', HUNT_COUNTRY: 'Pakistan', HUNT_NICHE: 'dentist' });
+  assert.equal(city.config.city, 'Lahore');
+  assert.equal(city.config.country, 'Pakistan');
+  assert.equal(city.config.center, null); // Birmingham's centre point must not carry over
+  assert.equal(city.config.phoneCountryCode, '92');
+  assert.deepEqual(city.config.categories, ['dentist']);
+  assert.equal(city.label, 'Manual run: Lahore, Pakistan · Dentist');
+  assert.equal(config.city, 'Birmingham'); // config.js values untouched
+
+  const nicheOnly = applyRunInputs(config, { HUNT_NICHE: 'gym' });
+  assert.equal(nicheOnly.config.city, 'Birmingham');
+  assert.deepEqual(nicheOnly.config.categories, ['gym']);
+  assert.equal(nicheOnly.label, 'Manual run: Gym');
+
+  const noCountry = applyRunInputs(config, { HUNT_CITY: 'Leeds' });
+  assert.equal(noCountry.config.country, '');
+  assert.equal(noCountry.config.phoneCountryCode, '');
+
+  assert.equal(callingCodeFor('UK'), '44');
+  assert.equal(callingCodeFor('united states'), '1');
+  assert.equal(callingCodeFor('Atlantis'), '');
+});
+
+test('Run workflow form: the business-type list matches the categories the bot knows', () => {
+  const yml = fs.readFileSync(new URL('../.github/workflows/hunt.yml', import.meta.url), 'utf8');
+  const block = yml.slice(yml.indexOf('niche:'), yml.indexOf('permissions:'));
+  const options = [...block.matchAll(/^\s+- "?([^"\n]+)"?$/gm)].map((m) => m[1].trim());
+  assert.equal(options[0], DEFAULT_NICHE);
+  assert.ok(block.includes(`default: "${DEFAULT_NICHE}"`));
+  assert.deepEqual(options.slice(1), Object.keys(CATEGORIES));
 });
