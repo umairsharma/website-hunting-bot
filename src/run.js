@@ -126,6 +126,7 @@ async function checkBusiness(biz, ctx) {
       rating: maps?.rating ?? null,
       reviews: maps?.reviews ?? null,
       mapsUrl: maps?.status === 'found' ? maps.mapsUrl : `https://www.google.com/maps/search/?api=1&query=${biz.lat},${biz.lon}`,
+      onMaps: maps?.status === 'found', // mapsUrl is their own listing, not just the spot on the map
       socials: uniqueUrls([...biz.socials, mapsSite?.kind === 'social' ? mapsSite.url : null, ...result.socials]).slice(0, 4),
       notes,
       checks: `Checked: OpenStreetMap ✓ · Google Maps ${maps ? '✓' : '✗'} · ${engineLabel(found.engine)} ✓`,
