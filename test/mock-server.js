@@ -95,8 +95,15 @@ function mapsSearch(q, scenario) {
   if (q.startsWith('Eiffel Tower') && scenario.mapsCanaryBroken) return renderLater(placeHtml({ title: 'Eiffel Tower', address: 'Paris' }));
   if (q.includes('Empty List')) return listPage(q, []);
   if (q.includes('Haveli Restaurant')) return listPage(q, [['Haveli Sweets', 'haveli-sweets'], ['Haveli Restaurant', 'haveli-restaurant']]);
-  const place = Object.values(PLACES).find((p) => p.query && q.includes(p.query));
-  if (place) return renderLater(placeHtml(place));
+  const slug = Object.keys(PLACES).find((k) => PLACES[k].query && q.includes(PLACES[k].query));
+  if (slug) {
+    // Like real Maps: the listing opens, then the address bar switches to the listing's /place/ link.
+    const id = (Object.keys(PLACES).indexOf(slug) + 10).toString(16);
+    return page('<div id="app"></div>', `setTimeout(() => {
+      document.getElementById('app').innerHTML = ${JSON.stringify(placeHtml(PLACES[slug]))};
+    }, 400);
+    setTimeout(() => history.replaceState(null, '', '/maps/place/${slug}/data=!4m6!3m5!1s0x48700000:0x${id}!8m2'), 2500);`);
+  }
   return renderLater(`<div role="main" aria-label="Google Maps"><div>Google Maps can't find <b>${esc(q)}</b></div></div>`);
 }
 
