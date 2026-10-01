@@ -1,23 +1,23 @@
 {
-  "startedAt": "2026-09-30T08:09:20.453Z",
-  "finishedAt": "2026-09-30T08:17:57.241Z",
-  "minutes": 8.6,
-  "place": "Birmingham, United Kingdom",
-  "area": "Birmingham, West Midlands, England, United Kingdom",
-  "candidates": 2446,
+  "startedAt": "2026-10-01T08:13:16.277Z",
+  "finishedAt": "2026-10-01T08:28:10.353Z",
+  "minutes": 14.9,
+  "place": "Lahore, Pakistan",
+  "area": "10 km around Lahore, Lahore Division, Punjab, 54100, Pakistan",
+  "candidates": 776,
   "checked": 30,
-  "leads": 14,
-  "hasWebsite": 11,
-  "closed": 5,
+  "leads": 19,
+  "hasWebsite": 8,
+  "closed": 3,
   "unverified": 0,
-  "pending": 2297,
+  "pending": 716,
   "searchEngines": {
-    "google": "broken",
+    "google": "blocked",
     "bing": "ok",
     "duckduckgo": "untested"
   },
   "warnings": [
-    "Web search: Google didn't work, so it used Bing."
+    "Web search: Google blocked the bot, so it used Bing."
   ],
   "error": null
 }
