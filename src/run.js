@@ -241,6 +241,7 @@ function engineWarnings(state) {
 
 function summaryText(cfg, stats, warnings, fatal) {
   const lines = [`🎯 **Website Hunting Bot** · ${cfg ? placeName(cfg) : 'setup problem'}`];
+  if (cfg?.runLabel) lines.push(`🖐️ ${cfg.runLabel}`);
   if (fatal) {
     lines.push(`❌ **Run failed:** ${String(fatal.message).split('\n')[0].slice(0, 300)}`);
   } else {
