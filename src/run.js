@@ -23,11 +23,13 @@ const DEFAULTS = {
   phoneCountryCode: '',
   searchEngines: KNOWN_ENGINES,
   requireMapsCheck: true,
+  requireWebSearch: true,
   delaySeconds: [4, 9],
   postSummaryWhenEmpty: true,
   // Fixed on purpose (not in config.js):
   maxRunMinutes: 40, // stop starting new checks after this, so the GitHub job never times out
   maxAttempts: 3, // give up on a business that can't be verified after this many runs
+  searchCooldownMinutes: 5, // a search engine that blocks the bot gets one more try after this break
   selfTest: true, // check a known place first, so a broken/blocked Google never produces fake leads
 };
 
@@ -42,6 +44,7 @@ export function normalizeConfig(raw = {}) {
   const delays = Array.isArray(cfg.delaySeconds) ? cfg.delaySeconds : [cfg.delaySeconds, cfg.delaySeconds];
   cfg.delaySeconds = [Number(delays[0]) || 0, Number(delays[1] ?? delays[0]) || 0];
   cfg.phoneCountryCode = String(cfg.phoneCountryCode || '').replace(/\D/g, '');
+  cfg.requireWebSearch = cfg.requireWebSearch !== false;
   const engines = (Array.isArray(cfg.searchEngines) ? cfg.searchEngines : [cfg.searchEngines])
     .map((e) => String(e).toLowerCase().trim());
   const unknown = engines.filter((e) => !KNOWN_ENGINES.includes(e));
@@ -98,17 +101,24 @@ async function checkBusiness(biz, ctx) {
   }
 
   // ── Layer 3: web search ──
-  const found = await searcher.search(biz);
-  if (found.status !== 'ok') {
-    if (found.allDead) {
-      warnings.push('Every search engine blocked the bot, so it stopped early. The rest will be checked next run.');
-      return { status: 'skipped', stop: true };
+  let found = null;
+  if (ctx.searchOn) {
+    found = await searcher.search(biz);
+    if (found.status !== 'ok') {
+      if (!found.allDead) return { status: 'unverified', reason: 'web search failed' };
+      ctx.searchOn = false;
+      found = null;
+      if (cfg.requireWebSearch) {
+        warnings.push('Every search engine blocked the bot, so it stopped early. The rest will be checked next run.');
+        return { status: 'skipped', stop: true };
+      }
+      warnings.push('Every search engine blocked the bot, so the rest were checked with OpenStreetMap + Google Maps only (those leads say "double-check").');
     }
-    return { status: 'unverified', reason: 'web search failed' };
   }
-  const result = analyzeResults(found.results, biz);
+  const result = found ? analyzeResults(found.results, biz) : { hasWebsite: false, possible: [], socials: [] };
   if (result.hasWebsite) return { status: 'has_website', layer: 3, website: hostOf(result.website) };
   for (const host of result.possible) notes.push(`Check first: ${host} might be their website`);
+  if (!found) notes.push("Web search wasn't available, so double-check they don't have a website before pitching");
 
   const mapsSite = maps?.website ? classifyUrl(maps.website) : null;
   const phone = maps?.phone || biz.phone || null;
@@ -129,7 +139,7 @@ async function checkBusiness(biz, ctx) {
       onMaps: maps?.status === 'found', // mapsUrl is their own listing, not just the spot on the map
       socials: uniqueUrls([...biz.socials, mapsSite?.kind === 'social' ? mapsSite.url : null, ...result.socials]).slice(0, 4),
       notes,
-      checks: `Checked: OpenStreetMap ✓ · Google Maps ${maps ? '✓' : '✗'} · ${engineLabel(found.engine)} ✓`,
+      checks: `Checked: OpenStreetMap ✓ · Google Maps ${maps ? '✓' : '✗'} · ${found ? `${engineLabel(found.engine)} ✓` : 'web search ✗'}`,
       city: cfg.city,
       osmUrl: biz.osmUrl,
       foundOn: today(),
@@ -184,8 +194,10 @@ async function checkQueue(ctx) {
   try {
     const mapsPage = await context.newPage();
     const searchPage = await context.newPage();
-    searcher = createSearcher({ page: searchPage, order: cfg.searchEngines, ep, delay, log });
-    const session = { ...ctx, mapsPage, searcher, delay, mapsOn: true };
+    searcher = createSearcher({
+      page: searchPage, order: cfg.searchEngines, ep, delay, log, deadline, cooldownMs: cfg.searchCooldownMinutes * 60000,
+    });
+    const session = { ...ctx, mapsPage, searcher, delay, mapsOn: true, searchOn: true };
 
     if (cfg.selfTest) {
       log('🔧 Google Maps self-test…');

@@ -41,6 +41,11 @@ export default {
   //   false = still check with OpenStreetMap + web search (leads get a warning note)
   requireMapsCheck: true,
 
+  // If every web search engine blocks the bot:
+  //   true  = stop checking for that run (leads are always checked 3 ways)
+  //   false = keep going with OpenStreetMap + Google Maps only (those leads get a "double-check" note)
+  requireWebSearch: true,
+
   // Random pause between checks, in seconds [min, max]. Slower = less chance of being blocked.
   delaySeconds: [4, 9],
 
