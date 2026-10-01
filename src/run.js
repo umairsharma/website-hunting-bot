@@ -4,13 +4,13 @@ import { resolveCategories } from './categories.js';
 import { resolveArea, fetchCandidates, pickQueue } from './overpass.js';
 import { launchBrowser } from './browser.js';
 import { checkMaps, mapsSelfTest } from './maps.js';
-import { createSearcher, engineLabel } from './search.js';
+import { createSearcher, engineLabel, ENGINE_NAMES } from './search.js';
 import { analyzeResults, classifyUrl, hostOf, prettySite, toWhatsApp, uniqueUrls } from './matching.js';
 import { buildMessages, sendMessages } from './discord.js';
 import { appendLead, loadState, saveState, writeLastRun } from './storage.js';
 import { endpoints, randomDelayMs, sleep, today } from './util.js';
 
-const KNOWN_ENGINES = ['google', 'bing', 'duckduckgo'];
+const KNOWN_ENGINES = ENGINE_NAMES; // google, brave, startpage, bing, duckduckgo
 
 const DEFAULTS = {
   city: '',

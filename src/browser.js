@@ -30,14 +30,15 @@ export async function launchBrowser() {
   return { browser, context };
 }
 
-/** Opens a URL and gets past Google's cookie-consent page if one appears. */
+/** Opens a URL and gets past Google's cookie-consent page if one appears. Returns the HTTP response. */
 export async function gotoPage(page, url) {
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
+  const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
   if (/^https?:\/\/consent\./i.test(page.url())) {
     const button = page.getByRole('button', { name: /reject all|accept all|i agree/i }).first();
     await button.click({ timeout: 8000 }).catch(() => {});
     await page.waitForLoadState('domcontentloaded').catch(() => {});
   }
+  return response;
 }
 
 const BLOCK_URL = /\/sorry\/|\/recaptcha\/|\/captcha|[?&]captcha/i;

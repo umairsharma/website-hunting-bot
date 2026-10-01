@@ -242,7 +242,8 @@ test('config: city required, bad values cleaned up', () => {
   assert.deepEqual(cfg.delaySeconds, [3, 3]);
   assert.equal(cfg.maxChecksPerRun, 10);
   assert.match(notes[0], /yahoo/);
-  assert.deepEqual(normalizeConfig({ city: 'X', searchEngines: ['nope'] }).cfg.searchEngines, ['google', 'bing', 'duckduckgo']);
+  assert.deepEqual(normalizeConfig({ city: 'X', searchEngines: ['nope'] }).cfg.searchEngines, ['google', 'brave', 'startpage', 'bing', 'duckduckgo']);
+  assert.deepEqual(normalizeConfig({ city: 'X', searchEngines: ['Brave', 'startpage'] }).cfg.searchEngines, ['brave', 'startpage']);
 });
 
 test('storage: state round-trips, CSV is escaped and formula-safe', () => {

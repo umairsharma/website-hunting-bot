@@ -8,7 +8,7 @@ A business only becomes a lead if it has **no website at all three checks**:
 
 1. **OpenStreetMap:** finds businesses in your city with no website listed.
 2. **Google Maps:** opens each business's listing and looks for a "Website" button.
-3. **Web search:** searches "*business name + city*" to catch websites Maps doesn't show. If Google blocks the bot, it switches to Bing, then DuckDuckGo.
+3. **Web search:** searches "*business name + city*" to catch websites Maps doesn't show. If Google blocks the bot, it switches to Brave, then Startpage (Google's results without the blocking), then Bing, then DuckDuckGo.
 
 Facebook pages, Instagram, Foodpanda and booking sites (Marham, Oladoc…) **don't count** as a website, so a business that only has one of those is still a lead.
 
@@ -40,6 +40,15 @@ Then tap the green **Run workflow** button. Results arrive in Discord in about 2
 
 These settings are for that one run only. The daily 9 AM run always uses `config.js`, so change that file to change the daily hunt. Businesses already checked in any run are never checked or sent twice.
 
+**4. Optional: a Brave Search API key (recommended)**
+Google, Brave and Startpage all sometimes block bots running on GitHub. Brave's official Search API never does. Its free allowance should cover the bot's ~30 searches a day; check the current terms when you sign up, as they may ask for a card.
+1. Sign up at **https://api-dashboard.search.brave.com**, choose the free plan, and copy your API key.
+2. Repo → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
+   - Name: `BRAVE_API_KEY`
+   - Secret: paste the key → **Add secret**
+
+That's it. The Discord summary will say *Brave (API)* when it's being used. Without a key, the bot tries Brave's normal website instead.
+
 ## What you get
 
 - **Discord:** a summary, then one card per lead with category, phone, a WhatsApp link, Google rating, address, social pages and notes. 🔥 means 50+ Google reviews (a busy business with no website, so the best leads).
@@ -61,7 +70,7 @@ The Discord summary always says what happened. Common messages:
 | Message | What to do |
 |---|---|
 | *Google Maps blocked the bot* / *couldn't read Google Maps* | Nothing. It retries next run. If it happens every day, set `requireMapsCheck: false` in `config.js`. |
-| *Web search: Google blocked the bot… used Bing* | Nothing, that's the fallback working. |
+| *Web search: Google blocked the bot… used Brave* (or Startpage / Bing) | Nothing, that's the fallback working. Add a Brave API key (below) so Brave never blocks. |
 | *OpenStreetMap has no businesses…* | Add more categories, set `radiusKm: 0`, or try a bigger city. OpenStreetMap has less data in some countries. |
 | *Every business found has already been checked* | You've used up that area. Add categories or change the city. |
 | *config.js has a mistake* | You probably deleted a comma or quote mark. Undo your last edit. |
