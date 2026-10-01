@@ -180,6 +180,19 @@
   "way/105431757": {"status":"lead","name":"Fairways Physiotherapy Clinic","checked":"2026-09-30"},
   "way/106162185": {"status":"lead","name":"Olton Tyres & Puncture Repairs","checked":"2026-09-30"},
   "way/136385859": {"status":"lead","name":"Cottam Dental","checked":"2026-09-30"},
-  "node/2642258392": {"status":"closed","name":"Vibro-Suite","checked":"2026-09-30"}
+  "node/2642258392": {"status":"closed","name":"Vibro-Suite","checked":"2026-09-30"},
+  "node/6127139562": {"status":"lead","name":"Dark Bull Barbers","checked":"2026-10-01"},
+  "way/223859272": {"status":"lead","name":"Lahore Cottage","checked":"2026-10-01"},
+  "node/6548293029": {"status":"lead","name":"Brunch","checked":"2026-10-01"},
+  "node/2517583448": {"status":"has_website","name":"Blue Banana","checked":"2026-10-01","website":"bluebanana.com","layer":2},
+  "way/1061415047": {"status":"has_website","name":"Provident Housing","checked":"2026-10-01","website":"provident.com","layer":3},
+  "way/106521751": {"status":"has_website","name":"Birmingham Physiocare Ltd","checked":"2026-10-01","website":"birminghamphysiocare.co.uk","layer":2},
+  "way/106784482": {"status":"lead","name":"Motor Body Centre Ltd","checked":"2026-10-01"},
+  "way/1296716398": {"status":"has_website","name":"Batch'd","checked":"2026-10-01","website":"batchd.co.uk","layer":2},
+  "way/137552733": {"status":"has_website","name":"A. W. Davies Dental Surgery","checked":"2026-10-01","website":"thegreensdentalsurgery.com","layer":2},
+  "node/2876970102": {"status":"lead","name":"Team-des Fitness Lts","checked":"2026-10-01"},
+  "node/858011750": {"status":"lead","name":"Sagheer Barbers Shop","checked":"2026-10-01"},
+  "way/74017832": {"status":"lead","name":"BRGRI","checked":"2026-10-01"},
+  "node/9062955869": {"status":"has_website","name":"Coffee Central","checked":"2026-10-01","website":"blacksheepcoffee.co.uk","layer":2}
  }
 }
