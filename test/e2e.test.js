@@ -20,6 +20,7 @@ const CONFIG = {
   phoneCountryCode: '92',
   searchEngines: ['google', 'bing', 'duckduckgo'],
   delaySeconds: [0, 0],
+  searchCooldownMinutes: 0.005, // 0.3 s instead of 5 min
 };
 
 async function withServer(scenario, fn) {
@@ -58,7 +59,9 @@ test('full run: 3 layers, Google blocked mid-run → falls back, Discord gets le
   await withServer({ googleBlockOn: 'Rehman Dental Clinic' }, async (server) => {
     const dataDir = tempDir();
     const logs = [];
-    const result = await run({ config: CONFIG, dataDir, webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m) });
+    // A long break, so Google stays blocked for the rest of this run (second chances are tested separately).
+    const config = { ...CONFIG, searchCooldownMinutes: 30 };
+    const result = await run({ config, dataDir, webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m) });
     const logText = logs.join('\n');
 
     assert.equal(result.error, null, logText);
@@ -223,14 +226,15 @@ test('Brave website: results read, its own links and ads skipped; Startpage used
 });
 
 test('Startpage captcha page counts as blocked', { timeout: 60000 }, async () => {
-  await withServer({ startpageBlocked: true }, async () => {
+  await withServer({ startpageBlocked: true }, async (server) => {
     const { browser, context } = await launchBrowser();
     try {
-      const searcher = createSearcher({ page: await context.newPage(), order: ['startpage'], ep: endpoints() });
+      const searcher = createSearcher({ page: await context.newPage(), order: ['startpage'], ep: endpoints(), cooldownMs: 100 });
       const r = await searcher.search(BIZ);
       assert.equal(r.status, 'unavailable');
       assert.equal(r.allDead, true);
       assert.equal(searcher.state.startpage.status, 'blocked');
+      assert.equal(server.requests.startpage.length, 2); // blocked, then blocked again after its break
     } finally {
       await browser.close();
     }
@@ -259,5 +263,72 @@ test('Brave Search API: used when BRAVE_API_KEY is set (no browser needed); a ba
       if (saved === undefined) delete process.env.BRAVE_API_KEY;
       else process.env.BRAVE_API_KEY = saved;
     }
+  });
+});
+
+test('Search: a blocked engine gets a second chance after a break; a half-loaded self-test is retried', { timeout: 120000 }, async () => {
+  await withServer({ braveBlockFirst: 1 }, async (server) => {
+    const { browser, context } = await launchBrowser();
+    try {
+      const logs = [];
+      const searcher = createSearcher({ page: await context.newPage(), order: ['brave'], ep: endpoints(), log: (m) => logs.push(m), cooldownMs: 300 });
+      const r = await searcher.search(BIZ);
+      assert.equal(r.status, 'ok', logs.join('\n'));
+      assert.equal(r.engine, 'brave');
+      assert.ok(logs.some((l) => /waiting/.test(l)) && logs.some((l) => /Trying Brave again/.test(l)), logs.join('\n'));
+      assert.equal(server.requests.brave.length, 3); // blocked self-test, then self-test + search after the break
+    } finally {
+      await browser.close();
+    }
+  });
+  await withServer({ braveWebBlocked: true }, async (server) => {
+    const { browser, context } = await launchBrowser();
+    try {
+      const searcher = createSearcher({ page: await context.newPage(), order: ['brave'], ep: endpoints(), cooldownMs: 100, maxBlocks: 2 });
+      const r = await searcher.search(BIZ);
+      assert.equal(r.status, 'unavailable');
+      assert.equal(r.allDead, true); // blocked twice = done for this run
+      assert.equal(server.requests.brave.length, 2);
+    } finally {
+      await browser.close();
+    }
+  });
+  await withServer({ bingWorks: true, bingEmptyFirst: true }, async (server) => {
+    const { browser, context } = await launchBrowser();
+    try {
+      const searcher = createSearcher({ page: await context.newPage(), order: ['bing'], ep: endpoints(), retryTestMs: 0 });
+      const r = await searcher.search(BIZ);
+      assert.equal(r.engine, 'bing');
+      assert.equal(server.requests.bing.length, 3); // empty self-test, retried self-test, search
+    } finally {
+      await browser.close();
+    }
+  });
+});
+
+test('Every search engine blocked + requireWebSearch: true → stops early, no half-checked leads', { timeout: 180000 }, async () => {
+  await withServer({ searchDown: true }, async (server) => {
+    const result = await run({ config: CONFIG, dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: () => {} });
+    assert.equal(result.error, null);
+    assert.equal(result.leads.length, 0);
+    assert.ok(result.warnings.some((w) => /stopped early/.test(w)), result.warnings.join(' | '));
+  });
+});
+
+test('Every search engine blocked + requireWebSearch: false → keeps going on OpenStreetMap + Google Maps, leads flagged', { timeout: 180000 }, async () => {
+  await withServer({ searchDown: true }, async (server) => {
+    const result = await run({
+      config: { ...CONFIG, requireWebSearch: false }, dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: () => {},
+    });
+    assert.equal(result.error, null);
+    assert.equal(result.checked, 6);
+    assert.equal(result.hasWebsite, 1); // Ali Bakers, by its Google Maps website button
+    assert.equal(result.closed, 1);
+    assert.deepEqual(result.leads.map((l) => l.name).sort(), ['Butt Karahi House', 'Gone Store', 'Haveli Restaurant', 'Rehman Dental Clinic']);
+    for (const lead of result.leads) {
+      assert.match(lead.checks, /web search ✗/);
+      assert.ok(lead.notes.some((n) => /Web search wasn't available/.test(n)));
+    }
+    assert.ok(result.warnings.some((w) => /OpenStreetMap \+ Google Maps only/.test(w)));
   });
 });

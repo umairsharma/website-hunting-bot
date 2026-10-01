@@ -71,6 +71,7 @@ The Discord summary always says what happened. Common messages:
 |---|---|
 | *Google Maps blocked the bot* / *couldn't read Google Maps* | Nothing. It retries next run. If it happens every day, set `requireMapsCheck: false` in `config.js`. |
 | *Web search: Google blocked the bot… used Brave* (or Startpage / Bing) | Nothing, that's the fallback working. Add a Brave API key (below) so Brave never blocks. |
+| *Every search engine blocked the bot, so it stopped early* | Engines that block get a second try after a 5-minute break. If it keeps happening, add a Brave API key (above), or set `requireWebSearch: false` in `config.js` to keep going with OpenStreetMap + Google Maps only (those leads say "double-check"). |
 | *OpenStreetMap has no businesses…* | Add more categories, set `radiusKm: 0`, or try a bigger city. OpenStreetMap has less data in some countries. |
 | *Every business found has already been checked* | You've used up that area. Add categories or change the city. |
 | *config.js has a mistake* | You probably deleted a comma or quote mark. Undo your last edit. |

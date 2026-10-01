@@ -131,7 +131,9 @@ function readBody(req) {
 }
 
 /**
- * scenario: { googleBlockOn?: string, bingWorks?: boolean, mapsCanaryBroken?: boolean, braveWebBlocked?: boolean, startpageBlocked?: boolean }
+ * scenario: { googleBlockOn?: string, bingWorks?: boolean, mapsCanaryBroken?: boolean, braveWebBlocked?: boolean,
+ *   startpageBlocked?: boolean, searchDown?: boolean (every engine blocks), braveBlockFirst?: number (first N Brave requests get 429),
+ *   bingEmptyFirst?: boolean (Bing's first page has no results) }
  */
 export async function startMockServer(scenario = {}) {
   const requests = { overpass: [], maps: [], google: [], brave: [], braveApi: [], startpage: [], bing: [], ddg: [], discord: [] };
@@ -163,7 +165,7 @@ export async function startMockServer(scenario = {}) {
     if (p === '/google/search') {
       const q = url.searchParams.get('q');
       requests.google.push(q);
-      if (scenario.googleBlockOn && q.includes(scenario.googleBlockOn)) {
+      if (scenario.searchDown || (scenario.googleBlockOn && q.includes(scenario.googleBlockOn))) {
         return send(302, 'text/plain', '', { Location: '/google/sorry/index?continue=search' });
       }
       return html(googleHtml(resultsFor(q)));
@@ -174,7 +176,9 @@ export async function startMockServer(scenario = {}) {
     if (p === '/brave/search') {
       const q = url.searchParams.get('q');
       requests.brave.push(q);
-      if (scenario.braveWebBlocked) return html(page('<p>Too many requests</p>'), 429);
+      if (scenario.braveWebBlocked || scenario.searchDown || requests.brave.length <= (scenario.braveBlockFirst || 0)) {
+        return html(page('<p>Too many requests</p>'), 429);
+      }
       return html(braveHtml(resultsFor(q)));
     }
     if (p === '/brave-api/res/v1/web/search') {
@@ -187,18 +191,21 @@ export async function startMockServer(scenario = {}) {
     if (p === '/startpage/sp/search') {
       const q = url.searchParams.get('query');
       requests.startpage.push(q);
-      if (scenario.startpageBlocked) return send(302, 'text/plain', '', { Location: '/startpage/sp/captcha-block?x=1' });
+      if (scenario.startpageBlocked || scenario.searchDown) return send(302, 'text/plain', '', { Location: '/startpage/sp/captcha-block?x=1' });
       return html(startpageHtml(resultsFor(q)));
     }
     if (p.startsWith('/startpage/sp/captcha-block')) return html(page('<p>Please confirm you are not a robot.</p>'));
     if (p === '/bing/search') {
       const q = url.searchParams.get('q');
       requests.bing.push(q);
+      if (scenario.searchDown) return html(page('<div id="b_captcha">Verify you are human</div>'));
+      if (scenario.bingEmptyFirst && requests.bing.length === 1) return html(bingHtml([]));
       return html(bingHtml(scenario.bingWorks ? resultsFor(q) : []));
     }
     if (p === '/ddg/html/') {
       const q = url.searchParams.get('q');
       requests.ddg.push(q);
+      if (scenario.searchDown) return html(page('<p>Unfortunately, bots use DuckDuckGo too.</p>'));
       return html(ddgHtml(resultsFor(q)));
     }
     if (p === '/discord/webhook' && req.method === 'POST') {

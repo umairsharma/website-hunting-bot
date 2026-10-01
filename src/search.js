@@ -112,35 +112,71 @@ async function runEngine(page, name, query, ep) {
 /**
  * Returns { search(biz), state }.
  * search → { status: 'ok', engine, results } | { status: 'unavailable', allDead }
- * Each engine is self-tested the first time it's needed; blocked/broken engines are skipped for the rest of the run.
+ * Each engine is self-tested the first time it's needed. A broken engine is skipped for the rest of the run.
+ * A blocked engine gets a second chance after a break (blocks like Brave's "too many requests" wear off),
+ * and when every engine is resting the search waits for the first one to come back, if the run has time.
  */
-export function createSearcher({ page, order, ep, delay = () => 0, log = () => {} }) {
+export function createSearcher({
+  page, order, ep, delay = () => 0, log = () => {},
+  cooldownMs = 5 * 60000, maxBlocks = 2, deadline = Infinity, retryTestMs = 5000,
+}) {
   const state = {};
-  for (const name of order) if (ENGINES[name]) state[name] = { status: 'untested', errors: 0 };
+  for (const name of order) if (ENGINES[name]) state[name] = { status: 'untested', errors: 0, blocks: 0, blockedAt: 0 };
 
-  async function selfTest(name) {
+  async function selfTestOnce(name) {
     const r = await runEngine(page, name, SEARCH_CANARY.query, ep);
-    if (r.blocked) return 'blocked';
-    if (r.error || !r.results.some((x) => hostOf(x.url).endsWith(SEARCH_CANARY.expectHost))) return 'broken';
-    return 'ok';
+    if (r.blocked) return { status: 'blocked' };
+    if (r.error) return { status: 'broken', why: r.error };
+    if (!r.results.some((x) => hostOf(x.url).endsWith(SEARCH_CANARY.expectHost))) {
+      return { status: 'broken', why: r.results.length ? 'the official site was missing from the results' : 'no results could be read' };
+    }
+    return { status: 'ok' };
   }
 
-  async function search(biz) {
-    const query = [biz.searchName, biz.city].filter(Boolean).join(' ');
+  async function selfTest(name) {
+    let r = await selfTestOnce(name);
+    if (r.status === 'broken') {
+      // Pages sometimes load half-way; one more look before giving up on the engine.
+      await sleep(retryTestMs);
+      r = await selfTestOnce(name);
+    }
+    log(`   🔧 ${engineLabel(name)} self-test: ${r.status}${r.why ? ` (${r.why})` : ''}`);
+    return r.status;
+  }
+
+  function markBlocked(st) {
+    st.status = 'blocked';
+    st.blocks += 1;
+    st.blockedAt = Date.now();
+  }
+
+  // A blocked engine that hasn't used up its chances can be tried again after the break.
+  const canRetry = (st) => st.status === 'blocked' && st.blocks < maxBlocks;
+  const readyAgain = (st) => canRetry(st) && Date.now() - st.blockedAt >= cooldownMs;
+
+  async function tryEngines(query) {
     let emptyFrom = null;
     for (const name of Object.keys(state)) {
       const st = state[name];
+      if (readyAgain(st)) {
+        log(`   ↩️ Trying ${engineLabel(name)} again after a break`);
+        st.status = 'untested';
+      }
       if (st.status === 'blocked' || st.status === 'broken') continue;
       if (st.status === 'untested') {
-        st.status = await selfTest(name);
-        log(`   🔧 ${engineLabel(name)} self-test: ${st.status}`);
+        const result = await selfTest(name);
+        if (result === 'blocked') {
+          markBlocked(st);
+          continue;
+        }
+        st.status = result;
         if (st.status !== 'ok') continue;
         await sleep(delay());
       }
       const r = await runEngine(page, name, query, ep);
       if (r.blocked) {
-        st.status = 'blocked';
-        log(`   ⛔ ${engineLabel(name)} blocked the bot — switching engine`);
+        markBlocked(st);
+        log(`   ⛔ ${engineLabel(name)} blocked the bot, switching engine${canRetry(st) ? ` (will try it again in ${Math.round(cooldownMs / 60000)} min)` : ''}`);
         continue;
       }
       if (r.error) {
@@ -158,6 +194,25 @@ export function createSearcher({ page, order, ep, delay = () => 0, log = () => {
       return { status: 'ok', engine: name, results: r.results };
     }
     if (emptyFrom) return { status: 'ok', engine: emptyFrom, results: [] };
+    return null;
+  }
+
+  async function search(biz) {
+    const query = [biz.searchName, biz.city].filter(Boolean).join(' ');
+    const found = await tryEngines(query);
+    if (found) return found;
+
+    // Nothing worked. If a blocked engine will get its second chance soon enough, wait for it.
+    const waits = Object.values(state).filter(canRetry).map((st) => st.blockedAt + cooldownMs - Date.now());
+    if (waits.length) {
+      const wait = Math.max(0, Math.min(...waits));
+      if (Date.now() + wait < deadline) {
+        log(`   ⏸️ Every search engine is resting, waiting ${Math.ceil(wait / 60000)} min for one to come back…`);
+        await sleep(wait);
+        const again = await tryEngines(query);
+        if (again) return again;
+      }
+    }
     const allDead = Object.values(state).every((s) => s.status === 'blocked' || s.status === 'broken');
     return { status: 'unavailable', allDead };
   }
