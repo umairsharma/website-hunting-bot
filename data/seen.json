@@ -240,6 +240,13 @@
   "way/107298360": {"status":"has_website","name":"Cartech","checked":"2026-10-01","website":"cartechmot.co.uk","layer":2},
   "way/153792050": {"status":"has_website","name":"The Little Cake Shop","checked":"2026-10-01","website":"littlecakecompany.co.uk","layer":2},
   "way/140429513": {"status":"has_website","name":"Hilltop Dental Spa","checked":"2026-10-01","website":"hilltopdental.co.uk","layer":2},
-  "node/3166867532": {"status":"has_website","name":"Healthier Body","checked":"2026-10-01","website":"healthier.inc","layer":3}
+  "node/3166867532": {"status":"has_website","name":"Healthier Body","checked":"2026-10-01","website":"healthier.inc","layer":3},
+  "node/9008457491": {"status":"lead","name":"Natrulique Hair & Holistic","checked":"2026-10-01"},
+  "node/10742561236": {"status":"has_website","name":"Bilash","checked":"2026-10-01","website":"bilashrestaurants.co.uk","layer":2},
+  "way/167948026": {"status":"has_website","name":"Chase Farm Cafe","checked":"2026-10-01","website":"chasefarmshop.co.uk","layer":2},
+  "node/2535769661": {"status":"has_website","name":"Emily Eve Bridal","checked":"2026-10-01","website":"emilylouisebridal.my.canva.site","layer":2},
+  "way/110560371": {"status":"has_website","name":"J & N Autos","checked":"2026-10-01","website":"jandnautos.co.uk","layer":2},
+  "way/115000613": {"status":"has_website","name":"Newtown Health Centre","checked":"2026-10-01","website":"newtownhealthcentre.co.uk","layer":2},
+  "way/144279337": {"status":"has_website","name":"Superior Estates","checked":"2026-10-01","website":"superiorestates.co.uk","layer":2}
  }
 }

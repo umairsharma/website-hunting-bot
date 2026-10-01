@@ -1,25 +1,26 @@
 {
-  "startedAt": "2026-10-01T08:35:21.477Z",
-  "finishedAt": "2026-10-01T08:43:38.015Z",
-  "minutes": 8.3,
+  "startedAt": "2026-10-01T16:28:14.752Z",
+  "finishedAt": "2026-10-01T16:30:28.934Z",
+  "minutes": 2.2,
   "place": "Birmingham, United Kingdom",
   "area": "Birmingham, West Midlands, England, United Kingdom",
   "candidates": 2446,
-  "checked": 30,
-  "leads": 11,
-  "hasWebsite": 18,
-  "closed": 1,
+  "checked": 7,
+  "leads": 1,
+  "hasWebsite": 6,
+  "closed": 0,
   "unverified": 0,
-  "pending": 2267,
+  "pending": 2260,
   "searchEngines": {
-    "google": "blocked",
+    "google": "broken",
     "brave": "blocked",
     "startpage": "blocked",
-    "bing": "ok",
-    "duckduckgo": "untested"
+    "bing": "broken",
+    "duckduckgo": "blocked"
   },
   "warnings": [
-    "Web search: Google blocked the bot, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
+    "Every search engine blocked the bot, so it stopped early. The rest will be checked next run.",
+    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, Bing didn't work, DuckDuckGo blocked the bot."
   ],
   "error": null
 }
