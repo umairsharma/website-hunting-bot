@@ -754,7 +754,7 @@
    {"type":"way","id":685209726,"center":{"lat":31.4902623,"lon":74.4223198},"tags":{"addr:city":"lahore","building":"yes","ele":"1","name":"LMS Garage","shop":"car_repair"}},
    {"type":"way","id":687498005,"center":{"lat":31.5257353,"lon":74.4467213},"tags":{"addr:city":"Lahore","addr:street":"Barki Road","building":"yes","ele":"1","name":"ZIC Service Center","service:vehicle:car_repair":"yes","service:vehicle:oil_change":"yes","shop":"car_repair"}}
  ]},
- "Birmingham|United Kingdom|0||no-chains|amenity=restaurant": {"fetched": "2026-09-27T02:38:54.900Z", "elements": [
+ "Birmingham|United Kingdom|0||no-chains|amenity=restaurant": {"fetched": "2026-10-04T15:28:47.482Z", "elements": [
    {"type":"node","id":92700622,"lat":52.4341123,"lon":-1.8937292,"tags":{"addr:city":"Birmingham","addr:housenumber":"17","addr:postcode":"B14 7SA","addr:street":"York Road","addr:suburb":"Kings Heath","amenity":"restaurant","fhrs:id":"1833786","internet_access":"wlan","internet_access:fee":"no","name":"Kitchen Garden Cafe","source:addr":"FHRS Open Data"}},
    {"type":"node","id":258084022,"lat":52.4977705,"lon":-1.8712154,"tags":{"amenity":"restaurant","name":"Johnny Wong","source":"survey"}},
    {"type":"node","id":258084023,"lat":52.4974679,"lon":-1.871025,"tags":{"amenity":"restaurant","name":"Wing Wah","source":"survey"}},
@@ -946,7 +946,7 @@
    {"type":"node","id":7055315648,"lat":52.4867624,"lon":-1.9172792,"tags":{"addr:city":"Birmingham","addr:housenumber":"110","addr:postcode":"B18 6RZ","addr:street":"Icknield Street","addr:suburb":"Soho","amenity":"restaurant","fhrs:id":"875592","name":"Klassic Grill","source":"survey","source:addr":"FHRS Open Data"}},
    {"type":"node","id":7077460487,"lat":52.475238,"lon":-1.9064673,"tags":{"addr:city":"Birmingham","addr:postcode":"B1 1RL","addr:street":"Wharfside Street","amenity":"restaurant","diet:vegan":"only","diet:vegetarian":"yes","name":"BA-HA"}},
    {"type":"node","id":7142720886,"lat":52.4747111,"lon":-1.8986139,"tags":{"addr:city":"Birmingham","addr:housenumber":"17","addr:postcode":"B5 4AT","addr:street":"Thorp Street","amenity":"restaurant","contact:facebook":"https://www.facebook.com/themeatshackburgers/","cuisine":"american;local","email":"paul@themeatshack.co.uk","name":"The Meat Shack","opening_hours":"Su 13:00-18:00; Th-Fr 17:00-22:00; Sa 12:00-22:00","phone":"+44 7756 913454"}},
-   {"type":"node","id":7142797285,"lat":52.4804936,"lon":-1.8984955,"tags":{"addr:city":"Birmingham","addr:housenumber":"61-63","addr:postcode":"B2 5LS","addr:street":"Temple Row","amenity":"restaurant","cuisine":"italian","fhrs:id":"1518049","name":"Riva Blu","old_name":"Gino D’Acampo My Restaurant"}},
+   {"type":"node","id":7142797285,"lat":52.4804936,"lon":-1.8984955,"tags":{"addr:city":"Birmingham","addr:housenumber":"61-63","addr:postcode":"B2 5LS","addr:street":"Temple Row","amenity":"restaurant","cuisine":"japanese","name":"Kibou Japanese Kitchen and Bar","opening_date":"2026-10-12"}},
    {"type":"node","id":7143216685,"lat":52.4751057,"lon":-1.8959679,"tags":{"addr:city":"Birmingham","addr:street":"The Arcadian Park","amenity":"restaurant","contact:facebook":"https://www.facebook.com/dezhoustyle","cuisine":"chinese;asian","name":"Dezhou Style Braised Chicken","phone":"+44 121 622 3283"}},
    {"type":"node","id":7143250686,"lat":52.432031,"lon":-1.892819,"tags":{"addr:city":"Birmingham","addr:housenumber":"23","addr:postcode":"B14 7JQ","addr:street":"Alcester Road South","amenity":"restaurant","contact:facebook":"https://www.facebook.com/people/Marmaris-original-Turkish-charcoal-grill/100046139239032/","cuisine":"mediterranean;turkish","email":"Hamzasezer21@hotmail.co.uk","fhrs:id":"1961408","name":"Marmaris Original Turkish Charcoal Grill","opening_hours":"Su 13:00-22:00; Mo-Sa 12:00-23:00","phone":"+44 121 443 2205","source:addr":"FHRS Open Data"}},
    {"type":"node","id":7143298785,"lat":52.4730943,"lon":-1.8957328,"tags":{"addr:city":"Birmingham","addr:housenumber":"115-117","addr:postcode":"B5 6SE","addr:street":"Hurst Street","amenity":"restaurant","contact:facebook":"https://www.facebook.com/Formosaizakaya/","cuisine":"asian","name":"Formosa Izakaya","opening_hours":"Tu-Su 12:00-22:00","phone":"+44 7880 585977"}},
@@ -986,7 +986,6 @@
    {"type":"node","id":12190278901,"lat":52.3982126,"lon":-1.9609515,"tags":{"addr:housenumber":"13","addr:postcode":"B31 3JW","addr:street":"Alvechurch Road","amenity":"restaurant","cuisine":"chinese","name":"Lai Yin Cantonese","opening_hours":"Su, Tu-Th 17:00-22:00; Fr-Sa 17:00-22:30"}},
    {"type":"node","id":12921174590,"lat":52.4762662,"lon":-1.9042428,"tags":{"addr:city":"Birmingham","addr:housename":"Mailbox","addr:housenumber":"48-54","addr:postcode":"B1 1RE","amenity":"restaurant","cuisine":"indian","fhrs:id":"1712126","level":"2","name":"Dilse","source:addr":"FHRS Open Data"}},
    {"type":"node","id":13019068217,"lat":52.4272666,"lon":-1.9224178,"tags":{"addr:city":"Birmingham","addr:housenumber":"1399","addr:postcode":"B30 2JR","addr:street":"Pershore Road","amenity":"restaurant","cuisine":"korean","name":"MMG Birmingham","opening_hours":"Mo-Sa 11:00-20:00"}},
-   {"type":"node","id":13089313752,"lat":52.4804655,"lon":-1.8989294,"tags":{"amenity":"restaurant","name":"Oyster Club by Adam Stokes"}},
    {"type":"node","id":13092826879,"lat":52.4797818,"lon":-1.8963995,"tags":{"addr:city":"Birmingham","addr:housename":"City Arcades","addr:housenumber":"3","addr:postcode":"B2 4TX","amenity":"restaurant","cuisine":"korean","fhrs:id":"1675464","name":"Mr Slim","source:addr":"FHRS Open Data"}},
    {"type":"node","id":13092848617,"lat":52.4797947,"lon":-1.8961879,"tags":{"addr:city":"Birmingham","addr:housenumber":"25","addr:postcode":"B2 4SW","addr:street":"Union Street","amenity":"restaurant","fhrs:id":"1754764","name":"Shawarma Palace","source:addr":"FHRS Open Data"}},
    {"type":"node","id":13092894606,"lat":52.4809992,"lon":-1.8977586,"tags":{"amenity":"restaurant","building":"no","cuisine":"middle_eastern","name":"Top Falafel","takeaway":"only","toilets":"no"}},
@@ -1008,6 +1007,7 @@
    {"type":"node","id":14067151247,"lat":52.4440523,"lon":-1.9359804,"tags":{"amenity":"restaurant","name":"Jumpin Jackets"}},
    {"type":"node","id":14131123121,"lat":52.4402164,"lon":-1.9387351,"tags":{"amenity":"restaurant","check_date":"2026-08-28","cuisine":"asian","name":"Restaurant 800"}},
    {"type":"node","id":14131123122,"lat":52.4396047,"lon":-1.9394252,"tags":{"amenity":"restaurant","check_date":"2026-08-28","cuisine":"chinese","name":"Happy Land"}},
+   {"type":"node","id":14222466951,"lat":52.4804269,"lon":-1.8990029,"tags":{"amenity":"restaurant","cuisine":"steak_house","name":"Flat Iron","opening_date":"2026-10-10"}},
    {"type":"way","id":31346959,"center":{"lat":52.4458486,"lon":-1.8240633},"tags":{"addr:city":"Birmingham","addr:housenumber":"2","addr:postcode":"B27 7UH","addr:street":"Westley Road","amenity":"restaurant","building":"pub","disused:amenity":"pub","heritage":"2","heritage:operator":"Birmingham City Council","listed_status":"local_grade_B","name":"My Kabul Restaurant","old_name":"Inn on the Green","source":"eyeball survey & estimate"}},
    {"type":"way","id":45946307,"center":{"lat":52.5567367,"lon":-1.826081},"tags":{"addr:city":"Sutton Coldfield","addr:housenumber":"27","addr:postcode":"B72 1QL","addr:street":"Maney Corner","amenity":"restaurant","building":"retail","cuisine":"indian","former_name":"Taylor's Newsagents","name":"The Purple Rooms","note":"Being prepared as \"The Purple Rooms\" April 2016","ref:GB:uprn":"10090431619;100070595453"}},
    {"type":"way","id":49427943,"center":{"lat":52.5578553,"lon":-1.8263966},"tags":{"addr:city":"Sutton Coldfield","addr:housenumber":"65","addr:postcode":"B72 1QF","addr:street":"Birmingham Road","amenity":"restaurant","building":"restaurant","cuisine":"indian","fhrs:id":"1051274","name":"New Moon","ref:GB:uprn":"100070578894","source":"GPS Survey"}},
@@ -1163,7 +1163,7 @@
    {"type":"way","id":1491462346,"center":{"lat":52.4454482,"lon":-1.9331333},"tags":{"addr:city":"Birmingham","addr:housenumber":"2","addr:postcode":"B29 7AE","addr:street":"Dawlish Road","amenity":"restaurant","building":"yes","cuisine":"korean","email":"kimchi5845@gmail.com","name":"Kimchi Korean Restaurant","opening_hours":"Mo-Th 11:00-21:00; Fr 11:00-01:00; Sa 11:00-22:00; Su 11:00-21:00","phone":"+44 121 293 5845"}},
    {"type":"way","id":1561473644,"center":{"lat":52.4793037,"lon":-1.9019955},"tags":{"addr:housenumber":"50","addr:street":"Pinfold Street","amenity":"restaurant","branch":"Birmingham","check_date":"2026-09-23","contact:instagram":"https://www.instagram.com/gulnarnoodles/?hl=en","cuisine":"noodle","delivery":"yes","diet:halal":"yes","fhrs:id":"1933544","indoor_seating":"yes","level":"-1","name":"Gulnar Noodle","opening_hours":"Mo-Su 12:00-22:00","outdoor_seating":"no","phone":"+44 7515101275","stroller":"limited","takeaway":"yes","toilets":"no","website:menu":"https://www.ubereats.com/gb/store/gulnar-noodle-birmingham/","wheelchair":"limited"}}
  ]},
- "Birmingham|United Kingdom|0||no-chains|amenity=cafe": {"fetched": "2026-09-27T02:38:56.636Z", "elements": [
+ "Birmingham|United Kingdom|0||no-chains|amenity=cafe": {"fetched": "2026-10-04T15:28:59.197Z", "elements": [
    {"type":"node","id":258083090,"lat":52.4964816,"lon":-1.8777451,"tags":{"amenity":"cafe","name":"Roy's Rolls","previous_name":"Rocky Lane Cafe"}},
    {"type":"node","id":309687718,"lat":52.4336426,"lon":-2.0057819,"tags":{"amenity":"cafe","name":"Alison's Big Munch","source":"survey"}},
    {"type":"node","id":313224758,"lat":52.4763473,"lon":-1.8979118,"tags":{"addr:city":"Birmingham","addr:housenumber":"1","addr:postcode":"B5 4EJ","addr:street":"Theatre Approach","amenity":"cafe","name":"The Little Tea Shop","source":"visual survey; estimate"}},
@@ -1424,7 +1424,7 @@
    {"type":"way","id":1426215174,"center":{"lat":52.451621,"lon":-1.9293118},"tags":{"addr:city":"Birmingham","addr:housename":"Muirhead Tower","addr:postcode":"B15 2TN","amenity":"cafe","building":"yes","building:levels":"2","name":"Muirhead Cafe","note":"Muirhead tower cafe, separated from the other building object as it's a mid-2000s addition and only has 2 levels, in contrast to the behemoth 1970s tower that it adjoins","ref":"R21"}},
    {"type":"way","id":1458744921,"center":{"lat":52.4770929,"lon":-1.9098653},"tags":{"addr:city":"Birmingham","addr:housenumber":"35","addr:postcode":"B1 2JU","addr:street":"Gas Street","amenity":"cafe","area":"yes","building":"yes","fhrs:id":"600861","heritage":"2","heritage:operator":"Historic England","listed_status":"Grade II","name":"Canalside Café","smoking":"no","source":"visual survey;cities_revealed_aerial_imagery"}}
  ]},
- "Birmingham|United Kingdom|0||no-chains|shop=bakery,shop=confectionery,shop=pastry": {"fetched": "2026-09-27T02:39:20.449Z", "elements": [
+ "Birmingham|United Kingdom|0||no-chains|shop=bakery,shop=confectionery,shop=pastry": {"fetched": "2026-10-04T15:29:21.821Z", "elements": [
    {"type":"node","id":569732035,"lat":52.4296672,"lon":-1.9350351,"tags":{"addr:city":"Birmingham","addr:housenumber":"41","addr:street":"Sycamore Road","indoor_seating":"no","name":"Bournville Bread Basket","outdoor_seating":"yes","phone":"+44 121 471 1420","shop":"bakery"}},
    {"type":"node","id":676281194,"lat":52.4357655,"lon":-1.8922641,"tags":{"name":"Maison Mayci","shop":"bakery","source":"visual survey;estimate"}},
    {"type":"node","id":833722647,"lat":52.4519834,"lon":-1.878649,"tags":{"name":"Royal Sweets","shop":"confectionery","source":"survey"}},
@@ -1433,8 +1433,6 @@
    {"type":"node","id":965974687,"lat":52.4822536,"lon":-1.8975807,"tags":{"addr:city":"Birmingham","addr:postcode":"B2 5HU","addr:street":"Great Western Arcade","fhrs:id":"601545","name":"Bread Collection","opening_hours":"Mo,Sa 08:30-16:00; Tu-Fr 08:30-17:30","shop":"bakery"}},
    {"type":"node","id":965992704,"lat":52.4837072,"lon":-1.8951961,"tags":{"addr:city":"Birmingham","addr:housename":"Fountain Court","addr:housenumber":"128","addr:postcode":"B4 6DR","addr:street":"Steelhouse Lane","name":"Hindleys","shop":"bakery","source":"visual survey; estimate"}},
    {"type":"node","id":1039775007,"lat":52.4797186,"lon":-1.9004676,"tags":{"addr:city":"Birmingham","addr:housenumber":"12","addr:postcode":"B2 5RS","addr:street":"Bennett's Hill","name":"Insomnia Cookies","shop":"pastry","source":"survey"}},
-   {"type":"node","id":1187947559,"lat":52.5239368,"lon":-1.8387346,"tags":{"name":"Firkin","shop":"bakery"}},
-   {"type":"node","id":2142618846,"lat":52.5317563,"lon":-1.929488,"tags":{"name":"Firkins Bakery","shop":"bakery"}},
    {"type":"node","id":2142623767,"lat":52.5326325,"lon":-1.9300405,"tags":{"name":"Vera's Traditional Caribbean Bakery","shop":"bakery"}},
    {"type":"node","id":2535904214,"lat":52.4768674,"lon":-1.8974818,"tags":{"check_date:opening_hours":"2022-11-12","level":"2","name":"PME Cake","opening_hours:signed":"no","shop":"bakery"}},
    {"type":"node","id":2535904236,"lat":52.4777425,"lon":-1.8951138,"tags":{"name":"Millies Cookis","shop":"confectionery"}},
@@ -1442,7 +1440,7 @@
    {"type":"node","id":3108516099,"lat":52.4159653,"lon":-1.9697656,"tags":{"name":"Candy World","shop":"confectionery"}},
    {"type":"node","id":3108527329,"lat":52.4164829,"lon":-1.9690464,"tags":{"name":"Jessica's","shop":"confectionery"}},
    {"type":"node","id":3177657673,"lat":52.4682151,"lon":-1.8577145,"tags":{"name":"Chittagong Mishti","shop":"confectionery"}},
-   {"type":"node","id":3177657681,"lat":52.4674961,"lon":-1.857993,"tags":{"name":"Medina Bakery","shop":"bakery"}},
+   {"type":"node","id":3177657681,"lat":52.4674961,"lon":-1.857993,"tags":{"addr:city":"Birmingham","addr:housenumber":"48","addr:postcode":"B10 0LG","addr:street":"Golden Hillock Road","fhrs:id":"599317","name":"Medina Bakery","shop":"bakery","source:addr":"FHRS Open Data"}},
    {"type":"node","id":3177657682,"lat":52.4671314,"lon":-1.8581304,"tags":{"name":"Mukhtar's","shop":"confectionery"}},
    {"type":"node","id":3400790604,"lat":52.4906203,"lon":-1.912471,"tags":{"name":"Cake Quarter","shop":"confectionery"}},
    {"type":"node","id":3406978069,"lat":52.4723231,"lon":-1.9176139,"tags":{"name":"The Sugarcraft Box","shop":"confectionery"}},
@@ -1454,16 +1452,16 @@
    {"type":"node","id":3461048629,"lat":52.4539525,"lon":-1.8776545,"tags":{"addr:housenumber":"332","name":"Sweet Temptations","shop":"confectionery"}},
    {"type":"node","id":3461605329,"lat":52.4566572,"lon":-1.876615,"tags":{"name":"Sweet Centre","shop":"confectionery"}},
    {"type":"node","id":3461626270,"lat":52.4581913,"lon":-1.8768139,"tags":{"addr:city":"Birmingham","addr:housenumber":"137","addr:postcode":"B12 8LH","addr:street":"Ladypool Road","fhrs:id":"1452098","name":"Cake Hut","not:brand:wikidata":"Q110057905","shop":"confectionery"}},
-   {"type":"node","id":3470524717,"lat":52.4710755,"lon":-1.8624577,"tags":{"name":"Pastry House","shop":"confectionery"}},
+   {"type":"node","id":3470524717,"lat":52.4710755,"lon":-1.8624577,"tags":{"addr:city":"Birmingham","addr:housenumber":"389B","addr:postcode":"B10 0SP","addr:street":"Coventry Road","addr:suburb":"Nechells","fhrs:id":"1823830","name":"Pastry House","shop":"confectionery","source:addr":"FHRS Open Data"}},
    {"type":"node","id":3470524747,"lat":52.4686033,"lon":-1.855197,"tags":{"name":"Shukrya","shop":"confectionery"}},
    {"type":"node","id":3470524764,"lat":52.4708517,"lon":-1.8628947,"tags":{"addr:city":"Birmingham","addr:country":"GB","addr:housenumber":"11C","addr:postcode":"B10 0NR","addr:street":"Whitmore Road","fhrs:id":"1017002","name":"Sundus Sweets","shop":"confectionery"}},
    {"type":"node","id":3470524787,"lat":52.4696423,"lon":-1.8580567,"tags":{"name":"Yasin","shop":"confectionery"}},
    {"type":"node","id":3470525036,"lat":52.4720864,"lon":-1.864071,"tags":{"name":"Gateaux Land","shop":"confectionery"}},
-   {"type":"node","id":3470525486,"lat":52.4687413,"lon":-1.8555827,"tags":{"name":"Ambala","shop":"confectionery"}},
-   {"type":"node","id":3470525495,"lat":52.4673901,"lon":-1.8512075,"tags":{"name":"Attock","shop":"confectionery"}},
+   {"type":"node","id":3470525486,"lat":52.4687413,"lon":-1.8555827,"tags":{"addr:city":"Birmingham","addr:housenumber":"552","addr:postcode":"B10 0UN","addr:street":"Coventry Road","addr:suburb":"South Yardley","fhrs:id":"1737935","name":"Ambala","shop":"confectionery","source:addr":"FHRS Open Data"}},
+   {"type":"node","id":3470525495,"lat":52.4673901,"lon":-1.8512075,"tags":{"addr:city":"Birmingham","addr:housenumber":"648","addr:postcode":"B10 0UT","addr:street":"Coventry Road","addr:suburb":"South Yardley","fhrs:id":"1208782","name":"Attock","shop":"confectionery","source:addr":"FHRS Open Data"}},
    {"type":"node","id":3470525543,"lat":52.4678517,"lon":-1.8538952,"tags":{"name":"Dewaan","shop":"confectionery"}},
    {"type":"node","id":3470525559,"lat":52.4693822,"lon":-1.8573735,"tags":{"name":"Firdoys Bakery","shop":"bakery"}},
-   {"type":"node","id":3470525613,"lat":52.4688452,"lon":-1.8558728,"tags":{"name":"Mishti Desh","shop":"confectionery"}},
+   {"type":"node","id":3470525613,"lat":52.4688452,"lon":-1.8558728,"tags":{"addr:city":"Birmingham","addr:housenumber":"546","addr:postcode":"B10 0UN","addr:street":"Coventry Road","addr:suburb":"South Yardley","fhrs:id":"599329","name":"Mishti Desh","shop":"confectionery","source:addr":"FHRS Open Data"}},
    {"type":"node","id":3470525617,"lat":52.4686865,"lon":-1.8554295,"tags":{"name":"Mushtar","shop":"confectionery"}},
    {"type":"node","id":3562350113,"lat":52.489953,"lon":-1.854062,"tags":{"name":"Mushtaq","shop":"confectionery"}},
    {"type":"node","id":3562350130,"lat":52.4896461,"lon":-1.851753,"tags":{"name":"The Red Velvet","shop":"confectionery"}},
@@ -1476,24 +1474,24 @@
    {"type":"node","id":3758952491,"lat":52.4773522,"lon":-1.8978388,"tags":{"layer":"1","level":"2","name":"Gobstopprs","shop":"confectionery"}},
    {"type":"node","id":4589821857,"lat":52.5485667,"lon":-1.8603126,"tags":{"addr:city":"Sutton Coldfield","addr:housenumber":"8A","addr:postcode":"B73 5AF","addr:street":"Kings Road","fhrs:id":"844156","fhrs:local_authority_id":"PI/000549053","name":"The Crafty Mrs Es Cake Studio","shop":"bakery","source":"FHRS Open Data"}},
    {"type":"node","id":5540224584,"lat":52.5008239,"lon":-1.802824,"tags":{"name":"Lovecake","shop":"confectionery"}},
-   {"type":"node","id":5647434168,"lat":52.4749338,"lon":-1.8969175,"tags":{"name":"Uncle Cake","shop":"bakery"}},
+   {"type":"node","id":5647434168,"lat":52.4749338,"lon":-1.8969175,"tags":{"addr:city":"Birmingham","addr:housenumber":"70","addr:postcode":"B5 4TD","addr:street":"Hurst Street","addr:unit":"Unit A207 The Arcadian Centre","fhrs:id":"1536195","name":"Uncle Cake","shop":"bakery","source:addr":"FHRS Open Data"}},
    {"type":"node","id":6439007632,"lat":52.493438,"lon":-1.8325479,"tags":{"name":"Kundun","shop":"bakery"}},
-   {"type":"node","id":7227103215,"lat":52.4938492,"lon":-1.8337949,"tags":{"addr:city":"Birmingham","addr:postcode":"B8 2HG","addr:street":"Washwood Heath Road","fhrs:id":"1099152","fhrs:local_authority_id":"PI/000648736","name":"Bismillah Bakery","not:addr:housenumber":"618","shop":"bakery"}},
+   {"type":"node","id":7227103215,"lat":52.4938492,"lon":-1.8337949,"tags":{"addr:city":"Birmingham","addr:housenumber":"602-604","addr:postcode":"B8 2HG","addr:street":"Washwood Heath Road","fhrs:id":"1376836","fhrs:local_authority_id":"PI/000648736","name":"Bismillah Bakery","not:addr:housenumber":"618","shop":"bakery","source:addr":"FHRS Open Data"}},
    {"type":"node","id":7227736666,"lat":52.4931499,"lon":-1.8315545,"tags":{"name":"Finest Desserts","shop":"confectionery","source":"survey"}},
    {"type":"node","id":8589411176,"lat":52.4532258,"lon":-1.9896466,"tags":{"addr:city":"Birmingham","addr:housenumber":"77","addr:postcode":"B32 2SJ","addr:street":"Gorsy Road","name":"Crusty Cottage Bakery","opening_hours":"Tu-Sa 09:00-15:00","phone":"+44 121 423 3084","shop":"bakery"}},
-   {"type":"node","id":9129564203,"lat":52.4447347,"lon":-1.8354122,"tags":{"addr:city":"Birmingham","addr:postcode":"B11 3DW","addr:street":"Spring Road","fhrs:id":"1387032","name":"Zizzi Desserts","shop":"confectionery"}},
-   {"type":"node","id":9684836076,"lat":52.4351876,"lon":-1.8931232,"tags":{"name":"Levain & Cherry","shop":"bakery"}},
+   {"type":"node","id":9684836076,"lat":52.4351876,"lon":-1.8931232,"tags":{"addr:city":"Birmingham","addr:housename":"Rear of 90","addr:postcode":"B14 7JZ","fhrs:id":"1272566","name":"Levain & Cherry","shop":"bakery","source:addr":"FHRS Open Data"}},
    {"type":"node","id":10773539879,"lat":52.4880429,"lon":-1.8454038,"tags":{"addr:city":"Birmingham","addr:housenumber":"341","addr:postcode":"B8 3BL","addr:street":"Alum Rock Road","name":"Eggless Cake Shop","shop":"bakery"}},
-   {"type":"node","id":11179211811,"lat":52.437149,"lon":-1.8927936,"tags":{"name":"Early Bird","shop":"pastry"}},
+   {"type":"node","id":11179211811,"lat":52.437149,"lon":-1.8927936,"tags":{"addr:city":"Birmingham","addr:housenumber":"28","addr:postcode":"B14 7JT","addr:street":"High Street","fhrs:id":"1106267","name":"Early Bird","shop":"pastry","source:addr":"FHRS Open Data"}},
    {"type":"node","id":11371479729,"lat":52.4360539,"lon":-1.8927933,"tags":{"name":"Ever So Sweet","shop":"confectionery"}},
-   {"type":"node","id":12365507836,"lat":52.4468485,"lon":-1.8883714,"tags":{"name":"La Brioche","shop":"bakery"}},
+   {"type":"node","id":12365507836,"lat":52.4468485,"lon":-1.8883714,"tags":{"addr:city":"Birmingham","addr:housenumber":"123","addr:postcode":"B13 8DD","addr:street":"Alcester Road","fhrs:id":"1180344","name":"La Brioche","shop":"bakery","source:addr":"FHRS Open Data"}},
    {"type":"node","id":12627531024,"lat":52.4524769,"lon":-1.7705559,"tags":{"check_date":"2024-01-23","name":"Tonka Bakery","shop":"bakery"}},
+   {"type":"node","id":13960860235,"lat":52.4721867,"lon":-1.9322483,"tags":{"addr:housenumber":"197c/d","addr:street":"Hagley Road","check_date":"2026-06-23","contact:facebook":"https://www.facebook.com/profile.php?id=100063736591211&locale=en_GB","contact:instagram":"https://www.instagram.com/cakesbynoushin_pars_patisserie","email":"alipour.noushin@yahoo.com","name":"Noushin’s Bakery (Pars Patisserie)","phone":"+44 7450531956","shop":"pastry"}},
    {"type":"way","id":63108816,"center":{"lat":52.4463616,"lon":-1.8596682},"tags":{"addr:city":"Birmingham","addr:housenumber":"772","addr:postcode":"B11 4BP","addr:street":"Stratford Road","building":"retail","name":"Best Pakora Shop","shop":"confectionery","source":"visual survey; bing"}},
    {"type":"way","id":63108817,"center":{"lat":52.4464863,"lon":-1.8603489},"tags":{"addr:city":"Birmingham","addr:housenumber":"703","addr:postcode":"B11 4DN","addr:street":"Stratford Road","building":"retail","name":"Suraj Sweet Centre","shop":"confectionery","source":"bing"}},
    {"type":"way","id":69089571,"center":{"lat":52.4845355,"lon":-1.8103708},"tags":{"addr:city":"Birmingham","addr:housenumber":"149","addr:postcode":"B33 8BA","addr:street":"Station Road","addr:suburb":"Stechford","building":"retail","name":"The Allotment","shop":"bakery","source":"bing"}},
    {"type":"way","id":85605805,"center":{"lat":52.4377138,"lon":-1.8469915},"tags":{"addr:city":"Birmingham","addr:postcode":"B28 8AF","addr:street":"Stratford Road","building":"retail","name":"Sweet Sensations","shop":"confectionery","source":"OS_OpenData_StreetView"}},
    {"type":"way","id":100614741,"center":{"lat":52.4454418,"lon":-1.8164641},"tags":{"addr:city":"Birmingham","addr:housenumber":"1196","addr:postcode":"B27 6BY","addr:street":"Warwick Road","building":"retail","name":"Icing World","shop":"confectionery","source":"OS_OpenData_StreetView"}},
-   {"type":"way","id":131319874,"center":{"lat":52.4932068,"lon":-1.8224555},"tags":{"addr:city":"Birmingham","addr:postcode":"B8 2NL","addr:street":"Washwood Heath Road","building":"retail","name":"Mr Frost","shop":"confectionery","source":"bing"}},
+   {"type":"way","id":131319874,"center":{"lat":52.4932068,"lon":-1.8224555},"tags":{"addr:city":"Birmingham","addr:housenumber":"858","addr:postcode":"B8 2NL","addr:street":"Washwood Heath Road","building":"retail","fhrs:id":"670211","name":"Mr Frost","shop":"confectionery","source":"bing","source:addr":"FHRS Open Data"}},
    {"type":"way","id":153792050,"center":{"lat":52.5502134,"lon":-1.8420245},"tags":{"addr:city":"Sutton Coldfield","addr:housenumber":"6","addr:street":"Boldmere Road","building":"retail","name":"The Little Cake Shop","ref:GB:uprn":"100071397730;100070579709","shop":"confectionery"}},
    {"type":"way","id":153792055,"center":{"lat":52.5500495,"lon":-1.8419804},"tags":{"addr:city":"Sutton Coldfield","addr:housenumber":"14","addr:street":"Boldmere Road","building":"retail","name":"Treat Street","ref:GB:uprn":"100071311119;100071397737;100071482612","shop":"confectionery"}},
    {"type":"way","id":153792063,"center":{"lat":52.5500925,"lon":-1.8420142},"tags":{"addr:city":"Sutton Coldfield","addr:housenumber":"12","addr:street":"Boldmere Road","building":"retail","name":"Jens Sweet Shop","ref:GB:uprn":"100071311118;100071397736;100071482611","shop":"confectionery"}},
@@ -1514,7 +1512,7 @@
    {"type":"way","id":1107739914,"center":{"lat":52.4870506,"lon":-1.8329306},"tags":{"building":"yes","name":"Sharif Bakery","shop":"bakery"}},
    {"type":"way","id":1296716398,"center":{"lat":52.4777424,"lon":-1.8938887},"tags":{"addr:city":"Birmingham","addr:housename":"Lower Mall","addr:postcode":"B5 4BU","addr:street":"The Bullring","fhrs:id":"1488493","indoor":"room","level":"0","name":"Batch'd","shop":"pastry","source:addr":"FHRS Open Data"}}
  ]},
- "Birmingham|United Kingdom|0||no-chains|shop=hairdresser,shop=beauty": {"fetched": "2026-09-27T02:41:39.017Z", "elements": [
+ "Birmingham|United Kingdom|0||no-chains|shop=hairdresser,shop=beauty": {"fetched": "2026-10-04T15:29:25.616Z", "elements": [
    {"type":"node","id":267735289,"lat":52.488253,"lon":-1.7940027,"tags":{"name":"Razor","shop":"hairdresser"}},
    {"type":"node","id":311131649,"lat":52.4452084,"lon":-1.9340477,"tags":{"name":"Scizzor Sisters","shop":"hairdresser"}},
    {"type":"node","id":330253869,"lat":52.4846574,"lon":-1.9052536,"tags":{"hairdresser":"barber","name":"Blunt","shop":"hairdresser","source":"survey"}},
@@ -1635,7 +1633,6 @@
    {"type":"node","id":2142623920,"lat":52.5325955,"lon":-1.9300237,"tags":{"name":"Kem Salon","shop":"hairdresser"}},
    {"type":"node","id":2412223209,"lat":52.3953816,"lon":-1.9790173,"tags":{"fixme":"Check name","name":"Barber","shop":"hairdresser"}},
    {"type":"node","id":2448319437,"lat":52.4815372,"lon":-1.8968787,"tags":{"addr:city":"Birmingham","addr:postcode":"B2 5HU","addr:street":"Great Western Arcade","hairdresser":"barber","name":"Maniac Barbers","opening_hours":"Mo-We 09:00-19:00; Th,Fr 09:00-20:00; Sa 08:30-16:30","shop":"hairdresser"}},
-   {"type":"node","id":2448319438,"lat":52.4821362,"lon":-1.8974352,"tags":{"addr:city":"Birmingham","addr:postcode":"B2 5HU","addr:street":"Great Western Arcade","name":"Ikon","opening_hours":"Mo-We 09:30-18:30; Th 10:00-19:00; Fr 09:30-18:30; Sa 09:00-17:00","shop":"hairdresser"}},
    {"type":"node","id":2448319447,"lat":52.4814935,"lon":-1.8968274,"tags":{"female":"yes","name":"Cora","opening_hours":"Tu-Th 10:00-20:00; Mo 10:00-18:00; Fr 10:00-19:00; Sa 09:00-18:00,10:30-17:30","shop":"hairdresser"}},
    {"type":"node","id":2517583445,"lat":52.4789175,"lon":-1.8988492,"tags":{"name":"Bad Apple","shop":"hairdresser"}},
    {"type":"node","id":2517583481,"lat":52.4788723,"lon":-1.89939,"tags":{"addr:city":"Birmingham","addr:postcode":"B2 4JD","addr:street":"Lower Temple Street","name":"Thérapie Clinic","shop":"beauty"}},
@@ -2175,7 +2172,7 @@
    {"type":"way","id":1317158746,"center":{"lat":52.4813,"lon":-1.7706687},"tags":{"addr:city":"Birmingham","addr:housenumber":"58","addr:postcode":"B33 0AP","addr:street":"East Meadway","building":"yes","name":"Style Council","opening_hours":"We 09:00-17:30; Th 09:30-19:00; Fr 09:00-17:30; Sa 09:00-16:30","phone":"+44121 783 5155","shop":"hairdresser"}},
    {"type":"way","id":1355371315,"center":{"lat":52.4815337,"lon":-1.7701442},"tags":{"addr:city":"Birmingham","addr:housenumber":"70","addr:postcode":"B33 0AP","addr:street":"East Meadway","building":"yes","hairdresser":"barber","male":"yes","name":"Turkish 5 Star Barber","opening_hours":"Mo-We 09:00-18:00; Th-Fr 09:00-19:00; Sa 09:00-18:30; Su 10:00-17:00","payment:cash":"yes","payment:contactless":"yes","phone":"+44121 794 8097","shop":"hairdresser"}}
  ]},
- "Birmingham|United Kingdom|0||no-chains|amenity=dentist,healthcare=dentist": {"fetched": "2026-09-27T02:41:48.958Z", "elements": [
+ "Birmingham|United Kingdom|0||no-chains|amenity=dentist,healthcare=dentist": {"fetched": "2026-10-04T15:29:28.646Z", "elements": [
    {"type":"node","id":835065369,"lat":52.4548697,"lon":-1.8772363,"tags":{"amenity":"dentist","healthcare":"dentist","name":"Hillbrook Dental Care","source":"survey"}},
    {"type":"node","id":835065378,"lat":52.458641,"lon":-1.8768621,"tags":{"addr:housenumber":"115","amenity":"dentist","healthcare":"dentist","name":"Dental Surgery","source":"survey"}},
    {"type":"node","id":900361760,"lat":52.4105113,"lon":-1.8868579,"tags":{"amenity":"dentist","healthcare":"dentist","name":"Dental Surgery","source":"survey"}},
@@ -2240,10 +2237,10 @@
    {"type":"way","id":366171415,"center":{"lat":52.4734669,"lon":-1.7626311},"tags":{"amenity":"dentist","building":"retail","healthcare":"dentist","name":"Dental Surgery","source":"Warwicks Aerial Imagery OGL v2"}},
    {"type":"way","id":996631948,"center":{"lat":52.4454393,"lon":-1.817935},"tags":{"addr:city":"Birmingham","addr:housenumber":"3","addr:postcode":"B27 7XZ","addr:street":"Victoria Road","addr:suburb":"Acocks Green","amenity":"dentist","building":"yes","healthcare":"dentist","name":"Rees Dental Practice"}}
  ]},
- "Birmingham|United Kingdom|0||no-chains|amenity=clinic,amenity=doctors,healthcare=clinic,healthcare=doctor": {"fetched": "2026-09-27T02:41:53.905Z", "elements": [
+ "Birmingham|United Kingdom|0||no-chains|amenity=clinic,amenity=doctors,healthcare=clinic,healthcare=doctor": {"fetched": "2026-10-04T15:30:02.605Z", "elements": [
    {"type":"node","id":459279693,"lat":52.4383417,"lon":-1.9383638,"tags":{"amenity":"doctors","healthcare":"doctor","name":"Selly Oak Health Centre"}},
    {"type":"node","id":459279694,"lat":52.438419,"lon":-1.938552,"tags":{"amenity":"doctors","healthcare":"doctor","name":"South Birmingham GP Walk-In Centre"}},
-   {"type":"node","id":555149147,"lat":52.4259274,"lon":-1.9282358,"tags":{"addr:city":"Birmingham","addr:housenumber":"81","addr:street":"Mary Vale Road","amenity":"clinic","healthcare":"clinic","name":"The Bournville Health Hub"}},
+   {"type":"node","id":555149147,"lat":52.4259274,"lon":-1.9282358,"tags":{"addr:city":"Birmingham","addr:housenumber":"81","addr:street":"Mary Vale Road","amenity":"clinic","check_date":"2026-10-01","healthcare":"clinic","name":"The Bournville Health Hub"}},
    {"type":"node","id":608328783,"lat":52.4536126,"lon":-1.9412707,"tags":{"amenity":"clinic","healthcare":"clinic","healthcare:speciality":"haematology","name":"Centre for Clinical Haematology","source":"visualsurvey;estimate"}},
    {"type":"node","id":608328802,"lat":52.4533095,"lon":-1.9400039,"tags":{"amenity":"clinic","healthcare":"clinic","healthcare:speciality":"oncology","name":"The Cancer Centre","source":"survey"}},
    {"type":"node","id":608328824,"lat":52.4530728,"lon":-1.9374314,"tags":{"amenity":"clinic","healthcare":"clinic","healthcare:speciality":"neurology","name":"Queen Elizabeth Neuroscience Centre","source":"visualsurvey;estimate"}},
@@ -2401,7 +2398,7 @@
    {"type":"relation","id":1847723,"center":{"lat":52.4086297,"lon":-1.9130654},"tags":{"amenity":"doctors","building":"yes","healthcare":"doctor","name":"Broadmeadow Health Centre","type":"multipolygon"}},
    {"type":"relation","id":11978016,"center":{"lat":52.4876223,"lon":-1.9304685},"tags":{"addr:city":"Birmingham","addr:postcode":"B18 7QH","addr:street":"Dudley Road","amenity":"clinic","building":"hospital","building:levels":"2","healthcare":"clinic","name":"Birmingham Treatment Centre","nohousenumber":"yes","roof:shape":"flat","source":"bing","type":"multipolygon"}}
  ]},
- "Birmingham|United Kingdom|0||no-chains|leisure=fitness_centre": {"fetched": "2026-09-27T02:42:26.734Z", "elements": [
+ "Birmingham|United Kingdom|0||no-chains|leisure=fitness_centre": {"fetched": "2026-10-04T15:32:41.006Z", "elements": [
    {"type":"node","id":1654557216,"lat":52.5601478,"lon":-1.8025837,"tags":{"addr:city":"Sutton Coldfield","addr:street":"Hollyfield Road South","leisure":"fitness_centre","name":"Sutton body therapies"}},
    {"type":"node","id":2519320969,"lat":52.4819963,"lon":-1.8930228,"tags":{"leisure":"fitness_centre","name":"Bannatyne's"}},
    {"type":"node","id":2642258392,"lat":52.4775103,"lon":-1.9182002,"tags":{"leisure":"fitness_centre","name":"Vibro-Suite"}},
@@ -2443,7 +2440,7 @@
    {"type":"way","id":414868950,"center":{"lat":52.5300031,"lon":-1.8927792},"tags":{"addr:city":"Birmingham","addr:housenumber":"54","addr:postcode":"B44 8BS","addr:street":"College Road","building":"yes","leisure":"fitness_centre","name":"Apollo Gym"}},
    {"type":"way","id":848036412,"center":{"lat":52.4790359,"lon":-1.9274618},"tags":{"building":"yes","leisure":"fitness_centre","name":"Ladywood Arts & Leisure Centre","source":"bing"}}
  ]},
- "Birmingham|United Kingdom|0||no-chains|shop=car_repair,shop=tyres": {"fetched": "2026-09-27T02:44:56.088Z", "elements": [
+ "Birmingham|United Kingdom|0||no-chains|shop=car_repair,shop=tyres": {"fetched": "2026-10-04T15:37:17.909Z", "elements": [
    {"type":"node","id":370703221,"lat":52.5152205,"lon":-1.9441541,"tags":{"name":"Uplands Auto Centre","shop":"car_repair"}},
    {"type":"node","id":452234002,"lat":52.431072,"lon":-1.922381,"tags":{"name":"Empire Garage","shop":"car_repair","source":"survey"}},
    {"type":"node","id":459180082,"lat":52.440332,"lon":-1.9377374,"tags":{"name":"KDM Engineering","shop":"car_repair"}},
@@ -2725,7 +2722,7 @@
    {"type":"way","id":1153266582,"center":{"lat":52.5396074,"lon":-1.896094},"tags":{"addr:city":"Birmingham","addr:housenumber":"686","addr:postcode":"B44 8NJ","addr:street":"Aldridge Road","building":"garage","name":"Brooklyn Garage","opening_hours":"Mo-Fr 08:30-17:00","phone":"+44 1213602184","shop":"car_repair","wheelchair":"no"}},
    {"type":"way","id":1215831325,"center":{"lat":52.4171401,"lon":-1.9315468},"tags":{"building":"yes","name":"Cotteridge Car Care","phone":"+44 121 458 2501","service:vehicle:air_conditioning":"yes","service:vehicle:mot":"yes","service:vehicle:repairs":"yes","service:vehicle:servicing":"yes","service:vehicle:tyres":"yes","shop":"car_repair"}}
  ]},
- "Birmingham|United Kingdom|0||no-chains|shop=clothes,shop=boutique,shop=fabric,shop=tailor,craft=tailor": {"fetched": "2026-09-27T02:47:35.349Z", "elements": [
+ "Birmingham|United Kingdom|0||no-chains|shop=clothes,shop=boutique,shop=fabric,shop=tailor,craft=tailor": {"fetched": "2026-10-04T15:37:32.904Z", "elements": [
    {"type":"node","id":253799372,"lat":52.4576074,"lon":-1.8764593,"tags":{"name":"Brides & Maids","previous_name":"The George Pub","shop":"clothes","source":"survey"}},
    {"type":"node","id":259507644,"lat":52.4395668,"lon":-1.8258685,"tags":{"name":"The Workwear Supplier","shop":"clothes","source":"survey"}},
    {"type":"node","id":312743999,"lat":52.4787849,"lon":-1.8969378,"tags":{"check_date":"2018-12-31","entrance":"yes","name":"Venue","shop":"clothes","wheelchair":"yes"}},

@@ -1,16 +1,16 @@
 {
-  "startedAt": "2026-10-03T08:08:41.061Z",
-  "finishedAt": "2026-10-03T08:17:52.357Z",
-  "minutes": 9.2,
+  "startedAt": "2026-10-04T15:26:30.087Z",
+  "finishedAt": "2026-10-04T15:50:12.708Z",
+  "minutes": 23.7,
   "place": "Birmingham, United Kingdom",
   "area": "Birmingham, West Midlands, England, United Kingdom",
-  "candidates": 2440,
+  "candidates": 2437,
   "checked": 30,
-  "leads": 13,
-  "hasWebsite": 15,
+  "leads": 11,
+  "hasWebsite": 17,
   "closed": 2,
   "unverified": 0,
-  "pending": 2195,
+  "pending": 2163,
   "searchEngines": {
     "google": "broken",
     "brave": "blocked",
@@ -19,6 +19,7 @@
     "duckduckgo": "untested"
   },
   "warnings": [
+    "OpenStreetMap servers were busy, so older saved data was used for: Real estate agent.",
     "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
   ],
   "error": null
