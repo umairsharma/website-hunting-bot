@@ -99,6 +99,10 @@ jobs:
     steps:
       - name: Get the code
         uses: actions/checkout@v5
+        with:
+          # The latest commit when this job starts, not when the run was queued. Otherwise a run queued
+          # behind another starts from old data/ and re-checks (and re-sends) the same businesses.
+          ref: ${{ github.ref_name }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v5
@@ -137,7 +141,8 @@ jobs:
           fi
           git commit -m "Update leads data"
           # If this push is lost, the next run re-checks the same businesses and sends duplicate leads,
-          # so retry. On a clash in data/, this run's copy wins (-X theirs keeps the commit being replayed).
+          # so retry. leads.csv merges by keeping both sides' rows (.gitattributes); on any other clash
+          # in data/, this run's copy wins (-X theirs keeps the commit being replayed).
           for attempt in 1 2 3 4 5; do
             if git pull --rebase -X theirs origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME"; then
               exit 0

@@ -383,6 +383,16 @@
   "way/910770847": {"status":"closed","name":"Andrade's Bakery","checked":"2026-10-05"},
   "node/11918794521": {"status":"has_website","name":"Russo's New York Pizzeria & Italian Kitchen","checked":"2026-10-05","website":"nypizzeria.com","layer":2},
   "node/10859166306": {"status":"has_website","name":"Bissonnet Dental","checked":"2026-10-05","website":"bissonnetdentalhouston.com","layer":2},
-  "node/8474235841": {"status":"has_website","name":"Teahouse Tapioca and Tea","checked":"2026-10-05","website":"teahousebeverage.com","layer":2}
+  "node/8474235841": {"status":"has_website","name":"Teahouse Tapioca and Tea","checked":"2026-10-05","website":"teahousebeverage.com","layer":2},
+  "node/11387635400": {"status":"has_website","name":"Pasha Snoring & Sinus Center","checked":"2026-10-05","website":"breathefreely.com","layer":2},
+  "node/11861622069": {"status":"has_website","name":"Fitness Connection","checked":"2026-10-05","website":"fitnessconnection.com","layer":2},
+  "node/4725196789": {"status":"lead","name":"First Choice Emergency Room","checked":"2026-10-05"},
+  "node/13031872101": {"status":"has_website","name":"Planet Fitness","checked":"2026-10-05","website":"planetfitness.com","layer":2},
+  "node/9758539441": {"status":"lead","name":"Midtown Family Medicine","checked":"2026-10-05"},
+  "node/12490664601": {"status":"closed","name":"Village Fitness","checked":"2026-10-05"},
+  "way/429209963": {"status":"has_website","name":"Neighbors Emergency Center","checked":"2026-10-05","website":"nec24.com","layer":2},
+  "node/3914677266": {"status":"lead","name":"Babu Fitness","checked":"2026-10-05"},
+  "node/10006755646": {"status":"has_website","name":"Richard B. Pesikoff, M.D. & Associates","checked":"2026-10-05","website":"drpesikoff.com","layer":2},
+  "node/5790207652": {"status":"has_website","name":"Aerobifit Fitness","checked":"2026-10-05","website":"aerobifit.com","layer":3}
  }
 }
