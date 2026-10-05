@@ -1,16 +1,16 @@
 {
-  "startedAt": "2026-10-05T16:43:07.430Z",
-  "finishedAt": "2026-10-05T17:07:01.265Z",
-  "minutes": 23.9,
+  "startedAt": "2026-10-05T17:07:49.724Z",
+  "finishedAt": "2026-10-05T17:31:59.794Z",
+  "minutes": 24.2,
   "place": "Houston, United States",
   "area": "Houston, Harris County, Texas, United States",
-  "candidates": 1441,
+  "candidates": 1558,
   "checked": 30,
-  "leads": 11,
-  "hasWebsite": 16,
+  "leads": 10,
+  "hasWebsite": 17,
   "closed": 3,
   "unverified": 0,
-  "pending": 1411,
+  "pending": 1528,
   "searchEngines": {
     "google": "broken",
     "brave": "ok",
@@ -19,7 +19,7 @@
     "duckduckgo": "untested"
   },
   "warnings": [
-    "OpenStreetMap servers were busy, so these were skipped this run: Salon / beauty, Car repair, Clothes / tailor, Real estate agent.",
+    "OpenStreetMap servers were busy, so these were skipped this run: Clinic / doctor, Gym, Car repair, Clothes / tailor, Real estate agent.",
     "Web search: Google didn't work, so it used Brave."
   ],
   "error": null
