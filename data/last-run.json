@@ -1,26 +1,26 @@
 {
-  "startedAt": "2026-10-05T17:07:49.724Z",
-  "finishedAt": "2026-10-05T17:31:59.794Z",
-  "minutes": 24.2,
+  "startedAt": "2026-10-05T17:38:59.533Z",
+  "finishedAt": "2026-10-05T18:04:09.570Z",
+  "minutes": 25.2,
   "place": "Houston, United States",
   "area": "Houston, Harris County, Texas, United States",
-  "candidates": 1558,
-  "checked": 30,
-  "leads": 10,
-  "hasWebsite": 17,
-  "closed": 3,
+  "candidates": 2110,
+  "checked": 25,
+  "leads": 3,
+  "hasWebsite": 21,
+  "closed": 1,
   "unverified": 0,
-  "pending": 1528,
+  "pending": 2045,
   "searchEngines": {
     "google": "broken",
-    "brave": "ok",
-    "startpage": "untested",
-    "bing": "untested",
-    "duckduckgo": "untested"
+    "brave": "blocked",
+    "startpage": "blocked",
+    "bing": "broken",
+    "duckduckgo": "blocked"
   },
   "warnings": [
-    "OpenStreetMap servers were busy, so these were skipped this run: Clinic / doctor, Gym, Car repair, Clothes / tailor, Real estate agent.",
-    "Web search: Google didn't work, so it used Brave."
+    "Every search engine blocked the bot, so it stopped early. The rest will be checked next run.",
+    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, Bing didn't work, DuckDuckGo blocked the bot."
   ],
   "error": null
 }
