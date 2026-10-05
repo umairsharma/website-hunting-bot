@@ -2,6 +2,7 @@
 //   seen.json     every business already checked (so it's never checked or sent twice)
 //   leads.csv     every lead ever found (GitHub shows it as a table)
 //   last-run.json stats from the most recent run
+//   run-leads.txt the latest run's leads as plain text (open it on GitHub and tap "Copy raw file")
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -65,4 +66,9 @@ export function appendLead(dir, lead) {
 export function writeLastRun(dir, summary) {
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'last-run.json'), `${JSON.stringify(summary, null, 2)}\n`);
+}
+
+export function writeRunLeads(dir, text) {
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'run-leads.txt'), `${text}\n`);
 }
