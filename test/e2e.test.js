@@ -105,9 +105,14 @@ test('full run: 3 layers, Google blocked mid-run → falls back, Discord gets le
     assert.equal(gone.onMaps, false);
     assert.equal(gone.whatsapp, null);
 
-    // Discord: first POST got a 429 and was retried; one message with the summary + 3 lead cards
-    assert.equal(server.requests.discord.length, 1);
+    // Discord: first POST got a 429 and was retried; summary + 3 lead cards, then the WhatsApp link
+    assert.equal(server.requests.discord.length, 2);
     const msg = server.requests.discord[0];
+    const wa = server.requests.discord[1];
+    assert.match(wa.content, /Send leads 1–3 to WhatsApp\]\(https:\/\/wa\.me\/\?text=/);
+    for (const name of ['Butt Karahi House', 'Gone Store', 'Rehman Dental Clinic']) assert.ok(wa.embeds[0].description.includes(name));
+    const runLeads = fs.readFileSync(path.join(dataDir, 'run-leads.txt'), 'utf8');
+    assert.match(runLeads, /^🎯 3 website leads · Lahore, Pakistan/);
     assert.equal(msg.embeds.length, 3);
     assert.match(msg.content, /3 new leads/);
     assert.match(msg.content, /Google blocked the bot, Bing didn't work, so it used DuckDuckGo/);
@@ -136,9 +141,9 @@ test('full run: 3 layers, Google blocked mid-run → falls back, Discord gets le
     assert.equal(again.leads.length, 0);
     assert.equal(server.requests.maps.length, mapsCalls);
     assert.equal(server.requests.overpass.length, 5); // OpenStreetMap data came from the weekly cache
-    assert.equal(server.requests.discord.length, 2);
-    assert.match(server.requests.discord[1].content, /No new leads/);
-    assert.match(server.requests.discord[1].content, /already been checked/);
+    assert.equal(server.requests.discord.length, 3); // no leads, so no WhatsApp link this time
+    assert.match(server.requests.discord[2].content, /No new leads/);
+    assert.match(server.requests.discord[2].content, /already been checked/);
     assert.equal(fs.readFileSync(path.join(dataDir, 'leads.csv'), 'utf8').trim().split('\n').length, 4);
   });
 });

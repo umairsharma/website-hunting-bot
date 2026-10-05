@@ -12,6 +12,7 @@ import { CATEGORIES, resolveCategories } from '../src/categories.js';
 import { applyRunInputs, callingCodeFor, DEFAULT_NICHE } from '../src/inputs.js';
 import { buildMessages, leadEmbed, sendMessages } from '../src/discord.js';
 import { shortMapsUrl } from '../src/maps.js';
+import { leadsText, whatsappMessages } from '../src/share.js';
 import { normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
 
@@ -411,4 +412,39 @@ test('Google Maps link on every lead card: their listing, or the location when n
   const value = huge.fields.find((f) => f.name === '📍 Google Maps').value;
   assert.ok(value.length < 1024);
   assert.ok(value.includes('query=Crusty%20Cottage%20Bakery%2C%201%20High%20St'));
+});
+
+test('Send to WhatsApp: every lead in a wa.me link, messages within Discord limits', () => {
+  const leads = Array.from({ length: 23 }, (_, i) => ({
+    name: `Business (${i}) & Sons Ltd`,
+    categoryLabel: 'Car repair',
+    phone: `+1 713 555 01${String(i).padStart(2, '0')}`,
+    mapsUrl: `https://maps.google.com/?cid=${12345678901234567890n + BigInt(i)}`,
+  }));
+  const messages = whatsappMessages(leads, 'Houston, United States');
+  assert.ok(messages.length >= 2 && messages.length <= 4, `${messages.length} messages`);
+  const sent = [];
+  for (const m of messages) {
+    assert.ok(m.content.length <= 2000, `content is ${m.content.length} characters`);
+    assert.ok(m.embeds[0].description.length <= 4096);
+    const url = m.content.match(/\]\((https:\/\/wa\.me\/\?text=[^)\s]+)\)/)[1]; // brackets in names don't break the link
+    const text = decodeURIComponent(new URL(url).searchParams.get('text'));
+    assert.equal(text, m.embeds[0].description); // the link and the copy-ready list match
+    for (const line of text.split('\n').filter((l) => /^\d+\. /.test(l))) sent.push(line);
+  }
+  assert.equal(sent.length, 23); // every lead exactly once, in order
+  assert.deepEqual(sent.map((l) => Number(l.split('.')[0])), Array.from({ length: 23 }, (_, i) => i + 1));
+  assert.match(messages[0].content, /Send leads 1–\d+ to WhatsApp/);
+
+  const one = whatsappMessages(leads.slice(0, 1), 'Houston, United States');
+  assert.equal(one.length, 1);
+  assert.match(one[0].content, /Send this lead to WhatsApp/);
+  assert.deepEqual(whatsappMessages([], 'x'), []);
+
+  const text = leadsText(leads.slice(0, 2), 'Houston, United States');
+  assert.equal(text, [
+    '🎯 2 website leads · Houston, United States',
+    '1. Business (0) & Sons Ltd (Car repair)\n📞 +1 713 555 0100\n📍 https://maps.google.com/?cid=12345678901234567890',
+    '2. Business (1) & Sons Ltd (Car repair)\n📞 +1 713 555 0101\n📍 https://maps.google.com/?cid=12345678901234567891',
+  ].join('\n\n'));
 });

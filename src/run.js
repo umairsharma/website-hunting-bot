@@ -7,7 +7,8 @@ import { checkMaps, mapsSelfTest } from './maps.js';
 import { createSearcher, engineLabel, ENGINE_NAMES } from './search.js';
 import { analyzeResults, classifyUrl, hostOf, prettySite, toWhatsApp, uniqueUrls } from './matching.js';
 import { buildMessages, sendMessages } from './discord.js';
-import { appendLead, loadState, saveState, writeLastRun } from './storage.js';
+import { appendLead, loadState, saveState, writeLastRun, writeRunLeads } from './storage.js';
+import { leadsText, whatsappMessages } from './share.js';
 import { endpoints, randomDelayMs, sleep, today } from './util.js';
 
 const KNOWN_ENGINES = ENGINE_NAMES; // google, brave, startpage, bing, duckduckgo
@@ -335,12 +336,14 @@ export async function run({ config, dataDir, dryRun = false, webhookUrl = proces
   if (!dryRun && state) {
     saveState(dataDir, state);
     writeLastRun(dataDir, summary);
+    if (leads.length) writeRunLeads(dataDir, leadsText(leads, placeName(cfg)));
   }
 
   const text = summaryText(cfg, stats, warnings, fatal);
   log(`\n${text}`);
   if (leads.length || fatal || warnings.length || cfg?.postSummaryWhenEmpty !== false) {
-    const messages = buildMessages(text, leads);
+    // Lead cards, then the 📲 Send to WhatsApp link(s) with every lead from this run.
+    const messages = [...buildMessages(text, leads), ...whatsappMessages(leads, cfg ? placeName(cfg) : '')];
     if (dryRun) {
       log(`\n[dry run] Would send ${messages.length} Discord message(s):\n${JSON.stringify(messages, null, 2)}`);
     } else if (!webhookUrl) {
