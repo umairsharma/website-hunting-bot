@@ -3097,7 +3097,7 @@
    {"type":"way","id":1296716406,"center":{"lat":52.4778308,"lon":-1.8931438},"tags":{"check_date":"2026-08-02","indoor":"room","level":"1","name":"Miss Diva","old_name":"Sole Trader","shop":"clothes"}},
    {"type":"way","id":1451936859,"center":{"lat":52.4632101,"lon":-1.8135262},"tags":{"clothes":"women;hijab","name":"Hijabi","shop":"clothes"}}
  ]},
- "Birmingham|United Kingdom|0||no-chains|office=estate_agent": {"fetched": "2026-09-27T02:47:39.316Z", "elements": [
+ "Birmingham|United Kingdom|0||no-chains|office=estate_agent": {"fetched": "2026-10-05T08:10:10.666Z", "elements": [
    {"type":"node","id":370703155,"lat":52.5401289,"lon":-1.8705926,"tags":{"name":"Samuel Lawrence & Co","office":"estate_agent"}},
    {"type":"node","id":459180067,"lat":52.4433899,"lon":-1.9362153,"tags":{"addr:city":"Birmingham","addr:country":"GB","addr:housenumber":"672","addr:postcode":"B29 6BJ","addr:street":"Bristol Road","name":"King & Co","office":"estate_agent","source":"survey"}},
    {"type":"node","id":459279744,"lat":52.4391222,"lon":-1.9397695,"tags":{"name":"Halifax","office":"estate_agent"}},

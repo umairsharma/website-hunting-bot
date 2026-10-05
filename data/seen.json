@@ -337,6 +337,22 @@
   "way/138504081": {"status":"has_website","name":"Sutton Road Surgery","checked":"2026-10-04","website":"suttonroadsurgery.co.uk","layer":2},
   "way/171752243": {"status":"has_website","name":"Just Move","checked":"2026-10-04","website":"justmoveestates.co.uk","layer":2},
   "way/186041151": {"status":"has_website","name":"Dental Surgery","checked":"2026-10-04","website":"riverdalehealthcare.com","layer":2},
-  "node/4480846719": {"status":"lead","name":"Body in Perfect Health","checked":"2026-10-04"}
+  "node/4480846719": {"status":"lead","name":"Body in Perfect Health","checked":"2026-10-04"},
+  "node/3100373307": {"status":"has_website","name":"The Clip Bar","checked":"2026-10-05","website":"theclipbar.com","layer":3},
+  "way/194115946": {"status":"lead","name":"Fargo's Food Factory","checked":"2026-10-05"},
+  "node/2469754464": {"status":"has_website","name":"Cafephilia","checked":"2026-10-05","website":"cafephilia.online","layer":2},
+  "node/3177657681": {"status":"has_website","name":"Medina Bakery","checked":"2026-10-05","website":"medinadelights.com","layer":3},
+  "node/3460994711": {"status":"closed","name":"Rukmoni","checked":"2026-10-05"},
+  "way/143611736": {"status":"has_website","name":"Grange Hill Surgery","checked":"2026-10-05","website":"weoleyparkandgrangehillsurgery.co.uk","layer":2},
+  "way/144554935": {"status":"has_website","name":"Forman Tyres","checked":"2026-10-05","website":"ww1.formanstyres.co.uk","layer":3},
+  "way/171752268": {"status":"has_website","name":"Seekers","checked":"2026-10-05","website":"loveseekers.co.uk","layer":2},
+  "way/20002347": {"status":"has_website","name":"Dental Care Partnership","checked":"2026-10-05","website":"suttondentalcare.co.uk","layer":2},
+  "node/5901431820": {"status":"has_website","name":"Ultimate Fitness","checked":"2026-10-05","website":"ultimatefitnessbirmingham.co.uk","layer":2},
+  "node/8332341943": {"status":"has_website","name":"Beeches Beds","checked":"2026-10-05","website":"hungryhorse.co.uk","layer":2},
+  "node/12190278901": {"status":"lead","name":"Lai Yin Cantonese","checked":"2026-10-05"},
+  "node/2535904279": {"status":"has_website","name":"Little Desert Shop","checked":"2026-10-05","website":"littledessertshop.co.uk","layer":2},
+  "node/3470524717": {"status":"has_website","name":"Pastry House","checked":"2026-10-05","website":"bestpastryhouse.co.uk","layer":2},
+  "node/3461048627": {"status":"lead","name":"Shafiq","checked":"2026-10-05"},
+  "way/143895597": {"status":"has_website","name":"Sparkbrook Community & Health Centre","checked":"2026-10-05","website":"birmingham.gov.uk","layer":2}
  }
 }
