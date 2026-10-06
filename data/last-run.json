@@ -1,16 +1,16 @@
 {
-  "startedAt": "2026-10-06T08:09:12.022Z",
-  "finishedAt": "2026-10-06T08:18:25.114Z",
-  "minutes": 9.2,
-  "place": "Birmingham, United Kingdom",
-  "area": "Birmingham, West Midlands, England, United Kingdom",
-  "candidates": 2437,
+  "startedAt": "2026-10-06T08:41:04.307Z",
+  "finishedAt": "2026-10-06T09:05:11.228Z",
+  "minutes": 24.1,
+  "place": "Boise, United States",
+  "area": "Boise, Ada County, Idaho, United States",
+  "candidates": 302,
   "checked": 30,
-  "leads": 10,
+  "leads": 11,
   "hasWebsite": 19,
-  "closed": 1,
+  "closed": 0,
   "unverified": 0,
-  "pending": 2117,
+  "pending": 272,
   "searchEngines": {
     "google": "broken",
     "brave": "blocked",
@@ -19,6 +19,7 @@
     "duckduckgo": "untested"
   },
   "warnings": [
+    "OpenStreetMap servers were busy, so these were skipped this run: Clothes / tailor, Real estate agent.",
     "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
   ],
   "error": null
