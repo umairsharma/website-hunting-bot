@@ -451,11 +451,10 @@
    {"type":"way","id":1434464842,"center":{"lat":31.4473607,"lon":74.267792},"tags":{"amenity":"cafe","building":"university","name":"Cafe A"}},
    {"type":"way","id":1482281592,"center":{"lat":31.4691678,"lon":74.4125623},"tags":{"amenity":"cafe","building":"yes","name":"Offside Cafe"}}
  ]},
- "Lahore|Pakistan|0||no-chains|shop=bakery,shop=confectionery,shop=pastry": {"fetched": "2026-09-26T18:58:15.397Z", "elements": [
+ "Lahore|Pakistan|0||no-chains|shop=bakery,shop=confectionery,shop=pastry": {"fetched": "2026-10-06T09:37:23.611Z", "elements": [
    {"type":"node","id":1357553199,"lat":31.4662272,"lon":74.2937463,"tags":{"name":"Gourmet Bakers","shop":"bakery"}},
    {"type":"node","id":1715927555,"lat":31.4660662,"lon":74.3161207,"tags":{"name":"Fresh Inn Bakers","shop":"bakery"}},
    {"type":"node","id":2296877476,"lat":31.4854263,"lon":74.3646806,"tags":{"name":"Faran Bakery","shop":"bakery"}},
-   {"type":"node","id":2328950086,"lat":31.501354,"lon":74.3661967,"tags":{"addr:street":"Ali Zeb Road","name":"Gourmet Bakers","shop":"bakery"}},
    {"type":"node","id":3228594852,"lat":31.5295776,"lon":74.3768165,"tags":{"name":"Rahat Bakery","shop":"bakery"}},
    {"type":"node","id":3343635641,"lat":31.4993781,"lon":74.265375,"tags":{"addr:city":"Lahore","name":"Al-Awan Bakers","shop":"bakery"}},
    {"type":"node","id":3536164079,"lat":31.5208501,"lon":74.2910578,"tags":{"name":"Nirala Sweets","shop":"bakery"}},
@@ -544,8 +543,6 @@
    {"type":"way","id":333712343,"center":{"lat":31.4703364,"lon":74.308724},"tags":{"addr:street":"Faisal Town","building":"yes","name":"Gourmet Bakers","shop":"bakery"}},
    {"type":"way","id":394362528,"center":{"lat":31.485264,"lon":74.2831771},"tags":{"building":"yes","name":"Cakes & Bakes, Tech Society Brankch","shop":"bakery"}},
    {"type":"way","id":544698793,"center":{"lat":31.4832896,"lon":74.4204406},"tags":{"addr:city":"Lahore","addr:postcode":"54000","addr:street":"Bedian Road","building":"yes","ele":"1","name":"Luqman Sweets and Bakers Store","shop":"bakery"}},
-   {"type":"way","id":544743904,"center":{"lat":31.5013013,"lon":74.366164},"tags":{"addr:city":"Lahore","addr:postcode":"54000","building":"yes","name":"Gourmet Bakers & Sweets","shop":"bakery"}},
-   {"type":"way","id":544743914,"center":{"lat":31.5012963,"lon":74.3662815},"tags":{"addr:city":"Lahore","addr:postcode":"54000","building":"yes","ele":"1","name":"Shezan Bakers & Confectioners","shop":"bakery"}},
    {"type":"way","id":544944891,"center":{"lat":31.4826888,"lon":74.3957923},"tags":{"addr:city":"Lahore","addr:postcode":"54000","addr:street":"St 148 Sec H Comm. Ph 1","building":"yes","level":"1","name":"Gourmet Bakery","shop":"bakery"}},
    {"type":"way","id":544945243,"center":{"lat":31.483277,"lon":74.3954002},"tags":{"addr:city":"Lahore","addr:postcode":"54000","building":"yes","level":"2","name":"Bread & Beyond","shop":"bakery"}},
    {"type":"way","id":544980236,"center":{"lat":31.4584991,"lon":74.3746601},"tags":{"building":"yes","ele":"2","name":"Allied Bakers","shop":"bakery"}},
@@ -562,7 +559,10 @@
    {"type":"way","id":791660215,"center":{"lat":31.5220807,"lon":74.4524291},"tags":{"building":"yes","name":"Rahat Bakery","shop":"bakery"}},
    {"type":"way","id":792582720,"center":{"lat":31.5827517,"lon":74.3708142},"tags":{"building":"yes","name":"Rafiq Bakery","shop":"bakery"}},
    {"type":"way","id":1155861278,"center":{"lat":31.5250968,"lon":74.4538328},"tags":{"addr:city":"Lahore","addr:housenumber":"63 S","addr:street":"Commercial Bock, Paragon City","building":"yes","name":"Jalal Sons","opening_hours":"Mo-Su 09:00-21:00","payment:cash":"yes","payment:credit_cards":"yes","payment:debit_cards":"yes","phone":"+923204805000","shop":"bakery"}},
-   {"type":"way","id":1481276902,"center":{"lat":31.6002592,"lon":74.3197477},"tags":{"building":"yes","name":"Pick N Pay Super Store","shop":"bakery"}}
+   {"type":"way","id":1481276902,"center":{"lat":31.6002592,"lon":74.3197477},"tags":{"building":"yes","name":"Pick N Pay Super Store","shop":"bakery"}},
+   {"type":"way","id":1564503896,"center":{"lat":31.5013659,"lon":74.3638351},"tags":{"addr:city":"Lahore","addr:full":"Plot # 68 Commercial Area, Cavalry Ground, Lahore","addr:housenumber":"Plot # 68","addr:place":"Commercial Area, Cavalry Ground","building":"yes","mobile":"0317-8886810","name":"Cakes & Bakes","shop":"bakery"}},
+   {"type":"way","id":1564503936,"center":{"lat":31.501817,"lon":74.3601799},"tags":{"building":"yes","mobile":"0302-3754400","name":"Eminabadi Barfi","name:ur":"ایمن آبادی برفی","shop":"bakery"}},
+   {"type":"way","id":1564503957,"center":{"lat":31.501308,"lon":74.3662795},"tags":{"addr:city":"Lahore","addr:full":"Commercial Area Masood Anwari Road, Lahore, Pakistan","addr:place":"Commerical Area","addr:street":"Masood Anwari Road","building":"yes","mobile":"0335-1119012","name":"Shezan Bakery","shop":"bakery"}}
  ]},
  "Lahore|Pakistan|0||no-chains|shop=hairdresser,shop=beauty": {"fetched": "2026-10-06T04:19:03.670Z", "elements": [
    {"type":"node","id":4533509193,"lat":31.5783613,"lon":74.3186614,"tags":{"name":"Madni Traders","opening_hours":"Mo-Sa 10:00-22:00","phone":"03214481300","shop":"beauty"}},
@@ -617,7 +617,7 @@
    {"type":"way","id":1530187620,"center":{"lat":31.5588538,"lon":74.3377074},"tags":{"addr:city":"Lahore","addr:street":"16 Sir Aga Khan Road","alt_name":"Manji Dental","amenity":"dentist","building":"clinic","building:levels":"1","contact:facebook":"https://www.facebook.com/manjidental","contact:instagram":"https://www.instagram.com/manjidental/","email":"manjidental@gmail.com","healthcare":"dentist","healthcare:speciality":"dental_oral_maxillo_facial_surgery;dentistry","mobile":"+923229499999","name":"Manji Dental & Healthcare Centre","opening_hours":"Mo-Sa 11:00-21:00","operator":"Asst. Prof. Dr. Salima Naveed Manji"}},
    {"type":"way","id":1564503831,"center":{"lat":31.5019179,"lon":74.3646524},"tags":{"addr:city":"Lahore","addr:full":"26 Commercial Plaza, Cavalry Ground, Lahore","addr:housenumber":"Shop No 4, 26 Commercial Plaza","addr:place":"Cavalry Ground","amenity":"dentist","building":"yes","healthcare":"dentist","mobile":"0300-9483315","name":"DentoCare Dental Clinic","operator":"Dr. Kamal & Associates","phone":"042-36668548"}}
  ]},
- "Lahore|Pakistan|0||no-chains|amenity=clinic,amenity=doctors,healthcare=clinic,healthcare=doctor": {"fetched": "2026-09-26T19:05:58.519Z", "elements": [
+ "Lahore|Pakistan|0||no-chains|amenity=clinic,amenity=doctors,healthcare=clinic,healthcare=doctor": {"fetched": "2026-10-06T09:39:01.186Z", "elements": [
    {"type":"node","id":4107300389,"lat":31.540731,"lon":74.3300801,"tags":{"addr:street":"Near Shadman Market, Behind Bank Alfalah, lahore","amenity":"clinic","healthcare":"clinic","name":"Advanced Medical Centre","name:ur":"ایڈوانسڈ میڈیکل سینٹر"}},
    {"type":"node","id":4170132589,"lat":31.5649365,"lon":74.3808544,"tags":{"amenity":"doctors","healthcare":"doctor","name":"Doctor"}},
    {"type":"node","id":4233658689,"lat":31.5469203,"lon":74.3048326,"tags":{"amenity":"doctors","name":"Dr Imran Wahees."}},
@@ -646,7 +646,6 @@
    {"type":"node","id":5142485922,"lat":31.4937471,"lon":74.41767,"tags":{"addr:street":"Airport Ghazi Rd","amenity":"clinic","name":"Dr Amir Homeopathic Clinic","name:ur":"ڈاکٹر عامر ہومیوپیتھک کلینک","operator":"Dr Amir"}},
    {"type":"node","id":5251896802,"lat":31.4848539,"lon":74.4088198,"tags":{"addr:city":"Lahore","addr:street":"Ghazi Road","amenity":"clinic","healthcare":"clinic","name":"Al-Khair Homeopathic Clinic & Medical Store","name:ur":"الخیر ہومیوپیتھک کلینک اینڈ میڈیکل سٹور"}},
    {"type":"node","id":5251896811,"lat":31.4860574,"lon":74.4143682,"tags":{"addr:city":"Lahore","addr:street":"Bedian Road","amenity":"clinic","healthcare":"clinic","name":"Farzana Clinic"}},
-   {"type":"node","id":5259654965,"lat":31.5018223,"lon":74.3631454,"tags":{"addr:city":"Lahore","addr:street":"Ali Zeb Road","amenity":"clinic","healthcare":"clinic","name":"Chughtais Lahore Lab","name:ur":"چغتائیس لاہور لیب"}},
    {"type":"node","id":5259654966,"lat":31.50182,"lon":74.3632983,"tags":{"addr:city":"Lahore","addr:street":"Ali Zeb Road","amenity":"clinic","healthcare":"clinic","name":"Shaukat Khanum Lab","name:ur":"شوکت خانم لیب"}},
    {"type":"node","id":5259654967,"lat":31.5018189,"lon":74.3634646,"tags":{"addr:city":"Lahore","addr:street":"Ali Zeb Road","amenity":"clinic","healthcare":"clinic","name":"Lahore Health Care","name:ur":"لاہور ہیلتھ کیئر"}},
    {"type":"node","id":5259747069,"lat":31.5024515,"lon":74.2679873,"tags":{"addr:city":"Lahore","addr:street":"Multan Road","amenity":"clinic","healthcare":"clinic","name":"Hussain Clinic"}},
@@ -688,9 +687,11 @@
    {"type":"way","id":546081030,"center":{"lat":31.4636461,"lon":74.386342},"tags":{"amenity":"clinic","building":"yes","ele":"2","healthcare":"clinic","name":"ساو آن طبي مرکز"}},
    {"type":"way","id":699576478,"center":{"lat":31.5381669,"lon":74.4479085},"tags":{"addr:city":"Lahore","amenity":"clinic","building":"yes","ele":"2","healthcare":"clinic","name":"Mother And Child Health Clinic","name:ur":"ماں اور بچے کی صحت کا کلینک"}},
    {"type":"way","id":799764071,"center":{"lat":31.5101507,"lon":74.3489271},"tags":{"addr:city":"لاہور","amenity":"clinic","building":"yes","healthcare":"clinic","name":"الشوکات میڈیکل اینڈ کڈنی سینٹر","name:en":"Al Shaukat Medical & Kidney Centre"}},
-   {"type":"way","id":1560098111,"center":{"lat":31.5070504,"lon":74.3170172},"tags":{"addr:city":"Lahore","addr:housenumber":"48-Ahmad Block New Garden Town, Lahore.","addr:place":"Ahmad Block New Garden Town","amenity":"clinic","building":"yes","email":"atif_kazmi80@hotmail.com","healthcare":"clinic","healthcare:speciality":"Skin Care","mobile":"0300-8440840","name":"Prof. Dr. Atif Kazmi","opening_hours":"Mo-Sa 18:00-21:00, Su 10:00-13:00","operator":"Prof. Dr. Atif Kazmi","phone":"35831596, 35863868"}}
+   {"type":"way","id":1560098111,"center":{"lat":31.5070504,"lon":74.3170172},"tags":{"addr:city":"Lahore","addr:housenumber":"48-Ahmad Block New Garden Town, Lahore.","addr:place":"Ahmad Block New Garden Town","amenity":"clinic","building":"yes","email":"atif_kazmi80@hotmail.com","healthcare":"clinic","healthcare:speciality":"Skin Care","mobile":"0300-8440840","name":"Prof. Dr. Atif Kazmi","opening_hours":"Mo-Sa 18:00-21:00, Su 10:00-13:00","operator":"Prof. Dr. Atif Kazmi","phone":"35831596, 35863868"}},
+   {"type":"way","id":1564503882,"center":{"lat":31.5019225,"lon":74.3631214},"tags":{"amenity":"clinic","building":"yes","healthcare":"clinic","mobile":"0305-4198517","name":"Medivision Poly Clinic","phone":"042-36610499"}},
+   {"type":"way","id":1564503966,"center":{"lat":31.5019349,"lon":74.3625359},"tags":{"addr:city":"Lahore Cantt","addr:full":"47-Cavalry Ground, Lahore Cantt Near Jinnah Flyover, Gulberg Lahore","addr:housenumber":"47","addr:place":"Cavalry Ground","amenity":"doctors","building":"yes","email":"ahmadtj@hotmail.com","healthcare":"doctor","healthcare:speciality":"dermatology","mobile":"0333-4247353, 0315-7580106","name":"Cavalry Institute of Skin Disorders","operator":"Dr. Tahir Jamil Ahmad","phone":"042-36610047"}}
  ]},
- "Lahore|Pakistan|0||no-chains|leisure=fitness_centre": {"fetched": "2026-09-26T19:06:31.164Z", "elements": [
+ "Lahore|Pakistan|0||no-chains|leisure=fitness_centre": {"fetched": "2026-10-06T09:39:40.275Z", "elements": [
    {"type":"node","id":4427363571,"lat":31.3889993,"lon":74.1913089,"tags":{"leisure":"fitness_centre","name":"Life Fitness Club"}},
    {"type":"node","id":4630049095,"lat":31.5356918,"lon":74.4174574,"tags":{"addr:postcode":"54000","addr:street":"Street 1","internet_access":"wlan","leisure":"fitness_centre","name":"Gymnasium, Askari - 10","name:en":"Gymnasium, Askari - 10"}},
    {"type":"node","id":5251896792,"lat":31.4837874,"lon":74.4082921,"tags":{"addr:city":"Lahore","addr:place":"Dha Phase 2","addr:street":"Sec Q Comm Ph 2","leisure":"fitness_centre","name":"Times Fitness"}},
