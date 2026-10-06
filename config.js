@@ -6,7 +6,7 @@
 
 export default {
   // Where to hunt. Any city in the world works.
-  city: 'Boise', // Idaho
+  city: 'Nashville', // Tennessee
   country: 'United States',
 
   // 0 = the whole city (or 5 km around `center` below, if you set one).
