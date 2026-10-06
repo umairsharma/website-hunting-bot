@@ -2,6 +2,7 @@
 
 import { hostOf, prettySite } from './matching.js';
 import { sleep } from './util.js';
+import { leadShareLink } from './share.js';
 
 const MAX_EMBEDS_PER_MESSAGE = 10; // Discord limit
 const MAX_CHARS_PER_MESSAGE = 5800; // Discord limit is 6000 across all embeds
@@ -45,6 +46,8 @@ export function leadEmbed(lead) {
     fields.push({ name: 'Social pages', value: clip(links, 1024) });
   }
   if (lead.notes?.length) fields.push({ name: 'Notes', value: clip(lead.notes.map((n) => `• ${n}`).join('\n'), 1024) });
+  // Opens WhatsApp with everything above typed in; pick a chat (or "Message yourself") and send.
+  fields.push({ name: '📲 Share', value: `[Send this lead to WhatsApp](${leadShareLink(lead)})` });
 
   const embed = {
     title: clip(`${hot ? '🔥 ' : ''}${lead.name}`, 256),

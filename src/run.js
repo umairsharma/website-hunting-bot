@@ -8,7 +8,7 @@ import { createSearcher, engineLabel, ENGINE_NAMES } from './search.js';
 import { analyzeResults, classifyUrl, hostOf, prettySite, toWhatsApp, uniqueUrls } from './matching.js';
 import { buildMessages, sendMessages } from './discord.js';
 import { appendLead, loadState, saveState, writeLastRun, writeRunLeads } from './storage.js';
-import { leadsText, whatsappMessages } from './share.js';
+import { leadsText } from './share.js';
 import { endpoints, randomDelayMs, sleep, today } from './util.js';
 
 const KNOWN_ENGINES = ENGINE_NAMES; // google, brave, startpage, bing, duckduckgo
@@ -253,6 +253,11 @@ function engineWarnings(state) {
   return [`Web search: ${what}${used.length ? `, so it used ${used.join(' + ')}` : ''}.`];
 }
 
+// Link to data/run-leads.txt on GitHub (every lead of this run as text, with a "Copy raw file" button).
+const runLeadsLink = () => (process.env.GITHUB_REPOSITORY
+  ? `https://github.com/${process.env.GITHUB_REPOSITORY}/blob/${process.env.GITHUB_REF_NAME || 'main'}/data/run-leads.txt`
+  : null);
+
 function summaryText(cfg, stats, warnings, fatal) {
   const lines = [`🎯 **Website Hunting Bot** · ${cfg ? placeName(cfg) : 'setup problem'}`];
   if (cfg?.runLabel) lines.push(`🖐️ ${cfg.runLabel}`);
@@ -268,6 +273,10 @@ function summaryText(cfg, stats, warnings, fatal) {
     if (stats.unverified) bits.push(`⏳ ${stats.unverified} to retry`);
     if (bits.length) lines.push(bits.join(' · '));
     lines.push(`🔎 Checked ${stats.checked} this run · ${stats.pending.toLocaleString('en-US')} still in the queue`);
+    if (stats.leads) {
+      const all = runLeadsLink();
+      lines.push(`📲 Each card has a "Send this lead to WhatsApp" link${all ? ` · [All ${stats.leads} leads as text](${all}) (tap Copy raw file)` : ''}`);
+    }
   }
   for (const w of warnings) lines.push(`⚠️ ${w}`);
   return lines.join('\n');
@@ -342,8 +351,7 @@ export async function run({ config, dataDir, dryRun = false, webhookUrl = proces
   const text = summaryText(cfg, stats, warnings, fatal);
   log(`\n${text}`);
   if (leads.length || fatal || warnings.length || cfg?.postSummaryWhenEmpty !== false) {
-    // Lead cards, then the 📲 Send to WhatsApp link(s) with every lead from this run.
-    const messages = [...buildMessages(text, leads), ...whatsappMessages(leads, cfg ? placeName(cfg) : '')];
+    const messages = buildMessages(text, leads);
     if (dryRun) {
       log(`\n[dry run] Would send ${messages.length} Discord message(s):\n${JSON.stringify(messages, null, 2)}`);
     } else if (!webhookUrl) {

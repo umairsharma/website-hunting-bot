@@ -52,8 +52,8 @@ That's it. The Discord summary will say *Brave (API)* when it's being used. With
 ## What you get
 
 - **Discord:** a summary, then one card per lead with category, phone, a WhatsApp link, Google rating, address, social pages and notes. 🔥 means 50+ Google reviews (a busy business with no website, so the best leads).
-- **📲 Send to WhatsApp:** after the lead cards, a link that opens WhatsApp with all of that run's leads typed in (name, type, phone, Google Maps link). Pick a chat or "Message yourself" and send. Big runs get one link per 8–10 leads.
-- **`data/run-leads.txt`:** the latest run's leads as plain text. Open it on GitHub and tap **Copy raw file** to copy them all.
+- **📲 Send this lead to WhatsApp:** a link on every lead card. It opens WhatsApp with all the card's details typed in (name, rating, phone, WhatsApp link, address, Google Maps link, email, social pages, notes). Pick a chat or "Message yourself" and send.
+- **`data/run-leads.txt`:** the latest run's leads with every detail, as text. The Discord summary links to it; tap **Copy raw file** to copy them all at once.
 - **`data/leads.csv`:** every lead ever found. GitHub shows it as a table.
 - **`data/last-run.json`:** numbers from the latest run.
 - **`data/seen.json`:** every business already checked, so nothing is checked or sent twice.
