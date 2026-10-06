@@ -1,5 +1,5 @@
 {
- "Lahore|Pakistan|0||no-chains|amenity=restaurant": {"fetched": "2026-09-26T18:55:34.736Z", "elements": [
+ "Lahore|Pakistan|0||no-chains|amenity=restaurant": {"fetched": "2026-10-06T04:05:19.472Z", "elements": [
    {"type":"node","id":526690133,"lat":31.4971045,"lon":74.3068676,"tags":{"amenity":"restaurant","key":"Punjab University Lahore","name":"Main Cafeteria"}},
    {"type":"node","id":533746262,"lat":31.4747018,"lon":74.3785748,"tags":{"amenity":"restaurant","name":"Gourmet Grill"}},
    {"type":"node","id":533746378,"lat":31.4735599,"lon":74.3792443,"tags":{"amenity":"restaurant","name":"Bundu Khan"}},
@@ -308,7 +308,6 @@
    {"type":"way","id":544692858,"center":{"lat":31.4744407,"lon":74.4009645},"tags":{"amenity":"restaurant","building":"yes","cuisine":"burger","name":"Choco Palace"}},
    {"type":"way","id":544707409,"center":{"lat":31.4745488,"lon":74.4032131},"tags":{"amenity":"restaurant","building":"yes","cuisine":"french","ele":"1","name":"Belgian Fries"}},
    {"type":"way","id":544707412,"center":{"lat":31.4745859,"lon":74.4023267},"tags":{"amenity":"restaurant","building":"yes","ele":"2","name":"MARO Tandoors"}},
-   {"type":"way","id":544744073,"center":{"lat":31.5013476,"lon":74.3646241},"tags":{"addr:city":"Lahore","addr:postcode":"54000","amenity":"restaurant","building":"yes","level":"1","name":"Libas-e-Khas"}},
    {"type":"way","id":544763657,"center":{"lat":31.482712,"lon":74.3965498},"tags":{"addr:city":"Lahore","addr:postcode":"54000","addr:street":"St 149 Sec H Comm Ph 1","amenity":"restaurant","building":"yes","level":"2","name":"Cravea"}},
    {"type":"way","id":544939912,"center":{"lat":31.4743721,"lon":74.4023233},"tags":{"amenity":"restaurant","building":"yes","cuisine":"burger;french","ele":"2","name":"OPTP"}},
    {"type":"way","id":544944894,"center":{"lat":31.4828113,"lon":74.3956603},"tags":{"addr:city":"Lahore","addr:postcode":"54000","addr:street":"St 148 Sec H Comm. Ph 1","amenity":"restaurant","building":"yes","level":"2","name":"Kababjees"}},
@@ -316,7 +315,6 @@
    {"type":"way","id":544946697,"center":{"lat":31.4702651,"lon":74.3903749},"tags":{"amenity":"restaurant","building":"yes","cuisine":"pizza","ele":"1","name":"Pizza Town"}},
    {"type":"way","id":544946698,"center":{"lat":31.4701316,"lon":74.3905983},"tags":{"amenity":"restaurant","building":"yes","ele":"1","name":"Holy Smoke"}},
    {"type":"way","id":544946885,"center":{"lat":31.4828393,"lon":74.3958487},"tags":{"addr:city":"Lahore","addr:postcode":"54000","amenity":"restaurant","building":"yes","level":"2","name":"The New York Gyro"}},
-   {"type":"way","id":544946944,"center":{"lat":31.469793,"lon":74.3897118},"tags":{"amenity":"restaurant","building":"yes","ele":"1","name":"Haleem Campus","toilets:wheelchair":"yes","wheelchair":"yes"}},
    {"type":"way","id":544947232,"center":{"lat":31.4788158,"lon":74.415811},"tags":{"addr:city":"Lahore","addr:postcode":"54000","addr:street":"Faisal Ghulam Shaeed Road","amenity":"restaurant","building":"yes","ele":"2","name":"Italian Pizza Lahore"}},
    {"type":"way","id":544950769,"center":{"lat":31.4820481,"lon":74.3959972},"tags":{"amenity":"restaurant","building":"yes","name":"Tandoor Restaurant"}},
    {"type":"way","id":544950771,"center":{"lat":31.4821794,"lon":74.3958396},"tags":{"addr:city":"Lahore","addr:postcode":"54000","amenity":"restaurant","building":"yes","level":"1","name":"Fazal-E-Haq Dera Restaurant"}},
@@ -376,9 +374,10 @@
    {"type":"way","id":1243458175,"center":{"lat":31.5812107,"lon":74.4774647},"tags":{"addr:city":"Lahore","addr:street":"نہر سڑک‎","amenity":"restaurant","building":"yes","name":"Umair Shinwari Restaurant and Kabuli Pulao"}},
    {"type":"way","id":1263957808,"center":{"lat":31.3697784,"lon":74.1885816},"tags":{"amenity":"restaurant","building":"yes","name":"Bahria Country Restaurant"}},
    {"type":"way","id":1473703058,"center":{"lat":31.4687512,"lon":74.4114192},"tags":{"amenity":"restaurant","building":"yes","name":"Green Olive"}},
-   {"type":"way","id":1516135919,"center":{"lat":31.4759454,"lon":74.4465838},"tags":{"amenity":"restaurant","branch":"Phase 6 DHA Lahore","building":"yes","cuisine":"chinese;regional;italian;indian","delivery":"yes","layer":"1","name":"Spice Bazaar Phase 6 DHA Lahore","takeaway":"yes","toilets":"yes"}}
+   {"type":"way","id":1516135919,"center":{"lat":31.4759454,"lon":74.4465838},"tags":{"amenity":"restaurant","branch":"Phase 6 DHA Lahore","building":"yes","cuisine":"chinese;regional;italian;indian","delivery":"yes","layer":"1","name":"Spice Bazaar Phase 6 DHA Lahore","takeaway":"yes","toilets":"yes"}},
+   {"type":"way","id":1564503881,"center":{"lat":31.5598289,"lon":74.3091777},"tags":{"addr:city":"Lahore","addr:housenumber":"4 Lyton Road, Lahore.","addr:street":"Lyton Road","amenity":"restaurant","building":"yes","contact:facebook":"masala.pk","mobile":"0322-4751552","name":"Masala Pakistan"}}
  ]},
- "Lahore|Pakistan|0||no-chains|amenity=cafe": {"fetched": "2026-09-26T18:56:21.704Z", "elements": [
+ "Lahore|Pakistan|0||no-chains|amenity=cafe": {"fetched": "2026-10-06T04:09:30.709Z", "elements": [
    {"type":"node","id":272344518,"lat":31.5185277,"lon":74.3777319,"tags":{"amenity":"cafe","created_by":"Potlatch 0.9c","name":"Services Club"}},
    {"type":"node","id":526681563,"lat":31.5036865,"lon":74.3078108,"tags":{"amenity":"cafe","key":"OGSA, Department of Geography","name":"Main Cafeteria"}},
    {"type":"node","id":1384171068,"lat":31.5143892,"lon":74.3512606,"tags":{"addr:housenumber":"1709","addr:street":"MM Alam Road","amenity":"cafe","name":"Indulge"}},
@@ -565,7 +564,7 @@
    {"type":"way","id":1155861278,"center":{"lat":31.5250968,"lon":74.4538328},"tags":{"addr:city":"Lahore","addr:housenumber":"63 S","addr:street":"Commercial Bock, Paragon City","building":"yes","name":"Jalal Sons","opening_hours":"Mo-Su 09:00-21:00","payment:cash":"yes","payment:credit_cards":"yes","payment:debit_cards":"yes","phone":"+923204805000","shop":"bakery"}},
    {"type":"way","id":1481276902,"center":{"lat":31.6002592,"lon":74.3197477},"tags":{"building":"yes","name":"Pick N Pay Super Store","shop":"bakery"}}
  ]},
- "Lahore|Pakistan|0||no-chains|shop=hairdresser,shop=beauty": {"fetched": "2026-09-26T19:01:19.367Z", "elements": [
+ "Lahore|Pakistan|0||no-chains|shop=hairdresser,shop=beauty": {"fetched": "2026-10-06T04:19:03.670Z", "elements": [
    {"type":"node","id":4533509193,"lat":31.5783613,"lon":74.3186614,"tags":{"name":"Madni Traders","opening_hours":"Mo-Sa 10:00-22:00","phone":"03214481300","shop":"beauty"}},
    {"type":"node","id":5251520115,"lat":31.5113078,"lon":74.3510786,"tags":{"addr:city":"Lahore","addr:street":"MM Alam Road","name":"Newlook Beauty Clinic and Spa","shop":"beauty"}},
    {"type":"node","id":5252199928,"lat":31.516653,"lon":74.3535596,"tags":{"addr:city":"Lahore","addr:street":"Tipu Road","name":"Le Reve","shop":"beauty"}},
@@ -598,9 +597,10 @@
    {"type":"way","id":545997600,"center":{"lat":31.4850835,"lon":74.3924772},"tags":{"addr:city":"Lahore","addr:postcode":"54000","building":"yes","level":"1","name":"Masooma's Avant Garde SALON","shop":"hairdresser"}},
    {"type":"way","id":684423057,"center":{"lat":31.4736137,"lon":74.4020334},"tags":{"addr:city":"Lahore","building":"yes","ele":"1","name":"NK Hair Saloon","shop":"hairdresser"}},
    {"type":"way","id":687291697,"center":{"lat":31.5370137,"lon":74.4114335},"tags":{"beauty":"nails","building":"yes","name":"Milano Salon for Men","shop":"beauty"}},
-   {"type":"way","id":687291701,"center":{"lat":31.5378159,"lon":74.4169893},"tags":{"building":"yes","name":"Khawar Riaz Bridal Salon","shop":"beauty"}}
+   {"type":"way","id":687291701,"center":{"lat":31.5378159,"lon":74.4169893},"tags":{"building":"yes","name":"Khawar Riaz Bridal Salon","shop":"beauty"}},
+   {"type":"way","id":1564503991,"center":{"lat":31.5013852,"lon":74.3634191},"tags":{"addr:city":"Lahore Cantt","addr:full":"Shop # 65, Cavalry Ground, Lahore Cantt","addr:housenumber":"Shop # 65","addr:place":"Cavalry Ground","building":"yes","name":"Grace & Glimmer Sparking With Elegance By Nazish","operator":"Nazish","shop":"beauty"}}
  ]},
- "Lahore|Pakistan|0||no-chains|amenity=dentist,healthcare=dentist": {"fetched": "2026-09-26T19:02:08.744Z", "elements": [
+ "Lahore|Pakistan|0||no-chains|amenity=dentist,healthcare=dentist": {"fetched": "2026-10-06T04:20:04.338Z", "elements": [
    {"type":"node","id":1750454167,"lat":31.5186253,"lon":74.3485791,"tags":{"addr:city":"Lahore","addr:housenumber":"51 D1","addr:postcode":"54660","amenity":"dentist","healthcare":"dentist","healthcare:speciality":"orthodontics;general;dentist;surgery","name":"Dr. Qazi and Associates","opening_hours":"Mo-Fr 09:00-18:00"}},
    {"type":"node","id":5253925864,"lat":31.4879716,"lon":74.3261076,"tags":{"addr:street":"Circular Road","amenity":"dentist","healthcare":"dentist","name":"Dental Hub"}},
    {"type":"node","id":6379726932,"lat":31.5545166,"lon":74.2992248,"tags":{"addr:housenumber":"15","addr:street":"Shamnagar Road","amenity":"dentist","contact:facebook":"https://www.facebook.com/bydentaloffices/","name":"Fawaz Dental Surgery"}},
@@ -612,10 +612,10 @@
    {"type":"node","id":11752486283,"lat":31.3882472,"lon":74.1819205,"tags":{"healthcare":"dentist","name":"Azhar's Dental Studio","survey:date":"2024-03-22"}},
    {"type":"node","id":11770977885,"lat":31.3611553,"lon":74.186737,"tags":{"healthcare":"dentist","name":"New Healerz","survey:date":"2024-03-29"}},
    {"type":"node","id":13946160600,"lat":31.5587184,"lon":74.3377549,"tags":{"addr:city":"Lahore","addr:street":"16 Sir Aga Khan Road","amenity":"dentist","contact:facebook":"https://www.facebook.com/manjidental","contact:instagram":"https://www.instagram.com/manjidental/","email":"manjidental@gmail.com","healthcare":"dentist","mobile":"+92 322 9499999","name":"Manji Dental & Healthcare Centre","name:ur":"مانجی ڈینٹل اینڈ ہیلتھ کیئر سینٹر","short_name":"Manji Dental"}},
-   {"type":"way","id":543676557,"center":{"lat":31.5019712,"lon":74.3618487},"tags":{"addr:city":"Lahore","addr:postcode":"54000","amenity":"dentist","building":"yes","healthcare":"dentist","name":"Cavalry Dental Clinic"}},
    {"type":"way","id":545994886,"center":{"lat":31.4847071,"lon":74.3920583},"tags":{"addr:city":"Lahore","addr:postcode":"54000","amenity":"dentist","building":"yes","healthcare":"dentist","level":"1","name":"Rabbani & Rabbani Dental Expressions"}},
    {"type":"way","id":795117473,"center":{"lat":31.521338,"lon":74.3505687},"tags":{"amenity":"dentist","building":"yes","healthcare":"dentist","name":"Family Dental Solutions - Institute of Orthodontics & Dental Cosmetics."}},
-   {"type":"way","id":1530187620,"center":{"lat":31.5588538,"lon":74.3377074},"tags":{"addr:city":"Lahore","addr:street":"16 Sir Aga Khan Road","alt_name":"Manji Dental","amenity":"dentist","building":"clinic","building:levels":"1","contact:facebook":"https://www.facebook.com/manjidental","contact:instagram":"https://www.instagram.com/manjidental/","email":"manjidental@gmail.com","healthcare":"dentist","healthcare:speciality":"dental_oral_maxillo_facial_surgery;dentistry","mobile":"+923229499999","name":"Manji Dental & Healthcare Centre","opening_hours":"Mo-Sa 11:00-21:00","operator":"Asst. Prof. Dr. Salima Naveed Manji"}}
+   {"type":"way","id":1530187620,"center":{"lat":31.5588538,"lon":74.3377074},"tags":{"addr:city":"Lahore","addr:street":"16 Sir Aga Khan Road","alt_name":"Manji Dental","amenity":"dentist","building":"clinic","building:levels":"1","contact:facebook":"https://www.facebook.com/manjidental","contact:instagram":"https://www.instagram.com/manjidental/","email":"manjidental@gmail.com","healthcare":"dentist","healthcare:speciality":"dental_oral_maxillo_facial_surgery;dentistry","mobile":"+923229499999","name":"Manji Dental & Healthcare Centre","opening_hours":"Mo-Sa 11:00-21:00","operator":"Asst. Prof. Dr. Salima Naveed Manji"}},
+   {"type":"way","id":1564503831,"center":{"lat":31.5019179,"lon":74.3646524},"tags":{"addr:city":"Lahore","addr:full":"26 Commercial Plaza, Cavalry Ground, Lahore","addr:housenumber":"Shop No 4, 26 Commercial Plaza","addr:place":"Cavalry Ground","amenity":"dentist","building":"yes","healthcare":"dentist","mobile":"0300-9483315","name":"DentoCare Dental Clinic","operator":"Dr. Kamal & Associates","phone":"042-36668548"}}
  ]},
  "Lahore|Pakistan|0||no-chains|amenity=clinic,amenity=doctors,healthcare=clinic,healthcare=doctor": {"fetched": "2026-09-26T19:05:58.519Z", "elements": [
    {"type":"node","id":4107300389,"lat":31.540731,"lon":74.3300801,"tags":{"addr:street":"Near Shadman Market, Behind Bank Alfalah, lahore","amenity":"clinic","healthcare":"clinic","name":"Advanced Medical Centre","name:ur":"ایڈوانسڈ میڈیکل سینٹر"}},

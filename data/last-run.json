@@ -1,26 +1,26 @@
 {
-  "startedAt": "2026-10-05T17:38:59.533Z",
-  "finishedAt": "2026-10-05T18:04:09.570Z",
-  "minutes": 25.2,
-  "place": "Houston, United States",
-  "area": "Houston, Harris County, Texas, United States",
-  "candidates": 2110,
-  "checked": 25,
-  "leads": 3,
-  "hasWebsite": 21,
-  "closed": 1,
+  "startedAt": "2026-10-06T04:05:17.750Z",
+  "finishedAt": "2026-10-06T04:29:52.639Z",
+  "minutes": 24.6,
+  "place": "Lahore, Pakistan",
+  "area": "Lahore District, Lahore Division, Punjab, Pakistan",
+  "candidates": 773,
+  "checked": 30,
+  "leads": 21,
+  "hasWebsite": 7,
+  "closed": 2,
   "unverified": 0,
-  "pending": 2045,
+  "pending": 684,
   "searchEngines": {
     "google": "broken",
     "brave": "blocked",
     "startpage": "blocked",
-    "bing": "broken",
-    "duckduckgo": "blocked"
+    "bing": "ok",
+    "duckduckgo": "untested"
   },
   "warnings": [
-    "Every search engine blocked the bot, so it stopped early. The rest will be checked next run.",
-    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, Bing didn't work, DuckDuckGo blocked the bot."
+    "OpenStreetMap servers were busy, so older saved data was used for: Bakery / sweets, Clinic / doctor, Gym, Car repair.",
+    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
   ],
   "error": null
 }
