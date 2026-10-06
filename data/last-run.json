@@ -1,16 +1,16 @@
 {
-  "startedAt": "2026-10-06T04:05:17.750Z",
-  "finishedAt": "2026-10-06T04:29:52.639Z",
-  "minutes": 24.6,
-  "place": "Lahore, Pakistan",
-  "area": "Lahore District, Lahore Division, Punjab, Pakistan",
-  "candidates": 773,
+  "startedAt": "2026-10-06T08:09:12.022Z",
+  "finishedAt": "2026-10-06T08:18:25.114Z",
+  "minutes": 9.2,
+  "place": "Birmingham, United Kingdom",
+  "area": "Birmingham, West Midlands, England, United Kingdom",
+  "candidates": 2437,
   "checked": 30,
-  "leads": 21,
-  "hasWebsite": 7,
-  "closed": 2,
+  "leads": 10,
+  "hasWebsite": 19,
+  "closed": 1,
   "unverified": 0,
-  "pending": 684,
+  "pending": 2117,
   "searchEngines": {
     "google": "broken",
     "brave": "blocked",
@@ -19,7 +19,6 @@
     "duckduckgo": "untested"
   },
   "warnings": [
-    "OpenStreetMap servers were busy, so older saved data was used for: Bakery / sweets, Clinic / doctor, Gym, Car repair.",
     "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
   ],
   "error": null
