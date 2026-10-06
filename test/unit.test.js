@@ -12,7 +12,7 @@ import { CATEGORIES, resolveCategories } from '../src/categories.js';
 import { applyRunInputs, callingCodeFor, DEFAULT_NICHE } from '../src/inputs.js';
 import { buildMessages, leadEmbed, sendMessages } from '../src/discord.js';
 import { shortMapsUrl } from '../src/maps.js';
-import { leadsText, whatsappMessages } from '../src/share.js';
+import { leadShareLink, leadText, leadsText } from '../src/share.js';
 import { normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
 
@@ -414,37 +414,44 @@ test('Google Maps link on every lead card: their listing, or the location when n
   assert.ok(value.includes('query=Crusty%20Cottage%20Bakery%2C%201%20High%20St'));
 });
 
-test('Send to WhatsApp: every lead in a wa.me link, messages within Discord limits', () => {
-  const leads = Array.from({ length: 23 }, (_, i) => ({
-    name: `Business (${i}) & Sons Ltd`,
-    categoryLabel: 'Car repair',
-    phone: `+1 713 555 01${String(i).padStart(2, '0')}`,
-    mapsUrl: `https://maps.google.com/?cid=${12345678901234567890n + BigInt(i)}`,
-  }));
-  const messages = whatsappMessages(leads, 'Houston, United States');
-  assert.ok(messages.length >= 2 && messages.length <= 4, `${messages.length} messages`);
-  const sent = [];
-  for (const m of messages) {
-    assert.ok(m.content.length <= 2000, `content is ${m.content.length} characters`);
-    assert.ok(m.embeds[0].description.length <= 4096);
-    const url = m.content.match(/\]\((https:\/\/wa\.me\/\?text=[^)\s]+)\)/)[1]; // brackets in names don't break the link
-    const text = decodeURIComponent(new URL(url).searchParams.get('text'));
-    assert.equal(text, m.embeds[0].description); // the link and the copy-ready list match
-    for (const line of text.split('\n').filter((l) => /^\d+\. /.test(l))) sent.push(line);
-  }
-  assert.equal(sent.length, 23); // every lead exactly once, in order
-  assert.deepEqual(sent.map((l) => Number(l.split('.')[0])), Array.from({ length: 23 }, (_, i) => i + 1));
-  assert.match(messages[0].content, /Send leads 1–\d+ to WhatsApp/);
-
-  const one = whatsappMessages(leads.slice(0, 1), 'Houston, United States');
-  assert.equal(one.length, 1);
-  assert.match(one[0].content, /Send this lead to WhatsApp/);
-  assert.deepEqual(whatsappMessages([], 'x'), []);
-
-  const text = leadsText(leads.slice(0, 2), 'Houston, United States');
+test('Send to WhatsApp: each card shares the full lead, within Discord limits', () => {
+  const lead = {
+    name: 'Snowflake (Donuts) & Co', categoryLabel: 'Bakery / sweets', rating: 4.8, reviews: 358,
+    phone: '(713) 827-2808', whatsapp: 'https://wa.me/17138272808', email: 'hello@snowflake.example',
+    address: '1234 Westheimer Rd, Houston, TX 77006', mapsUrl: 'https://maps.google.com/?cid=1841144998116252209',
+    socials: ['https://www.facebook.com/snowflakedonuts', 'https://www.instagram.com/snowflakedonuts/'],
+    notes: ['Their Google Maps "website" is just a Facebook page', 'Their Google listing is unclaimed'],
+  };
+  const card = leadEmbed(lead);
+  const share = card.fields.find((f) => f.name === '📲 Share');
+  assert.ok(share.value.length <= 1024, `${share.value.length} characters`);
+  const url = share.value.match(/^\[Send this lead to WhatsApp\]\((https:\/\/wa\.me\/\?text=[^)\s]+)\)$/)[1]; // brackets in the name don't break it
+  const text = decodeURIComponent(new URL(url).searchParams.get('text'));
   assert.equal(text, [
-    '🎯 2 website leads · Houston, United States',
-    '1. Business (0) & Sons Ltd (Car repair)\n📞 +1 713 555 0100\n📍 https://maps.google.com/?cid=12345678901234567890',
-    '2. Business (1) & Sons Ltd (Car repair)\n📞 +1 713 555 0101\n📍 https://maps.google.com/?cid=12345678901234567891',
-  ].join('\n\n'));
+    '🔥 *Snowflake (Donuts) & Co* (Bakery / sweets)',
+    '⭐ 4.8 (358 reviews)',
+    '📞 (713) 827-2808',
+    '💬 https://wa.me/17138272808',
+    '🏠 1234 Westheimer Rd, Houston, TX 77006',
+    '📍 https://maps.google.com/?cid=1841144998116252209',
+    '✉️ hello@snowflake.example',
+    '🔗 Facebook: https://www.facebook.com/snowflakedonuts',
+    '🔗 Instagram: https://www.instagram.com/snowflakedonuts/',
+    '📝 Their Google Maps "website" is just a Facebook page',
+    '📝 Their Google listing is unclaimed',
+  ].join('\n'));
+
+  // Too much for one link: notes go first, then extra social pages; the essentials always stay.
+  const huge = { ...lead, notes: Array(6).fill('n'.repeat(120)), socials: Array(4).fill(`https://www.facebook.com/${'p'.repeat(120)}`) };
+  const hugeText = decodeURIComponent(new URL(leadShareLink(huge)).searchParams.get('text'));
+  assert.ok(leadShareLink(huge).length <= 980);
+  for (const must of ['*Snowflake', '(713) 827-2808', 'Westheimer', 'maps.google.com/?cid=']) assert.ok(hugeText.includes(must), must);
+  assert.ok(!hugeText.includes('📝'));
+  assert.ok(leadShareLink({ name: 'x'.repeat(3000), phone: '1' }).length <= 980);
+
+  // run-leads.txt: every lead, numbered, every detail.
+  const all = leadsText([lead, { name: 'B', phone: '1' }], 'Houston, United States');
+  assert.ok(all.startsWith('🎯 2 website leads · Houston, United States\n\n1. 🔥 *Snowflake (Donuts) & Co*'));
+  assert.ok(all.includes('📝 Their Google listing is unclaimed') && all.includes('2. *B*\n📞 1'));
+  assert.equal(leadText({ name: 'C' }), '*C*');
 });
