@@ -2,10 +2,8 @@ name: Website Hunting Bot
 
 on:
   schedule:
-    # Every day at 9:00 AM UK time. GitHub schedules only use UTC, and UK clocks change,
-    # so both times are listed and the "time-check" job below lets through only the one that is 9 AM in London:
-    - cron: "0 8 * * *" # 9 AM in summer (BST, UTC+1)
-    - cron: "0 9 * * *" # 9 AM in winter (GMT, UTC+0)
+    # Every day at 4:00 PM Pakistan time. GitHub schedules use UTC; Pakistan is always UTC+5 (no daylight saving).
+    - cron: "0 11 * * *"
   # The "Run workflow" button in the Actions tab (also in the GitHub mobile app).
   # Leave the boxes empty to use config.js. Anything typed here applies to that one run only.
   workflow_dispatch:
@@ -70,30 +68,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  time-check:
-    runs-on: ubuntu-24.04
-    outputs:
-      go: ${{ steps.check.outputs.go }}
-    steps:
-      - id: check
-        env:
-          SCHEDULE: ${{ github.event.schedule }}
-        run: |
-          # Manual runs always go. A scheduled run goes only if its UTC slot is 9 AM in London today
-          # (based on which schedule fired, so a run GitHub starts late still counts).
-          offset=$(TZ=Europe/London date +%z)
-          if [ "${{ github.event_name }}" != "schedule" ] \
-            || { [ "$SCHEDULE" = "0 8 * * *" ] && [ "$offset" = "+0100" ]; } \
-            || { [ "$SCHEDULE" = "0 9 * * *" ] && [ "$offset" = "+0000" ]; }; then
-            echo "go=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Not 9 AM in the UK for this slot (London is UTC$offset), skipping."
-            echo "go=false" >> "$GITHUB_OUTPUT"
-          fi
-
   hunt:
-    needs: time-check
-    if: needs.time-check.outputs.go == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
