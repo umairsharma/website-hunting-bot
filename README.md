@@ -24,7 +24,7 @@ Open `config.js` → tap ✏️ → change `city`, `country`, `categories` → *
 
 **3. Run it**
 **Actions** tab → **Website Hunting Bot** → **Run workflow** → **Run workflow**.
-After that it runs by itself every day at 9 AM UK time (GitHub sometimes starts scheduled runs a few minutes late).
+After that it runs by itself every day at 4 PM Pakistan time (GitHub sometimes starts scheduled runs a few minutes late).
 
 ## Run it yourself, anywhere, any business type
 
@@ -38,7 +38,7 @@ Open the **Actions** tab → **Website Hunting Bot** → **Run workflow** (works
 
 Then tap the green **Run workflow** button. Results arrive in Discord in about 20–40 minutes, with a 🖐️ line showing what you picked.
 
-These settings are for that one run only. The daily 9 AM run always uses `config.js`, so change that file to change the daily hunt. Businesses already checked in any run are never checked or sent twice.
+These settings are for that one run only. The daily 4 PM run always uses `config.js`, so change that file to change the daily hunt. Businesses already checked in any run are never checked or sent twice.
 
 **4. Optional: a Brave Search API key (recommended)**
 Google, Brave and Startpage all sometimes block bots running on GitHub. Brave's official Search API never does. Its free allowance should cover the bot's ~30 searches a day; check the current terms when you sign up, as they may ask for a card.
@@ -79,7 +79,7 @@ The Discord summary always says what happened. Common messages:
 | *config.js has a mistake* | You probably deleted a comma or quote mark. Undo your last edit. |
 
 - **Start over:** delete `data/seen.json`, and everything gets re-checked.
-- **Change the time:** edit the two `cron` lines and the matching times in the `time-check` job in `.github/workflows/hunt.yml`. They're in UTC (UK = UTC+1 in summer, UTC+0 in winter).
+- **Change the time:** edit the `cron` line in `.github/workflows/hunt.yml`. It's in UTC (Pakistan = UTC+5, so 4 PM is `0 11 * * *`).
 - **Workflow shows a red ❌:** open it and read the "Hunt for leads" step. The error is at the bottom.
 
 ## Good to know
