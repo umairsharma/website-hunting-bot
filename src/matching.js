@@ -78,7 +78,7 @@ export function businessProfile(names, city) {
     keys.add(core.filter((t) => t !== 'and').join(''));
     for (const t of toks) words.add(t);
     const distinctive = toks.filter((t) => t.length >= 3 && !GENERIC_WORDS.has(t) && !cityTokens.has(t));
-    if (distinctive.length) tokenSets.push(distinctive);
+    if (distinctive.length) tokenSets.push([...new Set(distinctive)]); // "Clark & Clark" → clark
   }
   return { keys: [...keys].filter((k) => k.length >= 4), tokenSets, cityTokens, words };
 }
@@ -91,8 +91,9 @@ const SITE_FILLER = ['online', 'web', 'site', 'usa', 'official', 'team', 'home',
  * "bishopcisd" for "Bishop Plumbing" → "cisd"; "bishopplumbingms" → "ms".
  */
 function leftoverOf(siteKey, profile) {
+  // Short generic words ("new", "air") hide inside other words ("chapmannews"), so only longer ones count.
   const known = [...new Set([...profile.words, ...profile.cityTokens, ...GENERIC_WORDS, ...SITE_FILLER])]
-    .filter((w) => w.length >= 3 || profile.words.has(w))
+    .filter((w) => w.length >= 4 || profile.words.has(w))
     .sort((a, b) => b.length - a.length);
   let rest = siteKey;
   for (const w of known) rest = rest.split(w).join(' ');
@@ -116,11 +117,15 @@ export function siteMatchesBusiness(siteKey, profile, title = '') {
   const plain = siteKey.replace(/\d+/g, '');
   if (profile.tokenSets.some((tokens) => tokens.length === 1 && [plain, plain.replace(/s$/, '')].includes(tokens[0]))) return titled;
   if (profile.keys.some((key) => siteKey.length >= 5 && key.includes(siteKey) && siteKey.length >= key.length * 0.5)) return true;
-  const partial = profile.tokenSets.some(
-    (tokens) => tokens.join('').length >= 5 && tokens.every((x) => siteKey.includes(x)),
-  );
+  // One distinctive word plus another word of the name (bishopplumbing.com), not some other word (douglasus.com).
+  // A longer trade word counts too (harbornegarage.co.uk for "Harborne Auto Centre").
+  const otherNameWord = (tokens) => [...profile.words, ...[...GENERIC_WORDS].filter((w) => w.length >= 5)]
+    .some((w) => w.length >= 3 && !tokens.includes(w) && !STOP_WORDS.has(w) && siteKey.includes(w));
+  const holds = (tokens) => tokens.join('').length >= 5 && tokens.every((x) => siteKey.includes(x));
+  if (titled && profile.tokenSets.some(holds)) return true;
+  const partial = profile.tokenSets.some((tokens) => holds(tokens) && (tokens.length > 1 || otherNameWord(tokens)));
   // With more than that one word, nothing else in the domain may be unexplained.
-  return partial && (titled || leftoverOf(siteKey, profile).length <= 3);
+  return partial && leftoverOf(siteKey, profile).length <= 3;
 }
 
 function titleStartsWithName(title, names) {

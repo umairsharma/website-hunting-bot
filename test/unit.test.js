@@ -117,6 +117,10 @@ test('analyzeResults: one common word of the name ("Bishop", "Johnson") does not
   assert.ok(has('https://bishopplumbing.com/', 'Bishop Plumbing Service LLC'));
   assert.ok(has('https://bishopplumbingms.com/', 'Bishop Plumbing Service LLC'));
   assert.ok(has('https://mancusoservices.com/', 'Mancuso Brothers Plumbing'));
+  assert.ok(has('https://harbornegarage.co.uk/', 'Harborne Auto Centre'));
+  assert.equal(has('https://chapmannews.org/', 'Chapman Plumbing Co', 'Chapman News'), false);
+  assert.equal(has('https://douglasus.com/', 'Douglas Plumbing, LLC', 'Douglas Products'), false);
+  assert.equal(has('https://www.clarks.com/', 'Clark & Clark', 'Clarks Shoes'), false);
   assert.ok(has('https://barbersons.com/', 'Barber & Sons Plumbing Co'));
   assert.ok(has('https://johnsonplumbing247.com/', 'Johnson Plumbing'));
   // Just one word of the name, or a school / council site: not theirs (from a real run)
