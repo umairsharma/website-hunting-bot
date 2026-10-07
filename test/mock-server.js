@@ -201,6 +201,7 @@ export async function startMockServer(scenario = {}) {
     if (p === '/nominatim/search') return send(200, 'application/json', JSON.stringify(NOMINATIM));
     if (p === '/overpass/interpreter' && req.method === 'POST') {
       requests.overpass.push(new URLSearchParams(body).get('data'));
+      if (scenario.overpassDown) return send(504, 'text/plain', 'Gateway Timeout');
       return send(200, 'application/json', JSON.stringify({ elements: ELEMENTS }));
     }
     if (p.startsWith('/maps/search/')) {

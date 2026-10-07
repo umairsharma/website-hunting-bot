@@ -371,8 +371,14 @@ export async function run({ config, dataDir, dryRun = false, webhookUrl = proces
     const area = await resolveArea(cfg, ep, log);
     areaLabel = area.label;
     log(`📍 Area: ${area.label}`);
+    const canDiscover = cfg.mapsDiscovery && [...custom, ...defs].some((d) => d.search);
     const { candidates, notes: osmNotes } = defs.length
-      ? await fetchCandidates({ cfg, area, defs, ep, dataDir, save: !dryRun, log })
+      ? await fetchCandidates({ cfg, area, defs, ep, dataDir, save: !dryRun, log }).catch((err) => {
+        // OpenStreetMap down (or the area too big for it): Google Maps can still find businesses.
+        if (!canDiscover) throw err;
+        log(`⚠️ ${err.message} Searching Google Maps only.`);
+        return { candidates: [], notes: ['OpenStreetMap servers could not be reached, so only Google Maps was searched this run.'] };
+      })
       : { candidates: [], notes: [] };
     warnings.push(...osmNotes);
     stats.candidates = candidates.length;
