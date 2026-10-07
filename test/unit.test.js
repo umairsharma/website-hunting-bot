@@ -93,6 +93,29 @@ test('analyzeResults: a trade word alone ("plumbing") does not make another comp
   assert.ok(analyzeResults([{ url: 'https://jacksonplumbingco.com/', title: 'Home' }], jackson).hasWebsite); // the full name still counts
 });
 
+test('analyzeResults: one common word of the name ("Bishop", "Johnson") does not make a site theirs', () => {
+  const ms = (name) => {
+    const b = biz(name);
+    b.profile = businessProfile(b.names, 'Mississippi');
+    return b;
+  };
+  const has = (url, name, title = 'Home') => analyzeResults([{ url, title }], ms(name)).hasWebsite;
+  // Wrong matches from a real run
+  assert.equal(has('https://bishopcisd.net/', 'Bishop Plumbing Service LLC', 'Bishop CISD'), false);
+  assert.equal(has('https://barberhead.com/', 'Barber & Sons Plumbing Co'), false);
+  assert.equal(has('https://johnsonhvacdist.com/', 'Johnson Plumbing', 'Johnson HVAC Distributors'), false);
+  assert.equal(has('https://northeasternplumbingco.com/', 'North Ms Plumbing LLC'), false);
+  // Real sites still count
+  assert.ok(has('https://bishopplumbing.com/', 'Bishop Plumbing Service LLC'));
+  assert.ok(has('https://bishopplumbingms.com/', 'Bishop Plumbing Service LLC'));
+  assert.ok(has('https://mancusoservices.com/', 'Mancuso Brothers Plumbing'));
+  assert.ok(has('https://barbersons.com/', 'Barber & Sons Plumbing Co'));
+  assert.ok(has('https://johnsonplumbing247.com/', 'Johnson Plumbing'));
+  // An extra word is fine when the page is titled with the business's name
+  assert.ok(has('https://barberbrandon.com/', 'Barber & Sons Plumbing Co', 'Barber & Sons Plumbing | Brandon, MS'));
+  assert.equal(has('https://barberbrandon.com/', 'Barber & Sons Plumbing Co', 'Barber shop in Brandon'), false);
+});
+
 test('analyzeResults: socials, delivery apps, directories and news are not websites', () => {
   const r = analyzeResults([
     { url: 'https://www.facebook.com/buttkarahihouse/', title: 'Butt Karahi House - Home | Facebook' },

@@ -66,28 +66,59 @@ export function businessProfile(names, city) {
   const cityTokens = new Set(tokensOf(city));
   const keys = new Set();
   const tokenSets = [];
+  const words = new Set();
   for (const name of names) {
     const toks = tokensOf(name);
     if (!toks.length) continue;
     keys.add(toks.join(''));
     keys.add(toks.filter((t) => t !== 'and').join(''));
+    // Without "LLC", "Inc", "Co": "Bishop Plumbing Service LLC" → bishopplumbingservice
+    const core = toks.filter((t) => !STOP_WORDS.has(t) && t !== 'co');
+    keys.add(core.join(''));
+    keys.add(core.filter((t) => t !== 'and').join(''));
+    for (const t of toks) words.add(t);
     const distinctive = toks.filter((t) => t.length >= 3 && !GENERIC_WORDS.has(t) && !cityTokens.has(t));
     if (distinctive.length) tokenSets.push(distinctive);
   }
-  return { keys: [...keys].filter((k) => k.length >= 4), tokenSets, cityTokens };
+  return { keys: [...keys].filter((k) => k.length >= 4), tokenSets, cityTokens, words };
 }
 
-/** Strong match: the domain is clearly named after the business (alibakers.pk for "Ali Bakers"). */
-export function siteMatchesBusiness(siteKey, profile) {
+// Extra words sites add to a business name (joesplumbingonline.com, bishopplumbingms.com).
+const SITE_FILLER = ['online', 'web', 'site', 'usa', 'official', 'team', 'home', 'call', 'now', 'get', 'local', 'pro'];
+
+/**
+ * What's left of a domain after taking out the business's own words and generic ones.
+ * "bishopcisd" for "Bishop Plumbing" → "cisd"; "bishopplumbingms" → "ms".
+ */
+function leftoverOf(siteKey, profile) {
+  const known = [...new Set([...profile.words, ...profile.cityTokens, ...GENERIC_WORDS, ...SITE_FILLER])]
+    .filter((w) => w.length >= 3 || profile.words.has(w))
+    .sort((a, b) => b.length - a.length);
+  let rest = siteKey;
+  for (const w of known) rest = rest.split(w).join(' ');
+  return rest.replace(/[\s\d]+/g, '');
+}
+
+/**
+ * Strong match: the domain is clearly named after the business (alibakers.pk for "Ali Bakers").
+ * A domain holding only part of the name ("bishop" of "Bishop Plumbing") must have nothing else
+ * unexplained in it, or a page title naming the business: bishopcisd.net is a school district.
+ */
+export function siteMatchesBusiness(siteKey, profile, title = '') {
   if (!siteKey || siteKey.length < 3) return false;
   if (GENERIC_WORDS.has(siteKey) || profile.cityTokens.has(siteKey)) return false;
   for (const key of profile.keys) {
     if (siteKey.includes(key)) return true;
     if (siteKey.length >= 5 && key.includes(siteKey) && siteKey.length >= key.length * 0.5) return true;
   }
-  return profile.tokenSets.some(
+  const partial = profile.tokenSets.some(
     (tokens) => tokens.join('').length >= 5 && tokens.every((t) => siteKey.includes(t)),
   );
+  if (!partial) return false;
+  if (leftoverOf(siteKey, profile).length <= 3) return true;
+  const t = compact(title);
+  const tCore = tokensOf(title).filter((w) => !STOP_WORDS.has(w)).join(''); // "Barber & Sons" → barbersons
+  return profile.keys.some((k) => k.length >= 6 && (t.includes(k) || tCore.includes(k)));
 }
 
 function titleStartsWithName(title, names) {
@@ -253,7 +284,7 @@ export function analyzeResults(results, biz) {
       continue;
     }
     if (site.kind !== 'website') continue;
-    if (siteMatchesBusiness(site.siteKey, profile)) return { hasWebsite: true, website: site.url, socials, possible };
+    if (siteMatchesBusiness(site.siteKey, profile, r.title)) return { hasWebsite: true, website: site.url, socials, possible };
     if (possible.length < 2 && pathDepth(site.url) <= 1 && titleStartsWithName(r.title, biz.names)) {
       if (!possible.includes(site.host)) possible.push(site.host);
     }
