@@ -166,6 +166,9 @@ const DIRECTORY = brandPattern([
   'yandex', '2gis', 'apple', 'findglocal', 'infoisinfo', 'locanto', 'rozee', 'mustakbil', 'dnb', 'opencorporates',
   'bizapedia', 'zoominfo', 'crunchbase', 'placedigger', 'worldorgs', 'tuugo', 'ezlocal', 'citysquares',
   'superpages', 'merchantcircle', 'storeboard', 'showmelocal', 'cataloxy', 'tradekey', 'alibaba', 'indiamart',
+  'birdeye', 'homeyou', 'yellowbot', 'buildzoom', 'homeadvisor', 'porch', 'bark', 'expertise', 'threebestrated',
+  'callupcontact', 'bizprofile', 'chamberorganization', 'allbiz', 'yably', 'judysbook', 'kudzu', 'loc8nearme',
+  'whitepages', 'spokeo', 'fyple', 'golocal247', 'iglobal', 'us-business',
 ]);
 // Google shut down business.site websites in 2024 — a link there means no working site.
 const DEAD = /(^|\.)business\.site$/;
