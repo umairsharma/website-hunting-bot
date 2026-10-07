@@ -32,6 +32,7 @@ export function applyRunInputs(config, env = process.env) {
   const city = String(env.HUNT_CITY || '').trim();
   const country = String(env.HUNT_COUNTRY || '').trim();
   const niche = String(env.HUNT_NICHE || '').trim();
+  const custom = String(env.HUNT_CUSTOM_NICHE || '').trim();
   const out = { ...config };
   const parts = [];
 
@@ -47,9 +48,16 @@ export function applyRunInputs(config, env = process.env) {
   }
   if (city || country) parts.push([out.city, out.country].filter(Boolean).join(', '));
 
-  if (niche && niche !== DEFAULT_NICHE) {
+  const picked = niche && niche !== DEFAULT_NICHE;
+  if (picked) {
     out.categories = [niche];
     parts.push(CATEGORIES[niche.toLowerCase()]?.label || niche);
+  }
+  if (custom) {
+    // Any business type, typed in: found by searching Google Maps (e.g. "pool cleaners").
+    out.mapsSearch = [custom];
+    if (!picked) out.categories = [];
+    parts.push(`"${custom}" (Google Maps search)`);
   }
   return { config: out, label: parts.length ? `Manual run: ${parts.join(' · ')}` : null };
 }

@@ -22,6 +22,10 @@ export default {
   // You can also use any OpenStreetMap tag, like 'shop=bicycle'.
   categories: ['restaurant', 'cafe', 'bakery', 'salon', 'dentist', 'clinic', 'gym', 'car_repair', 'clothes', 'real_estate'],
 
+  // When OpenStreetMap doesn't have enough of these businesses (common for plumbers, roofers and other
+  // trades in the US), also search Google Maps for them, e.g. "plumbers in Nashville". true = on.
+  mapsDiscovery: true,
+
   // How many businesses to check each run. 20–40 is safe. Higher = more likely Google blocks the bot.
   maxChecksPerRun: 30,
 

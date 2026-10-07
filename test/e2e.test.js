@@ -21,6 +21,7 @@ const CONFIG = {
   searchEngines: ['google', 'bing', 'duckduckgo'],
   delaySeconds: [0, 0],
   searchCooldownMinutes: 0.005, // 0.3 s instead of 5 min
+  mapsDiscovery: false, // tested on its own below
 };
 
 async function withServer(scenario, fn) {
@@ -117,7 +118,10 @@ test('full run: 3 layers, Google blocked mid-run → falls back, Discord gets le
 
     // Saved state
     const seen = readJson(dataDir, 'seen.json');
-    assert.equal(Object.keys(seen.places).length, 6);
+    const own = Object.values(seen.places).filter((p) => !p.sameAs);
+    assert.equal(own.length, 6);
+    // Each business found on Google Maps is also filed under its Maps place, so a Maps search can't bring it back.
+    assert.equal(Object.keys(seen.places).filter((k) => k.startsWith('gmaps/')).length, 4);
     assert.deepEqual(
       { status: seen.places['node/1'].status, website: seen.places['node/1'].website, layer: seen.places['node/1'].layer },
       { status: 'has_website', website: 'alibakers.pk', layer: 2 },
@@ -331,5 +335,61 @@ test('Every search engine blocked + requireWebSearch: false → keeps going on O
       assert.ok(lead.notes.some((n) => /Web search wasn't available/.test(n)));
     }
     assert.ok(result.warnings.some((w) => /OpenStreetMap \+ Google Maps only/.test(w)));
+  });
+});
+
+test('Google Maps search: finds plumbers OpenStreetMap lacks, skips ones whose card shows a website, never repeats', { timeout: 240000 }, async () => {
+  await withServer({}, async (server) => {
+    const dataDir = tempDir();
+    const logs = [];
+    const config = { ...CONFIG, categories: ['plumber'], mapsDiscovery: true };
+    const result = await run({ config, dataDir, webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m) });
+    const logText = logs.join('\n');
+    assert.equal(result.error, null, logText);
+    assert.equal(result.candidates, 0); // OpenStreetMap has no plumbers here
+    assert.ok(server.requests.maps.includes('plumbers in Lahore, Pakistan'), server.requests.maps.join(' | '));
+    assert.equal(result.discovered, 3, logText); // 4 on the list (2 after scrolling); Pipe Masters' card shows its website
+    assert.equal(result.checked, 3, logText);
+    assert.equal(result.hasWebsite, 1, logText); // Ace Drain Co: website button on its listing
+    assert.deepEqual(result.leads.map((l) => l.name).sort(), ['Delta Rooter', 'Mike Pipe Fix']);
+    const mike = result.leads.find((l) => l.name === 'Mike Pipe Fix');
+    assert.equal(mike.phone, '0321 1234567');
+    assert.equal(mike.whatsapp, 'https://wa.me/923211234567');
+    assert.equal(mike.rating, 4.8);
+    assert.match(mike.mapsUrl, /^https:\/\/maps\.google\.com\/\?cid=\d+$/);
+    assert.equal(mike.categoryLabel, 'Plumber');
+    assert.match(server.requests.discord.at(-1).content, /found by searching Google Maps/);
+
+    const seen = readJson(dataDir, 'seen.json').places;
+    assert.equal(Object.values(seen).find((p) => p.name === 'Pipe Masters').layer, 'maps list');
+
+    // Next run: everything on the list is known, so nothing is checked or sent twice.
+    const again = await run({ config, dataDir, webhookUrl: `${server.base}/discord/webhook`, log: () => {} });
+    assert.equal(again.checked, 0);
+    assert.equal(again.leads.length, 0);
+    assert.ok(again.warnings.some((w) => /already been checked/.test(w)), again.warnings.join(' | '));
+  });
+});
+
+test('Google Maps search: any typed-in business type, with no categories at all', { timeout: 180000 }, async () => {
+  await withServer({}, async (server) => {
+    const result = await run({
+      config: { ...CONFIG, categories: [], mapsSearch: ['plumbers'], mapsDiscovery: true }, dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: () => {},
+    });
+    assert.equal(result.error, null);
+    assert.equal(server.requests.overpass.length, 0); // OpenStreetMap isn't asked
+    assert.equal(result.leads.length, 2);
+    assert.ok(result.leads.every((l) => l.categoryLabel === 'Plumbers'));
+  });
+});
+
+test('Google Maps search blocked: says so, and checks what it has', { timeout: 180000 }, async () => {
+  await withServer({ mapsSearchBlocked: true }, async (server) => {
+    const result = await run({
+      config: { ...CONFIG, categories: ['plumber'], mapsDiscovery: true }, dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: () => {},
+    });
+    assert.equal(result.error, null);
+    assert.equal(result.checked, 0);
+    assert.ok(result.warnings.some((w) => /Google Maps blocked the search/.test(w)), result.warnings.join(' | '));
   });
 });

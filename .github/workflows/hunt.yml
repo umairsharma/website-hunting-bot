@@ -17,7 +17,7 @@ on:
         required: false
         default: ""
       niche:
-        description: "Type of business (optional)"
+        description: "Type of business from the list (optional)"
         type: choice
         required: false
         default: "(daily settings)"
@@ -59,6 +59,17 @@ on:
           - driving_school
           - plumber
           - electrician
+          - hvac
+          - roofer
+          - painter
+          - locksmith
+          - carpenter
+          - cleaning
+          - landscaping
+      custom_niche:
+        description: "Or type ANY business type, e.g. pool cleaners (optional, found by searching Google Maps)"
+        required: false
+        default: ""
 
 permissions:
   contents: write # lets the bot save data/ (leads.csv, seen.json) back to the repo
@@ -103,6 +114,7 @@ jobs:
           HUNT_CITY: ${{ inputs.city }}
           HUNT_COUNTRY: ${{ inputs.country }}
           HUNT_NICHE: ${{ inputs.niche }}
+          HUNT_CUSTOM_NICHE: ${{ inputs.custom_niche }}
 
       - name: Save progress
         if: always()

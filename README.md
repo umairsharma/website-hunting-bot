@@ -6,7 +6,7 @@ Finds local businesses that **don't have a website** and sends them to your Disc
 
 A business only becomes a lead if it has **no website at all three checks**:
 
-1. **OpenStreetMap:** finds businesses in your city with no website listed.
+1. **OpenStreetMap:** finds businesses in your city with no website listed. If it doesn't have enough (common for plumbers, roofers and other trades in the US), the bot also **searches Google Maps** for them, e.g. "plumbers in Jackson, Mississippi".
 2. **Google Maps:** opens each business's listing and looks for a "Website" button.
 3. **Web search:** searches "*business name + city*" to catch websites Maps doesn't show. If Google blocks the bot, it switches to Brave, then Startpage (Google's results without the blocking), then Bing, then DuckDuckGo.
 
@@ -35,6 +35,7 @@ Open the **Actions** tab → **Website Hunting Bot** → **Run workflow** (works
 | **City** | e.g. `Manchester` | uses the city in `config.js` |
 | **Country** | e.g. `United Kingdom` (always fill this in with a new city) | uses the country in `config.js` |
 | **Type of business** | pick one from the list, e.g. `dentist` | uses all the categories in `config.js` |
+| **Or type ANY business type** | anything, e.g. `pool cleaners` or `wedding photographers` (found by searching Google Maps) | not used |
 
 Then tap the green **Run workflow** button. Results arrive in Discord in about 20–40 minutes, with a 🖐️ line showing what you picked.
 
@@ -61,7 +62,7 @@ That's it. The Discord summary will say *Brave (API)* when it's being used. With
 
 ## Categories for `config.js`
 
-`restaurant` · `cafe` · `fast_food` · `bakery` · `salon` · `dentist` · `clinic` · `pharmacy` · `gym` · `car_repair` · `car_dealer` · `motorcycle` · `clothes` · `shoes` · `jewelry` · `electronics` · `furniture` · `hardware` · `grocery` · `butcher` · `optician` · `florist` · `hotel` · `real_estate` · `lawyer` · `accountant` · `travel_agency` · `vet` · `laundry` · `printing` · `photographer` · `pet_shop` · `books` · `driving_school` · `plumber` · `electrician`
+`restaurant` · `cafe` · `fast_food` · `bakery` · `salon` · `dentist` · `clinic` · `pharmacy` · `gym` · `car_repair` · `car_dealer` · `motorcycle` · `clothes` · `shoes` · `jewelry` · `electronics` · `furniture` · `hardware` · `grocery` · `butcher` · `optician` · `florist` · `hotel` · `real_estate` · `lawyer` · `accountant` · `travel_agency` · `vet` · `laundry` · `printing` · `photographer` · `pet_shop` · `books` · `driving_school` · `plumber` · `electrician` · `hvac` · `roofer` · `painter` · `locksmith` · `carpenter` · `cleaning` · `landscaping`
 
 You can also use any [OpenStreetMap tag](https://wiki.openstreetmap.org/wiki/Map_features), like `'shop=bicycle'`.
 

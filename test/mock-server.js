@@ -23,6 +23,7 @@ export const ELEMENTS = [
   { type: 'way', id: 10, center: { lat: 31.52001, lon: 74.35001 }, tags: { name: 'Ali Bakers', shop: 'bakery' } },
 ];
 
+const PLACES_EXTRA = {};
 const PLACES = {
   'eiffel-tower': { query: 'Eiffel Tower', title: 'Eiffel Tower', website: 'https://www.toureiffel.paris/', address: 'Av. Gustave Eiffel, 75007 Paris, France', rating: '4.7', reviews: '400,123' },
   'ali-bakers': { query: 'Ali Bakers', title: 'Ali Bakers', website: 'http://www.alibakers.pk/', phone: '+924235761234', phoneLabel: '042 35761234', address: '12 Main Blvd, Gulberg, Lahore' },
@@ -32,6 +33,44 @@ const PLACES = {
   zamzam: { query: 'Zam Zam Tailors', title: 'Zam Zam Tailors', closed: true, address: 'Anarkali, Lahore' },
   rehman: { query: 'Rehman Dental Clinic', title: 'Rehman Dental Clinic', website: 'https://www.facebook.com/rehmandental', phone: '+923214445555', phoneLabel: '0321 4445555', address: 'Model Town, Lahore', rating: '4.9', reviews: '41' },
 };
+
+// Plumbers found only by searching Google Maps (OpenStreetMap has none). The results list shows two
+// places, then two more after scrolling, like the real site. Their links carry place IDs and positions.
+const placeLink = (slug, id) => `/maps/place/${slug}/data=!4m7!3m6!1s0x39190000:0x${id}!8m2!3d31.5${id}!4d74.3${id}`;
+const MAPS_PLUMBERS = [
+  { slug: 'pipe-masters', title: 'Pipe Masters', id: 'a1', cardWebsite: 'https://pipemasters.example/' },
+  { slug: 'ace-drain-co', title: 'Ace Drain Co', id: 'a2' },
+  { slug: 'mike-pipe-fix', title: 'Mike Pipe Fix', id: 'a3' },
+  { slug: 'delta-rooter', title: 'Delta Rooter', id: 'a4' },
+];
+Object.assign(PLACES_EXTRA, {
+  'pipe-masters': { title: 'Pipe Masters', website: 'https://pipemasters.example/', address: '1 Canal Rd, Lahore' },
+  'ace-drain-co': { title: 'Ace Drain Co', website: 'https://acedrainco.example/', phone: '+923001234500', phoneLabel: '0300 1234500', address: '2 Mall Rd, Lahore', rating: '4.6', reviews: '88' },
+  'mike-pipe-fix': { title: 'Mike Pipe Fix', phone: '+923211234567', phoneLabel: '0321 1234567', address: '3 Ferozepur Rd, Lahore', rating: '4.8', reviews: '64' },
+  'delta-rooter': { title: 'Delta Rooter', phone: '+924235550000', phoneLabel: '042 35550000', address: '4 Jail Rd, Lahore' },
+});
+
+function discoveryPage(q) {
+  const card = (p) => `<div class="Nv2PK"><a class="hfpxzc" aria-label="${esc(p.title)}" href="${placeLink(p.slug, p.id)}"></a>`
+    + `<div class="qBF1Pd">${esc(p.title)}</div>${p.cardWebsite ? `<a class="lcr4fd" data-value="Website" href="${esc(p.cardWebsite)}">Website</a>` : ''}`
+    + '<a href="https://www.google.com/maps/dir//x">Directions</a></div>';
+  const first = MAPS_PLUMBERS.slice(0, 2).map(card).join('');
+  const more = MAPS_PLUMBERS.slice(2).map(card).join('');
+  const feed = `<div role="feed" aria-label="Results for ${esc(q)}" style="height:300px;overflow:auto"><div style="height:1200px">${first}</div></div>`;
+  return page(
+    `<div role="main" aria-label="Results for ${esc(q)}"><h1>Results</h1><div id="slot"></div></div>`,
+    `setTimeout(() => {
+      document.getElementById('slot').outerHTML = ${JSON.stringify(feed)};
+      const f = document.querySelector('div[role="feed"]');
+      let loaded = false;
+      f.addEventListener('scroll', () => {
+        if (loaded) return;
+        loaded = true;
+        setTimeout(() => f.insertAdjacentHTML('beforeend', ${JSON.stringify(more)} + "<p>You've reached the end of the list.</p>"), 300);
+      });
+    }, 400);`,
+  );
+}
 
 const RESULTS = [
   { match: 'Eiffel Tower', results: [
@@ -92,6 +131,10 @@ function listPage(q, items) {
 }
 
 function mapsSearch(q, scenario) {
+  if (/^plumbers in /i.test(q)) {
+    if (scenario.mapsSearchBlocked) return page('<p>Our systems have detected unusual traffic from your computer network.</p>');
+    return discoveryPage(q);
+  }
   if (q.startsWith('Eiffel Tower') && scenario.mapsCanaryBroken) return renderLater(placeHtml({ title: 'Eiffel Tower', address: 'Paris' }));
   if (q.includes('Empty List')) return listPage(q, []);
   if (q.includes('Haveli Restaurant')) return listPage(q, [['Haveli Sweets', 'haveli-sweets'], ['Haveli Restaurant', 'haveli-restaurant']]);
@@ -140,7 +183,7 @@ function readBody(req) {
 /**
  * scenario: { googleBlockOn?: string, bingWorks?: boolean, mapsCanaryBroken?: boolean, braveWebBlocked?: boolean,
  *   startpageBlocked?: boolean, searchDown?: boolean (every engine blocks), braveBlockFirst?: number (first N Brave requests get 429),
- *   bingEmptyFirst?: boolean (Bing's first page has no results) }
+ *   bingEmptyFirst?: boolean (Bing's first page has no results), mapsSearchBlocked?: boolean }
  */
 export async function startMockServer(scenario = {}) {
   const requests = { overpass: [], maps: [], google: [], brave: [], braveApi: [], startpage: [], bing: [], ddg: [], discord: [] };
@@ -166,7 +209,8 @@ export async function startMockServer(scenario = {}) {
       return html(mapsSearch(q, scenario));
     }
     if (p.startsWith('/maps/place/')) {
-      const place = PLACES[p.slice('/maps/place/'.length)];
+      const slug = p.slice('/maps/place/'.length).split('/')[0];
+      const place = PLACES[slug] || PLACES_EXTRA[slug];
       return html(place ? renderLater(placeHtml(place)) : page('Not found'), place ? 200 : 404);
     }
     if (p === '/google/search') {
