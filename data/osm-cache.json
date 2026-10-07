@@ -6084,5 +6084,8 @@
  ]},
  "Jackson, Mississippi|United States|0||no-chains|craft=plumber": {"fetched": "2026-10-07T09:09:33.365Z", "elements": [
 
+ ]},
+ "Mississippi|United States|0||no-chains|craft=plumber": {"fetched": "2026-10-07T10:07:10.067Z", "elements": [
+   {"type":"way","id":511335215,"center":{"lat":33.7117999,"lon":-90.7190795},"tags":{"addr:city":"Boyle","addr:country":"US","addr:housenumber":"617","addr:postcode":"38730","addr:state":"MS","addr:street":"North Gaines Highway","building":"yes","craft":"plumber","name":"Timbo's Plumbing"}}
  ]}
 }
