@@ -51,6 +51,9 @@ test('classifyUrl sorts links into own sites vs everything else', () => {
   assert.equal(classifyUrl('https://www.marham.pk/doctors/lahore/dentist/x').kind, 'booking');
   assert.equal(classifyUrl('https://www.tripadvisor.com.pk/Restaurant_Review').kind, 'directory');
   assert.equal(classifyUrl('https://yellowpages.com.pk/x').kind, 'directory');
+  assert.equal(classifyUrl('https://reviews.birdeye.com/hortons-a1-plumbing-123').kind, 'directory');
+  assert.equal(classifyUrl('https://www.homeyou.com/ms/plumbers-decatur/x').kind, 'directory');
+  assert.equal(classifyUrl('https://www.yellowbot.com/hood-plumbing.html').kind, 'directory');
   assert.equal(classifyUrl('https://alibakers.business.site/').kind, 'dead');
   assert.equal(classifyUrl('https://maps.google.com/?cid=123').kind, 'maps');
   assert.equal(classifyUrl('https://g.page/alibakers').kind, 'maps');
