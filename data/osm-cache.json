@@ -6081,5 +6081,8 @@
    {"type":"way","id":490437444,"center":{"lat":36.1515339,"lon":-86.8501979},"tags":{"amenity":"doctors","building":"yes","healthcare":"doctor","name":"St Thomas Medical Partners"}},
    {"type":"way","id":1102616443,"center":{"lat":36.218376,"lon":-86.599938},"tags":{"addr:city":"Nashville","addr:housenumber":"244","addr:postcode":"37076","addr:state":"TN","addr:street":"Jackson Meadows Dr","amenity":"doctors","building":"yes","building:levels":"1","healthcare":"doctor","name":"Hermitage Family Practice","source":"microsoft/BuildingFootprints"}},
    {"type":"way","id":1102625483,"center":{"lat":36.2206865,"lon":-86.5967565},"tags":{"amenity":"doctors","building":"yes","healthcare":"doctor","name":"Dr. Cynthia L. Wallace, MD","source":"microsoft/BuildingFootprints"}}
+ ]},
+ "Jackson, Mississippi|United States|0||no-chains|craft=plumber": {"fetched": "2026-10-07T09:09:33.365Z", "elements": [
+
  ]}
 }

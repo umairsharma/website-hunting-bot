@@ -1,26 +1,19 @@
 {
-  "startedAt": "2026-10-06T11:17:13.890Z",
-  "finishedAt": "2026-10-06T11:41:06.747Z",
-  "minutes": 23.9,
-  "place": "Nashville, United States",
-  "area": "Nashville, Davidson County, Middle Tennessee, Tennessee, United States",
-  "candidates": 339,
-  "checked": 30,
-  "leads": 8,
-  "hasWebsite": 21,
-  "closed": 1,
+  "startedAt": "2026-10-07T09:09:30.851Z",
+  "finishedAt": "2026-10-07T09:09:33.395Z",
+  "minutes": 0,
+  "place": "Jackson, Mississippi, United States",
+  "area": "Jackson, Hinds County, Mississippi, United States",
+  "candidates": 0,
+  "checked": 0,
+  "leads": 0,
+  "hasWebsite": 0,
+  "closed": 0,
   "unverified": 0,
-  "pending": 309,
-  "searchEngines": {
-    "google": "broken",
-    "brave": "blocked",
-    "startpage": "blocked",
-    "bing": "ok",
-    "duckduckgo": "untested"
-  },
+  "pending": 0,
+  "searchEngines": {},
   "warnings": [
-    "OpenStreetMap servers were busy, so these were skipped this run: Gym, Car repair, Clothes / tailor, Real estate agent.",
-    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
+    "OpenStreetMap has no businesses without a website for these categories here. Try more categories, a bigger radius or another city."
   ],
   "error": null
 }
