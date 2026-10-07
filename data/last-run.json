@@ -1,27 +1,27 @@
 {
-  "startedAt": "2026-10-07T10:49:06.749Z",
-  "finishedAt": "2026-10-07T10:55:23.626Z",
-  "minutes": 6.3,
+  "startedAt": "2026-10-07T11:07:22.530Z",
+  "finishedAt": "2026-10-07T11:09:45.686Z",
+  "minutes": 2.4,
   "place": "Mississippi, United States",
   "area": "Mississippi, United States",
   "candidates": 1,
-  "discovered": 19,
+  "discovered": 6,
   "mapsListed": 113,
-  "checked": 19,
-  "leads": 14,
-  "hasWebsite": 5,
+  "checked": 6,
+  "leads": 4,
+  "hasWebsite": 2,
   "closed": 0,
   "unverified": 0,
   "pending": 0,
   "searchEngines": {
     "google": "broken",
-    "brave": "blocked",
-    "startpage": "blocked",
-    "bing": "ok",
+    "brave": "ok",
+    "startpage": "untested",
+    "bing": "untested",
     "duckduckgo": "untested"
   },
   "warnings": [
-    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
+    "Web search: Google didn't work, so it used Brave."
   ],
   "error": null
 }

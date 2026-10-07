@@ -677,6 +677,15 @@
   "gmaps/5160647664359298608": {"status":"lead","name":"Ross Jackson Plumbing","checked":"2026-10-07"},
   "gmaps/13861372649666664814": {"status":"lead","name":"M & M Plumbing, LLC","checked":"2026-10-07"},
   "gmaps/718416071261577805": {"status":"lead","name":"Stanley Graves Plumbing Co","checked":"2026-10-07"},
-  "gmaps/1555021073939086129": {"status":"lead","name":"Horton's Plumbing Services","checked":"2026-10-07"}
+  "gmaps/1555021073939086129": {"status":"lead","name":"Horton's Plumbing Services","checked":"2026-10-07"},
+  "gmaps/14202575114923105507": {"status":"has_website","name":"Hughes Supply - Pearl, Ms","checked":"2026-10-07","website":"hughessupplypearlms.com","layer":"maps list"},
+  "gmaps/5071145557949323545": {"status":"has_website","name":"Detect-a-Leak MS | Leak Detection, Plumbing & Water Mitigation","checked":"2026-10-07","website":"detectaleakms.com","layer":"maps list"},
+  "gmaps/1565242626784034049": {"status":"has_website","name":"Patriot Plumbing","checked":"2026-10-07","website":"patriotplumbingms.net","layer":"maps list"},
+  "gmaps/13590003496714049359": {"status":"has_website","name":"Wades Maintenance Service | A/C & Plumbing","checked":"2026-10-07","website":"wadesmaintenance.com","layer":3},
+  "gmaps/13556310001813826524": {"status":"lead","name":"R & D Plumbing","checked":"2026-10-07"},
+  "gmaps/12945995819018390675": {"status":"lead","name":"Parham Plumbing","checked":"2026-10-07"},
+  "gmaps/11828692226753524419": {"status":"lead","name":"Chapman Plumbing Co","checked":"2026-10-07"},
+  "gmaps/16438915414666946866": {"status":"has_website","name":"Douglas Plumbing, LLC","checked":"2026-10-07","website":"rdouglasplumbing.com","layer":3},
+  "gmaps/18433951852945216195": {"status":"lead","name":"Clark & Clark","checked":"2026-10-07"}
  }
 }
