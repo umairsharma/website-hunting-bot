@@ -208,7 +208,7 @@ export function createSearcher({
       const wait = Math.max(0, Math.min(...waits));
       if (Date.now() + wait < deadline) {
         log(`   ⏸️ Every search engine is resting, waiting ${Math.ceil(wait / 60000)} min for one to come back…`);
-        await sleep(wait);
+        await sleep(wait + 250); // timers can fire a millisecond early; don't wake up just before the break ends
         const again = await tryEngines(query);
         if (again) return again;
       }

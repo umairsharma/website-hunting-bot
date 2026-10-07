@@ -10,6 +10,11 @@ const GENERIC_WORDS = new Set([
   'garage', 'service', 'services', 'traders', 'trading', 'enterprises', 'enterprise', 'point', 'corner', 'hub',
   'express', 'international', 'studio', 'boutique', 'collection', 'tailors', 'tailor', 'clothing', 'fashion',
   'electronics', 'mobile', 'mobiles', 'agency', 'agent', 'associates', 'group', 'brothers', 'bros', 'sons',
+  // Trades: "Jackson Plumbing Co." is not hattiesburgplumbingco.com
+  'plumbing', 'plumber', 'plumbers', 'heating', 'cooling', 'air', 'conditioning', 'hvac', 'electric', 'electrical',
+  'electrician', 'electricians', 'roofing', 'roofer', 'roofers', 'painting', 'painters', 'cleaning', 'cleaners',
+  'landscaping', 'lawn', 'construction', 'contractor', 'contractors', 'repair', 'repairs', 'drain', 'sewer', 'gas',
+  'pest', 'control', 'locksmith', 'carpentry', 'remodeling', 'solutions', 'pros', 'experts', 'llc',
 ]);
 
 const STOP_WORDS = new Set(['the', 'and', 'pvt', 'ltd', 'llc', 'inc', 'company', 'limited']);

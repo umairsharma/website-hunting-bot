@@ -46,7 +46,8 @@ export async function resolveArea(cfg, ep, log = () => {}) {
     return { type: 'around', lat, lon, radiusM: radiusKm * 1000, label: `${radiusKm} km around ${best.display_name}` };
   }
   const offset = best.osm_type === 'relation' ? RELATION_AREA_OFFSET : WAY_AREA_OFFSET;
-  return { type: 'area', areaId: offset + Number(best.osm_id), lat, lon, label: best.display_name };
+  // kind: city, state, county… (a whole state is searched differently on Google Maps)
+  return { type: 'area', areaId: offset + Number(best.osm_id), lat, lon, label: best.display_name, kind: best.addresstype || best.type || null };
 }
 
 const quote = (s) => `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
