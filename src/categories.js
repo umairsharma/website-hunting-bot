@@ -38,6 +38,28 @@ export const CATEGORIES = {
   driving_school: { label: 'Driving school', tags: ['amenity=driving_school'] },
   plumber: { label: 'Plumber', tags: ['craft=plumber'] },
   electrician: { label: 'Electrician', tags: ['craft=electrician'] },
+  hvac: { label: 'HVAC / air conditioning', tags: ['craft=hvac'] },
+  roofer: { label: 'Roofer', tags: ['craft=roofer'] },
+  painter: { label: 'Painter / decorator', tags: ['craft=painter'] },
+  locksmith: { label: 'Locksmith', tags: ['shop=locksmith', 'craft=locksmith'] },
+  carpenter: { label: 'Carpenter', tags: ['craft=carpenter'] },
+  cleaning: { label: 'Cleaning service', tags: ['craft=cleaning', 'office=cleaning'] },
+  landscaping: { label: 'Landscaping / gardening', tags: ['craft=gardener'] },
+};
+
+// What to type into Google Maps for each category ("plumbers in Jackson, Mississippi").
+// Used when OpenStreetMap doesn't have enough of them; mostly the case for trades in the US.
+export const MAPS_SEARCH = {
+  restaurant: 'restaurants', cafe: 'cafes', fast_food: 'fast food', bakery: 'bakeries', salon: 'beauty salons',
+  dentist: 'dentists', clinic: 'medical clinics', pharmacy: 'pharmacies', gym: 'gyms', car_repair: 'auto repair shops',
+  car_dealer: 'car dealers', motorcycle: 'motorcycle shops', clothes: 'clothing stores', shoes: 'shoe stores',
+  jewelry: 'jewelry stores', electronics: 'electronics stores', furniture: 'furniture stores', hardware: 'hardware stores',
+  grocery: 'grocery stores', butcher: 'butcher shops', optician: 'opticians', florist: 'florists', hotel: 'hotels',
+  real_estate: 'real estate agents', lawyer: 'lawyers', accountant: 'accountants', travel_agency: 'travel agencies',
+  vet: 'veterinarians', laundry: 'laundry services', printing: 'printing services', photographer: 'photographers',
+  pet_shop: 'pet stores', books: 'bookstores', driving_school: 'driving schools', plumber: 'plumbers',
+  electrician: 'electricians', hvac: 'hvac contractors', roofer: 'roofing contractors', painter: 'painters',
+  locksmith: 'locksmiths', carpenter: 'carpenters', cleaning: 'cleaning services', landscaping: 'landscapers',
 };
 
 function parseTag(text) {
@@ -53,8 +75,8 @@ export function resolveCategories(list) {
     const id = String(raw ?? '').trim();
     if (!id) continue;
     const known = CATEGORIES[id.toLowerCase()];
-    if (known) defs.push({ id: id.toLowerCase(), label: known.label, tags: known.tags.map(parseTag) });
-    else if (/^[\w:-]+=[^=]+$/.test(id)) defs.push({ id, label: id, tags: [parseTag(id)] });
+    if (known) defs.push({ id: id.toLowerCase(), label: known.label, tags: known.tags.map(parseTag), search: MAPS_SEARCH[id.toLowerCase()] });
+    else if (/^[\w:-]+=[^=]+$/.test(id)) defs.push({ id, label: id, tags: [parseTag(id)], search: parseTag(id).value.replace(/_/g, ' ') });
     else unknown.push(id);
   }
   return { defs, unknown };

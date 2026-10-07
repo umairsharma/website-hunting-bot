@@ -128,7 +128,8 @@ function readPlace(page) {
  * When found: website, phone, address, rating, reviews, permanentlyClosed, temporarilyClosed, claimable, mapsUrl.
  */
 export async function checkMaps(page, biz, { mapsBase, timeoutMs = 20000 }) {
-  const searchUrl = mapsSearchUrl(mapsBase, biz);
+  // A place found on Google Maps already has its listing link; others are searched by name near their position.
+  const searchUrl = biz.placeUrl ? withEnglish(biz.placeUrl) : mapsSearchUrl(mapsBase, biz);
   try {
     await gotoPage(page, searchUrl);
     if (await isBlocked(page)) return { status: 'blocked' };

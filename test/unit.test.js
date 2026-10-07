@@ -8,7 +8,8 @@ import {
   analyzeResults, businessProfile, classifyUrl, namesMatch, toWhatsApp, unwrapRedirect,
 } from '../src/matching.js';
 import { buildOverpassQuery, fetchCandidates, pickQueue, toCandidates } from '../src/overpass.js';
-import { CATEGORIES, resolveCategories } from '../src/categories.js';
+import { CATEGORIES, MAPS_SEARCH, resolveCategories } from '../src/categories.js';
+import { placeIdOf } from '../src/discover.js';
 import { applyRunInputs, callingCodeFor, DEFAULT_NICHE } from '../src/inputs.js';
 import { buildMessages, leadEmbed, sendMessages } from '../src/discord.js';
 import { shortMapsUrl } from '../src/maps.js';
@@ -376,6 +377,13 @@ test('Run workflow form: city/country/niche apply to that run only, empty boxes 
   assert.deepEqual(nicheOnly.config.categories, ['gym']);
   assert.equal(nicheOnly.label, 'Manual run: Gym');
 
+  const typed = applyRunInputs(config, { HUNT_CUSTOM_NICHE: ' pool cleaners ', HUNT_NICHE: DEFAULT_NICHE });
+  assert.deepEqual(typed.config.mapsSearch, ['pool cleaners']);
+  assert.deepEqual(typed.config.categories, []); // only what was typed, not the daily list
+  assert.equal(typed.label, 'Manual run: "pool cleaners" (Google Maps search)');
+  const both = applyRunInputs(config, { HUNT_CUSTOM_NICHE: 'pool cleaners', HUNT_NICHE: 'plumber' });
+  assert.deepEqual(both.config.categories, ['plumber']);
+
   const noCountry = applyRunInputs(config, { HUNT_CITY: 'Leeds' });
   assert.equal(noCountry.config.country, '');
   assert.equal(noCountry.config.phoneCountryCode, '');
@@ -454,4 +462,13 @@ test('Send to WhatsApp: each card shares the full lead, within Discord limits', 
   assert.ok(all.startsWith('🎯 2 website leads · Houston, United States\n\n1. 🔥 *Snowflake (Donuts) & Co*'));
   assert.ok(all.includes('📝 Their Google listing is unclaimed') && all.includes('2. *B*\n📞 1'));
   assert.equal(leadText({ name: 'C' }), '*C*');
+});
+
+test('Google Maps search phrases: every category has one; place IDs read from listing links', () => {
+  assert.deepEqual(Object.keys(MAPS_SEARCH).sort(), Object.keys(CATEGORIES).sort());
+  const { defs } = resolveCategories(['plumber', 'shop=bicycle']);
+  assert.equal(defs[0].search, 'plumbers');
+  assert.equal(defs[1].search, 'bicycle');
+  assert.equal(placeIdOf('https://www.google.com/maps/place/X/data=!4m7!3m6!1s0x4870bc5f0d3bb1c3:0x8a5e3f44a2b1c0d9!8m2'), BigInt('0x8a5e3f44a2b1c0d9').toString());
+  assert.equal(placeIdOf('https://www.google.com/maps/place/X'), null);
 });
