@@ -568,6 +568,27 @@
   "node/12360247153": {"status":"has_website","name":"Venetian Nail Spa","checked":"2026-10-06","website":"d3booking.com","layer":2},
   "way/1131960642": {"status":"has_website","name":"Rolin Hills Dental Care","checked":"2026-10-06","website":"rolinhillsdentalcare.com","layer":2},
   "node/11305114941": {"status":"has_website","name":"Madtown Coffee","checked":"2026-10-06","website":"madtowncoffee.com","layer":2},
-  "node/11327525944": {"status":"has_website","name":"Faith Family Medical Center","checked":"2026-10-06","website":"faithmedical.org","layer":2}
+  "node/11327525944": {"status":"has_website","name":"Faith Family Medical Center","checked":"2026-10-06","website":"faithmedical.org","layer":2},
+  "gmaps/15830176666213252803": {"status":"has_website","name":"Environment Masters","checked":"2026-10-07","website":"environmentmasters.com","layer":"maps list"},
+  "gmaps/15964710063907952124": {"status":"has_website","name":"Jackson Plumbing and Drain Services","checked":"2026-10-07","website":"jackson.plumbingdrainservices.com","layer":"maps list"},
+  "gmaps/837417363776934623": {"status":"has_website","name":"Roto-Rooter Plumbing & Water Cleanup","checked":"2026-10-07","website":"rotorooter.com","layer":"maps list"},
+  "gmaps/3502856254560519282": {"status":"has_website","name":"Mississippi Plumbing Solutions - Formerly Reid Plumbing","checked":"2026-10-07","website":"msplumbingsolutions.com","layer":"maps list"},
+  "gmaps/14390617475648548069": {"status":"has_website","name":"Arender Plumbing Supply","checked":"2026-10-07","website":"arender.net","layer":"maps list"},
+  "gmaps/11476225864526524706": {"status":"has_website","name":"DrainGo of Mississippi LLC.","checked":"2026-10-07","website":"draingoms.com","layer":"maps list"},
+  "gmaps/1338034551143434766": {"status":"has_website","name":"Carr Plumbing Supply","checked":"2026-10-07","website":"carrplumbingsupply.com","layer":"maps list"},
+  "gmaps/9552514878292975947": {"status":"has_website","name":"The Honest Plumber Jackson","checked":"2026-10-07","website":"thehonestplumberjackson.com","layer":"maps list"},
+  "gmaps/7316856375403315286": {"status":"has_website","name":"Cornerstone Plumbing and Drain","checked":"2026-10-07","website":"cornerstoneplumbinganddrain.com","layer":"maps list"},
+  "gmaps/2784482654978942934": {"status":"has_website","name":"Jackson Water Heaters","checked":"2026-10-07","website":"jacksonwaterheaters.com","layer":"maps list"},
+  "gmaps/11105754182403181633": {"status":"has_website","name":"Ferguson Plumbing Supply","checked":"2026-10-07","website":"ferguson.com","layer":"maps list"},
+  "gmaps/14801409272574177073": {"status":"has_website","name":"Davis Plumbing and Gas","checked":"2026-10-07","website":"davisplumbingandgas.com","layer":"maps list"},
+  "gmaps/8387681715168643793": {"status":"has_website","name":"Weiand Plumbing, Inc.","checked":"2026-10-07","website":"weiandplumbingms.com","layer":"maps list"},
+  "gmaps/18007633720519504714": {"status":"has_website","name":"Champagne Plumbing Co","checked":"2026-10-07","website":"cplumbingms.com","layer":"maps list"},
+  "gmaps/1070933550237205818": {"status":"has_website","name":"Dent Air Conditioning","checked":"2026-10-07","website":"dentairconditioning.com","layer":"maps list"},
+  "gmaps/4953323209369159543": {"status":"has_website","name":"Skeen Plumbing & Gas, Inc.","checked":"2026-10-07","website":"skeenplumbinggas.com","layer":"maps list"},
+  "gmaps/1579119345409327496": {"status":"has_website","name":"Jackson Plumbing Co.","checked":"2026-10-07","website":"hattiesburgplumbingco.com","layer":3},
+  "gmaps/5630536601609177441": {"status":"has_website","name":"BUFORD PLUMBING COMPANY, INC.","checked":"2026-10-07","website":"bufordplumbing.net","layer":3},
+  "gmaps/15817863964875623370": {"status":"has_website","name":"Leak Freak Plumbing","checked":"2026-10-07","website":"leakfreakplumbing.us","layer":3},
+  "gmaps/11502891572756995361": {"status":"lead","name":"South Central Heating & Plumbing","checked":"2026-10-07"},
+  "gmaps/17491820519774906523": {"status":"lead","name":"Jackson's Favorite Air Conditioning","checked":"2026-10-07"}
  }
 }

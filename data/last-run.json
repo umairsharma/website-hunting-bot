@@ -1,19 +1,28 @@
 {
-  "startedAt": "2026-10-07T09:09:30.851Z",
-  "finishedAt": "2026-10-07T09:09:33.395Z",
-  "minutes": 0,
+  "startedAt": "2026-10-07T09:27:44.194Z",
+  "finishedAt": "2026-10-07T09:35:03.194Z",
+  "minutes": 7.3,
   "place": "Jackson, Mississippi, United States",
   "area": "Jackson, Hinds County, Mississippi, United States",
   "candidates": 0,
-  "checked": 0,
-  "leads": 0,
-  "hasWebsite": 0,
+  "discovered": 8,
+  "mapsListed": 24,
+  "checked": 5,
+  "leads": 2,
+  "hasWebsite": 3,
   "closed": 0,
   "unverified": 0,
   "pending": 0,
-  "searchEngines": {},
+  "searchEngines": {
+    "google": "broken",
+    "brave": "blocked",
+    "startpage": "blocked",
+    "bing": "broken",
+    "duckduckgo": "blocked"
+  },
   "warnings": [
-    "OpenStreetMap has no businesses without a website for these categories here. Try more categories, a bigger radius or another city."
+    "Every search engine blocked the bot, so it stopped early. The rest will be checked next run.",
+    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, Bing didn't work, DuckDuckGo blocked the bot."
   ],
   "error": null
 }
