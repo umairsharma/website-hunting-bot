@@ -37,7 +37,9 @@ function coordsOf(href) {
  */
 export async function discoverOnMaps(page, { term, city, country, area, mapsBase, want = 30, isKnown = () => false, log = () => {} }) {
   const query = `${term} in ${[city, country].filter(Boolean).join(', ')}`;
-  const at = area && Number.isFinite(area.lat) && Number.isFinite(area.lon) ? `/@${area.lat.toFixed(5)},${area.lon.toFixed(5)},12z` : '';
+  // Centre the map on a city; for a whole state or country let Google frame it ("plumbers in Mississippi").
+  const wide = ['state', 'country', 'region', 'province'].includes(area?.kind);
+  const at = !wide && area && Number.isFinite(area.lat) && Number.isFinite(area.lon) ? `/@${area.lat.toFixed(5)},${area.lon.toFixed(5)},12z` : '';
   log(`🔎 Google Maps: searching "${query}"…`);
   await gotoPage(page, `${mapsBase}/search/${encodeURIComponent(query)}${at}?hl=en`);
   if (await isBlocked(page)) return { blocked: true, places: [] };

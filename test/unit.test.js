@@ -84,6 +84,15 @@ test('analyzeResults: a domain named after the business = has a website', () => 
   assert.ok(analyzeResults([{ url: 'https://alibakers.wixsite.com/shop', title: 'Home' }], biz('Ali Bakers')).hasWebsite);
 });
 
+test('analyzeResults: a trade word alone ("plumbing") does not make another company site theirs', () => {
+  const jackson = biz('Jackson Plumbing Co.');
+  jackson.profile = businessProfile(jackson.names, 'Jackson, Mississippi');
+  assert.equal(analyzeResults([{ url: 'https://hattiesburgplumbingco.com/', title: 'Hattiesburg Plumbing Co' }], jackson).hasWebsite, false);
+  assert.ok(analyzeResults([{ url: 'https://bufordplumbing.net/', title: 'Home' }], biz('BUFORD PLUMBING COMPANY, INC.')).hasWebsite);
+  assert.ok(analyzeResults([{ url: 'https://leakfreakplumbing.us/', title: 'Home' }], biz('Leak Freak Plumbing')).hasWebsite);
+  assert.ok(analyzeResults([{ url: 'https://jacksonplumbingco.com/', title: 'Home' }], jackson).hasWebsite); // the full name still counts
+});
+
 test('analyzeResults: socials, delivery apps, directories and news are not websites', () => {
   const r = analyzeResults([
     { url: 'https://www.facebook.com/buttkarahihouse/', title: 'Butt Karahi House - Home | Facebook' },
