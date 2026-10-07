@@ -57,6 +57,11 @@ test('classifyUrl sorts links into own sites vs everything else', () => {
   assert.equal(classifyUrl('https://alibakers.business.site/').kind, 'dead');
   assert.equal(classifyUrl('https://maps.google.com/?cid=123').kind, 'maps');
   assert.equal(classifyUrl('https://g.page/alibakers').kind, 'maps');
+  assert.equal(classifyUrl('https://bishop.edu/').kind, 'institution');
+  assert.equal(classifyUrl('https://www.oxford.gov.uk/').kind, 'institution');
+  assert.equal(classifyUrl('https://www.punjab.gov.pk/').kind, 'institution');
+  assert.equal(classifyUrl('https://jackson.k12.ms.us/').kind, 'institution');
+  assert.equal(classifyUrl('https://www.ox.ac.uk/').kind, 'institution');
   assert.equal(classifyUrl('mailto:x@y.com'), null);
 
   const own = classifyUrl('https://www.alibakers.com.pk/menu');
@@ -80,8 +85,8 @@ test('unwrapRedirect decodes Google, Bing and DuckDuckGo result links', () => {
 
 test('analyzeResults: a domain named after the business = has a website', () => {
   assert.ok(analyzeResults([{ url: 'https://havelirestaurant.pk/', title: 'Food Street' }], biz('Haveli Restaurant')).hasWebsite);
-  assert.ok(analyzeResults([{ url: 'https://haveli.com.pk/', title: 'Home' }], biz('Haveli Restaurant')).hasWebsite);
-  assert.ok(analyzeResults([{ url: 'https://www.aylanto.com/', title: 'Aylanto' }], biz('Cafe Aylanto')).hasWebsite);
+  assert.ok(analyzeResults([{ url: 'https://haveli.com.pk/', title: 'Haveli Restaurant | Lahore' }], biz('Haveli Restaurant')).hasWebsite);
+  assert.ok(analyzeResults([{ url: 'https://www.aylanto.com/', title: 'Cafe Aylanto' }], biz('Cafe Aylanto')).hasWebsite);
   assert.ok(analyzeResults([{ url: 'https://buttkarahi.pk/', title: 'Home' }], biz('Butt Karahi House')).hasWebsite);
   assert.ok(analyzeResults([{ url: 'https://ali-bakers.pk/', title: 'Home' }], biz('Ali Bakers')).hasWebsite);
   assert.ok(analyzeResults([{ url: 'https://alibakers.wixsite.com/shop', title: 'Home' }], biz('Ali Bakers')).hasWebsite);
@@ -114,6 +119,16 @@ test('analyzeResults: one common word of the name ("Bishop", "Johnson") does not
   assert.ok(has('https://mancusoservices.com/', 'Mancuso Brothers Plumbing'));
   assert.ok(has('https://barbersons.com/', 'Barber & Sons Plumbing Co'));
   assert.ok(has('https://johnsonplumbing247.com/', 'Johnson Plumbing'));
+  // Just one word of the name, or a school / council site: not theirs (from a real run)
+  assert.equal(has('https://jackson.com/', 'Jackson Plumbing Co.', 'Jackson | Annuities'), false);
+  assert.equal(has('https://www.clarks.com/', 'Clark Plumbing Service, Inc', 'Clarks Shoes'), false);
+  assert.equal(has('https://pinebelt.net/', 'Pinebelt Plumbing, LLC', 'Pine Belt Communications'), false);
+  assert.equal(has('https://www.oxford.gov.uk/', 'Oxford Plumbing, LLC', 'Oxford City Council'), false);
+  assert.equal(has('https://bishop.edu/', 'Bishop Plumbing Service LLC', 'Bishop State'), false);
+  assert.ok(has('https://pinebelt.net/', 'Pinebelt Plumbing, LLC', 'Pinebelt Plumbing - Hattiesburg, MS'));
+  const bare = analyzeResults([{ url: 'https://haveli.com.pk/', title: 'Home' }], biz('Haveli Restaurant'));
+  assert.equal(bare.hasWebsite, false);
+  assert.deepEqual(bare.possible, ['haveli.com.pk']); // shown as "Check first"
   // An extra word is fine when the page is titled with the business's name
   assert.ok(has('https://barberbrandon.com/', 'Barber & Sons Plumbing Co', 'Barber & Sons Plumbing | Brandon, MS'));
   assert.equal(has('https://barberbrandon.com/', 'Barber & Sons Plumbing Co', 'Barber shop in Brandon'), false);

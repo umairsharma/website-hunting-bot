@@ -107,18 +107,20 @@ function leftoverOf(siteKey, profile) {
 export function siteMatchesBusiness(siteKey, profile, title = '') {
   if (!siteKey || siteKey.length < 3) return false;
   if (GENERIC_WORDS.has(siteKey) || profile.cityTokens.has(siteKey)) return false;
-  for (const key of profile.keys) {
-    if (siteKey.includes(key)) return true;
-    if (siteKey.length >= 5 && key.includes(siteKey) && siteKey.length >= key.length * 0.5) return true;
-  }
-  const partial = profile.tokenSets.some(
-    (tokens) => tokens.join('').length >= 5 && tokens.every((t) => siteKey.includes(t)),
-  );
-  if (!partial) return false;
-  if (leftoverOf(siteKey, profile).length <= 3) return true;
+  if (profile.keys.some((key) => siteKey.includes(key))) return true;
   const t = compact(title);
   const tCore = tokensOf(title).filter((w) => !STOP_WORDS.has(w)).join(''); // "Barber & Sons" → barbersons
-  return profile.keys.some((k) => k.length >= 6 && (t.includes(k) || tCore.includes(k)));
+  const titled = profile.keys.some((k) => k.length >= 6 && (t.includes(k) || tCore.includes(k)));
+  // Just one word of the name (jackson.com for "Jackson Plumbing Co.") is a surname or a place as often
+  // as it's the business, so it counts only when the page title names the business.
+  const plain = siteKey.replace(/\d+/g, '');
+  if (profile.tokenSets.some((tokens) => tokens.length === 1 && [plain, plain.replace(/s$/, '')].includes(tokens[0]))) return titled;
+  if (profile.keys.some((key) => siteKey.length >= 5 && key.includes(siteKey) && siteKey.length >= key.length * 0.5)) return true;
+  const partial = profile.tokenSets.some(
+    (tokens) => tokens.join('').length >= 5 && tokens.every((x) => siteKey.includes(x)),
+  );
+  // With more than that one word, nothing else in the domain may be unexplained.
+  return partial && (titled || leftoverOf(siteKey, profile).length <= 3);
 }
 
 function titleStartsWithName(title, names) {
@@ -170,6 +172,8 @@ const DIRECTORY = brandPattern([
   'callupcontact', 'bizprofile', 'chamberorganization', 'allbiz', 'yably', 'judysbook', 'kudzu', 'loc8nearme',
   'whitepages', 'spokeo', 'fyple', 'golocal247', 'iglobal', 'us-business',
 ]);
+// Government, schools and universities are never a local business's own site (bishop.edu, oxford.gov.uk).
+const INSTITUTION = /\.(gov|edu|mil)(\.[a-z]{2})?$|\.(ac|gov|govt|edu|nhs|police|sch|mil)\.[a-z]{2}$|\.(k12|state)\.[a-z]{2}\.us$/;
 // Google shut down business.site websites in 2024 — a link there means no working site.
 const DEAD = /(^|\.)business\.site$/;
 const GOOGLE = /(^|\.)google\.[a-z.]{2,8}$|(^|\.)(goo\.gl|g\.page|g\.co|share\.google)$/;
@@ -244,6 +248,7 @@ export function classifyUrl(raw) {
   else if (BOOKING.test(host)) kind = 'booking';
   else if (GOOGLE.test(host)) kind = 'maps';
   else if (DIRECTORY.test(host) || /yellow-?pages/.test(host)) kind = 'directory';
+  else if (INSTITUTION.test(host)) kind = 'institution';
   return { kind, host, url: u.href, siteKey: siteKeyFor(host, u) };
 }
 
@@ -288,7 +293,8 @@ export function analyzeResults(results, biz) {
     }
     if (site.kind !== 'website') continue;
     if (siteMatchesBusiness(site.siteKey, profile, r.title)) return { hasWebsite: true, website: site.url, socials, possible };
-    if (possible.length < 2 && pathDepth(site.url) <= 1 && titleStartsWithName(r.title, biz.names)) {
+    const oneWord = pathDepth(site.url) <= 1 && profile.tokenSets.some((tokens) => tokens.length === 1 && tokens[0] === site.siteKey);
+    if (possible.length < 2 && pathDepth(site.url) <= 1 && (oneWord || titleStartsWithName(r.title, biz.names))) {
       if (!possible.includes(site.host)) possible.push(site.host);
     }
   }
