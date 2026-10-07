@@ -393,3 +393,15 @@ test('Google Maps search blocked: says so, and checks what it has', { timeout: 1
     assert.ok(result.warnings.some((w) => /Google Maps blocked the search/.test(w)), result.warnings.join(' | '));
   });
 });
+
+test('OpenStreetMap down: still searches Google Maps instead of failing the run', { timeout: 180000 }, async () => {
+  await withServer({ overpassDown: true }, async (server) => {
+    const result = await run({
+      config: { ...CONFIG, categories: ['plumber'], mapsDiscovery: true }, dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: () => {},
+    });
+    assert.equal(result.error, null);
+    assert.ok(server.requests.overpass.length > 0);
+    assert.deepEqual(result.leads.map((l) => l.name).sort(), ['Delta Rooter', 'Mike Pipe Fix']);
+    assert.ok(result.warnings.some((w) => /only Google Maps was searched/.test(w)), result.warnings.join(' | '));
+  });
+});
