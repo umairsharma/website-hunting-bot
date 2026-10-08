@@ -19,12 +19,18 @@ const label = (host) => {
   return DIRECTORY_NAMES[brand] || prettySite(host);
 };
 
-/** The search result is about this business: its name is in the title or the text under it. */
+/**
+ * The search result is about this business: its full name is in the title or the text under it, or all
+ * of its distinctive words when there are several. One word isn't enough ("Torres" is also a town).
+ */
 function aboutBusiness(r, profile) {
   const text = compact(`${r.title || ''} ${r.snippet || ''}`);
   if (profile.keys.some((k) => k.length >= 6 && text.includes(k))) return true;
-  return profile.tokenSets.some((tokens) => tokens.join('').length >= 5 && tokens.every((x) => text.includes(x)));
+  return profile.tokenSets.some((tokens) => tokens.length > 1 && tokens.every((x) => text.includes(x)));
 }
+
+// A directory's search or category page lists many businesses, not this one.
+const isListPage = (url) => /[?&](find_desc|q|query|search|keyword)=|\/(search|s|find|category|categories)(\/|\?|$)/i.test(url);
 
 /** Directories, booking and delivery sites that list this business: [{ name: 'Yelp', url }], at most 6. */
 export function listingsFrom(results, biz) {
@@ -34,7 +40,7 @@ export function listingsFrom(results, biz) {
     const site = classifyUrl(r.url);
     if (!site || !['directory', 'booking', 'delivery'].includes(site.kind)) continue;
     if (['bing', 'duckduckgo', 'yahoo', 'yandex', 'wikipedia', 'wikidata', 'reddit', 'quora'].some((b) => site.host.includes(b))) continue;
-    if (!aboutBusiness(r, profile)) continue;
+    if (isListPage(site.url) || !aboutBusiness(r, profile)) continue;
     const name = label(site.host);
     if (!out.has(name)) out.set(name, { name, url: site.url });
     if (out.size >= 6) break;

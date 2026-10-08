@@ -123,6 +123,7 @@ test('analyzeResults: one common word of the name ("Bishop", "Johnson") does not
   assert.ok(has('https://bishopplumbingms.com/', 'Bishop Plumbing Service LLC'));
   assert.ok(has('https://mancusoservices.com/', 'Mancuso Brothers Plumbing'));
   assert.ok(has('https://harbornegarage.co.uk/', 'Harborne Auto Centre'));
+  assert.equal(has('https://avantemedicalcenter.com/', 'Avante Plumbing Co Contractors', 'Avante Medical Center'), false);
   assert.equal(has('https://www.friendlysrestaurants.com/', 'Friendly Plumbers', "Friendly's Restaurants"), false);
   assert.equal(has('https://chapmannews.org/', 'Chapman Plumbing Co', 'Chapman News'), false);
   assert.equal(has('https://douglasus.com/', 'Douglas Plumbing, LLC', 'Douglas Products'), false);
@@ -629,6 +630,13 @@ test('Lead details: hours, other listings, year started, social activity', () =>
     { url: 'https://www.instagram.com/cobbplumbing/', title: 'Cobb Plumbing (@cobbplumbing)', snippet: '2,345 Followers, 50 Following, 120 Posts - See Instagram photos' },
   ];
   assert.deepEqual(listingsFrom(results, cobb).map((l) => l.name), ['BBB', 'Yelp']);
+  // A directory's search page, or a page that only shares one word of the name, isn't their listing
+  const torres = { name: 'Torres Plumbing', names: ['Torres Plumbing'], city: 'El Paso' };
+  assert.deepEqual(listingsFrom([
+    { url: 'https://www.tripadvisor.com/Attractions-g303553-Activities-Torres_State_of_Rio_Grande_do_Sul.html', title: 'Things to do in Torres' },
+    { url: 'https://www.yelp.com/search?find_desc=Torres+Plumbing&find_loc=El+Paso', title: 'Torres Plumbing - El Paso - Yelp' },
+    { url: 'https://www.yelp.com/biz/torres-plumbing-el-paso', title: 'Torres Plumbing - El Paso - Yelp' },
+  ], torres).map((l) => l.url), ['https://www.yelp.com/biz/torres-plumbing-el-paso']);
   assert.deepEqual(sinceFrom(results, cobb), { year: 1990, source: 'BBB' });
   assert.equal(sinceFrom([{ url: 'https://www.yelp.com/biz/x', title: 'Cobb Plumbing Co', snippet: 'Yelping since 2009' }], cobb), null);
   const activity = socialActivityFrom(results);
