@@ -53,6 +53,7 @@ That's it. The Discord summary will say *Brave (API)* when it's being used. With
 ## What you get
 
 - **Discord:** a summary, then one card per lead with category, phone, a WhatsApp link, Google rating, address, social media and notes. 🔥 means 50+ Google reviews (a busy business with no website, so the best leads).
+- **Websites with a different name:** a site found by search only counts if its address matches the business's name, or if it shows the business's phone number. The bot also searches the phone number itself, so it finds sites named differently from the business (cpimemphis.com for "Culpepper Plumbing"). Turn off with `phoneCheck: false`.
 - **Social media IDs:** for every lead the bot also searches "name + town + instagram" (and "facebook" if none was found yet) and lists the accounts it's sure are theirs, e.g. 📸 Instagram @roysplumbing, Instagram first. Turn it off with `findSocials: false` in `config.js`.
 - **📲 Send this lead to WhatsApp:** a link on every lead card. It opens WhatsApp with all the card's details typed in (name, rating, phone, WhatsApp link, address, Google Maps link, email, social pages, notes). Pick a chat or "Message yourself" and send.
 - **`data/run-leads.txt`:** the latest run's leads with every detail, as text. The Discord summary links to it; tap **Copy raw file** to copy them all at once.
