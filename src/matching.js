@@ -96,7 +96,8 @@ const SITE_FILLER = ['online', 'web', 'site', 'usa', 'official', 'team', 'home',
  */
 function leftoverOf(siteKey, profile) {
   // Short generic words ("new", "air") hide inside other words ("chapmannews"), so only longer ones count.
-  const known = [...new Set([...profile.words, ...profile.cityTokens, ...GENERIC_WORDS, ...SITE_FILLER])]
+  // Another trade's word doesn't explain itself (avantemedicalcenter.com is not "Avante Plumbing Co").
+  const known = [...new Set([...profile.words, ...profile.cityTokens, ...NEUTRAL_WORDS, ...SITE_FILLER])]
     .filter((w) => w.length >= 4 || profile.words.has(w))
     .sort((a, b) => b.length - a.length);
   let rest = siteKey;
