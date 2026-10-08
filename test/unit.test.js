@@ -55,6 +55,8 @@ test('classifyUrl sorts links into own sites vs everything else', () => {
   assert.equal(classifyUrl('https://reviews.birdeye.com/hortons-a1-plumbing-123').kind, 'directory');
   assert.equal(classifyUrl('https://www.homeyou.com/ms/plumbers-decatur/x').kind, 'directory');
   assert.equal(classifyUrl('https://www.yellowbot.com/hood-plumbing.html').kind, 'directory');
+  assert.equal(classifyUrl('https://ajax-plumbing-and-water-leaks.wheree.com/').kind, 'directory');
+  assert.equal(classifyUrl('https://www.homescroller.com/x').kind, 'directory');
   assert.equal(classifyUrl('https://alibakers.business.site/').kind, 'dead');
   assert.equal(classifyUrl('https://maps.google.com/?cid=123').kind, 'maps');
   assert.equal(classifyUrl('https://g.page/alibakers').kind, 'maps');
@@ -553,6 +555,15 @@ test('findSocials: keeps only the business own accounts, Instagram first', () =>
     { url: 'https://www.facebook.com/116228315383391/', title: 'Joe Plumbing | Facebook' }, // a number says nothing
   ], roy);
   assert.deepEqual(found.map((p) => p.display), ['@roysplumbingms']);
+  // A handle that's only the city + trade is someone else's (from a real San Antonio run)
+  const dueSouth = { name: 'San Antonio Due South Plumbing', names: ['San Antonio Due South Plumbing'], city: 'San Antonio',
+    profile: businessProfile(['San Antonio Due South Plumbing'], 'San Antonio') };
+  assert.deepEqual(findSocials([
+    { url: 'https://www.instagram.com/sanantonioplumbing/', title: 'San Antonio Plumbing (@sanantonioplumbing)' },
+    { url: 'https://www.facebook.com/SanAntonioPlumbing/', title: 'San Antonio Plumbing | Facebook' },
+  ], dueSouth), []);
+  assert.deepEqual(findSocials([{ url: 'https://www.instagram.com/duesouthplumbing/', title: 'Instagram' }], dueSouth)
+    .map((p) => p.display), ['@duesouthplumbing']);
   assert.deepEqual(orderSocials([
     'https://www.facebook.com/roys/', 'https://www.instagram.com/roysplumbing', 'https://instagram.com/RoysPlumbing/',
   ]), ['https://www.instagram.com/roysplumbing/', 'https://www.facebook.com/roys/']);

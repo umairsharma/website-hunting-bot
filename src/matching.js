@@ -175,7 +175,8 @@ const DIRECTORY = brandPattern([
   'superpages', 'merchantcircle', 'storeboard', 'showmelocal', 'cataloxy', 'tradekey', 'alibaba', 'indiamart',
   'birdeye', 'homeyou', 'yellowbot', 'buildzoom', 'homeadvisor', 'porch', 'bark', 'expertise', 'threebestrated',
   'callupcontact', 'bizprofile', 'chamberorganization', 'allbiz', 'yably', 'judysbook', 'kudzu', 'loc8nearme',
-  'whitepages', 'spokeo', 'fyple', 'golocal247', 'iglobal', 'us-business',
+  'whitepages', 'spokeo', 'fyple', 'golocal247', 'iglobal', 'us-business', 'wheree', 'homescroller', 'rocketreach',
+  'nicelocal', 'cityfos', 'bizvibe', 'dexknows',
 ]);
 // Government, schools and universities are never a local business's own site (bishop.edu, oxford.gov.uk).
 const INSTITUTION = /\.(gov|edu|mil)(\.[a-z]{2})?$|\.(ac|gov|govt|edu|nhs|police|sch|mil)\.[a-z]{2}$|\.(k12|state)\.[a-z]{2}\.us$/;

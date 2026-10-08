@@ -76,7 +76,9 @@ export function findSocials(results, biz) {
     // A Facebook page's name is in its title; a numeric ID says nothing on its own.
     // Handles are short, so the start of the name is enough (@roysplumbingms for "Roy's Plumbing, Heating & Cooling").
     const handle = compact(p.id);
-    const start = compact(tokensOf(biz.name).filter((w) => !STOP_WORDS.has(w)).slice(0, 2).join(' '));
+    // The city doesn't count ("San Antonio Due South Plumbing" is not @sanantonioplumbing).
+    const words = tokensOf(biz.name).filter((w) => !STOP_WORDS.has(w) && !profile.cityTokens.has(w)).slice(0, 2);
+    const start = words.some((w) => profile.tokenSets.some((t) => t.includes(w))) ? words.join('') : '';
     const ownHandle = !/^\d+$/.test(p.id)
       && ((start.length >= 8 && handle.includes(start)) || siteMatchesBusiness(handle, profile, r.title));
     if (ownHandle || titleMentionsName(r.title || '', profile)) out.set(p.network, p);
