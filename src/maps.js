@@ -131,8 +131,12 @@ function readPlace(page) {
         const cells = Array.from(row.querySelectorAll('td, th')).map((c) => clean(c.innerText));
         const day = cells.find((c) => /^(mon|tues|wednes|thurs|fri|satur|sun)day\b/i.test(c));
         const time = cells.find((c) => c !== day && /\d|closed|open 24/i.test(c));
-        if (day && time) days.push([day.match(/^\w+day/i)[0], time]);
+        // Drop Google's notes after the times ("Hours might differ", "Holiday hours").
+        if (day && time) days.push([day.match(/^\w+day/i)[0], time.replace(/\s*(hours (might|may) differ|holiday hours|special hours|confirmed by)\b.*$/i, '').trim()]);
       }
+      // Monday first, however the listing ordered them (it starts with today).
+      const order = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+      days.sort((a, b) => order.indexOf(a[0].toLowerCase()) - order.indexOf(b[0].toLowerCase()));
       const toggle = root.querySelector('[jsaction*="openhours"]');
       const status = toggle ? clean(toggle.innerText).split(/ (?=See more hours)/)[0] : '';
       return days.length || status ? { status: status.slice(0, 80) || null, days } : null;

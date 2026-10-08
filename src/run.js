@@ -78,7 +78,7 @@ function websiteNote(site) {
 }
 
 /**
- * A lead's Instagram (and Facebook, if none was found yet): one more search each, e.g.
+ * A lead's Instagram (and Facebook, when it comes up too): one more search, e.g.
  * "Roy's Plumbing Abbeville instagram". Only profiles that are clearly this business are kept.
  */
 // Returns { urls: the new profiles, results: all search results looked at }.
@@ -90,13 +90,15 @@ async function findSocialPages(biz, known, address, ctx) {
   const town = (!inCity && parts.length >= 3 && !/\d/.test(parts.at(-2)) ? parts.at(-2) : null) || biz.city;
   const found = [];
   const seen = []; // every result, for the card's extra details (followers, other listings)
-  for (const network of ['instagram', 'facebook']) {
-    if (has(network) || found.some((p) => p.network === network)) continue;
+  // One search, for Instagram: free search engines block the bot after a few dozen searches, so each one
+  // counts. Facebook pages usually come up in it (or in the name search) anyway.
+  if (!has('instagram')) {
     await sleep(ctx.delay());
-    const results = await ctx.searcher.find([biz.searchName, town, network].filter(Boolean).join(' '));
-    if (!results) break; // every engine is busy; not worth stopping the run for
-    seen.push(...results);
-    found.push(...findSocials(results, biz).filter((p) => !has(p.network)));
+    const results = await ctx.searcher.find([biz.searchName, town, 'instagram'].filter(Boolean).join(' '));
+    if (results) { // null: every engine is busy; not worth stopping the run for
+      seen.push(...results);
+      found.push(...findSocials(results, biz).filter((p) => !has(p.network)));
+    }
   }
   for (const p of found) ctx.log(`   📱 ${p.label}: ${p.display}`);
   return { urls: found.map((p) => p.url), results: seen };

@@ -421,6 +421,7 @@ test('Social media: finds the Instagram and Facebook of a lead by searching, ski
     const mike = result.leads.find((l) => l.name === 'Mike Pipe Fix');
     assert.deepEqual(mike.socials, ['https://www.instagram.com/mikepipefix/', 'https://www.facebook.com/MikePipeFixLahore/']);
     assert.ok(server.requests.google.some((q) => q === 'Mike Pipe Fix Lahore instagram'), server.requests.google.join(' | '));
+    assert.ok(!server.requests.google.some((q) => q.endsWith(' facebook'))); // one social search per lead
     assert.match(logText, /📱 Instagram: @mikepipefix/);
     // The card's extra details
     assert.equal(mike.category, 'Plumber');
