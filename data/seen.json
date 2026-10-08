@@ -920,6 +920,26 @@
   "gmaps/2244032911609381937": {"status":"lead","name":"Bill Brown Plumbing Co","checked":"2026-10-08"},
   "gmaps/2320619732745882330": {"status":"lead","name":"Memphis Plumbers JAC","checked":"2026-10-08"},
   "gmaps/9269011112395432613": {"status":"lead","name":"Faucet Doctor's Plumbing","checked":"2026-10-08"},
-  "gmaps/4236321105862668664": {"status":"unverified","name":"Brooks Plumbing","checked":"2026-10-08","attempts":1,"reason":"web search failed"}
+  "gmaps/4236321105862668664": {"status":"unverified","name":"Brooks Plumbing","checked":"2026-10-08","attempts":1,"reason":"web search failed"},
+  "gmaps/10328342171154358099": {"status":"has_website","name":"Fabellous Beauty Lounge","checked":"2026-10-08","website":"fabellousbeautylounge.as.me","layer":"maps list"},
+  "gmaps/8410231626561742646": {"status":"has_website","name":"Great Lengths Hair Salon","checked":"2026-10-08","website":"greatlengthssalonmemphis.com","layer":2},
+  "gmaps/15629320319205302914": {"status":"has_website","name":"Epic Total Salon","checked":"2026-10-08","website":"epictotalsalon.com","layer":2},
+  "gmaps/12845927544208288278": {"status":"has_website","name":"New York Hair Salon","checked":"2026-10-08","website":"nyhair-memphis.com","layer":2},
+  "gmaps/12565058731505771916": {"status":"has_website","name":"Empire Hair Studio","checked":"2026-10-08","website":"empirehairstudio.com","layer":2},
+  "gmaps/11485331903887883879": {"status":"has_website","name":"Salon 387","checked":"2026-10-08","website":"salon387.com","layer":2},
+  "gmaps/12224454590667446178": {"status":"has_website","name":"A Natural Affair Beauty Lounge","checked":"2026-10-08","website":"anaturalaffair.com","layer":2},
+  "gmaps/1278193336672462732": {"status":"lead","name":"Dabbles Hair Company","checked":"2026-10-08"},
+  "gmaps/16716647884926277511": {"status":"has_website","name":"Pavo Salon Laurelwood","checked":"2026-10-08","website":"pavosalon.com","layer":2},
+  "gmaps/2298009335082213836": {"status":"has_website","name":"Pavo Salon Central","checked":"2026-10-08","website":"pavosalon.com","layer":2},
+  "gmaps/8086111529349741431": {"status":"has_website","name":"Hero & Sage Salon","checked":"2026-10-08","website":"heroandsagesalon.com","layer":2},
+  "gmaps/17476482107195186767": {"status":"has_website","name":"Vy Vy's Hair Salon","checked":"2026-10-08","website":"vyvyshairsalon.org","layer":2},
+  "gmaps/3547099793317064777": {"status":"has_website","name":"Juve Salon Spa","checked":"2026-10-08","website":"juvesalonspa.com","layer":2},
+  "gmaps/6408516398089319001": {"status":"has_website","name":"The Row Salon","checked":"2026-10-08","website":"therowsalon.com","layer":2},
+  "gmaps/13674391926539998386": {"status":"has_website","name":"Ashe Natural Haircare Salon","checked":"2026-10-08","website":"ashenaturalhaircaresalon.blogspot.com","layer":2},
+  "gmaps/13614668359219510396": {"status":"has_website","name":"Sage+Honey Hair Co.","checked":"2026-10-08","website":"sagehoneyhairco.com","layer":2},
+  "gmaps/8695630384584454659": {"status":"lead","name":"Sumthing Different Hair Salon","checked":"2026-10-08"},
+  "gmaps/8490902462623423237": {"status":"has_website","name":"LIMITLESS Naturals Salon","checked":"2026-10-08","website":"limitlessnaturalssalon.com","layer":2},
+  "gmaps/16514117576937474040": {"status":"lead","name":"Miss Bonita Hair","checked":"2026-10-08"},
+  "gmaps/10921482221079130224": {"status":"has_website","name":"Holly Woods Colorist","checked":"2026-10-08","website":"hollywoodscolorist.com","layer":2}
  }
 }

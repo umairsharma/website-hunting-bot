@@ -1,27 +1,28 @@
 {
-  "startedAt": "2026-10-08T06:40:33.014Z",
-  "finishedAt": "2026-10-08T06:54:56.835Z",
-  "minutes": 14.4,
+  "startedAt": "2026-10-08T10:16:34.362Z",
+  "finishedAt": "2026-10-08T10:27:51.333Z",
+  "minutes": 11.3,
   "place": "Memphis, United States",
   "area": "Memphis, Shelby County, West Tennessee, Tennessee, United States",
   "candidates": 0,
-  "discovered": 16,
-  "mapsListed": 60,
-  "checked": 16,
-  "leads": 14,
-  "hasWebsite": 1,
+  "discovered": 30,
+  "mapsListed": 34,
+  "checked": 19,
+  "leads": 3,
+  "hasWebsite": 16,
   "closed": 0,
-  "unverified": 1,
+  "unverified": 0,
   "pending": 0,
   "searchEngines": {
     "google": "broken",
     "brave": "blocked",
     "startpage": "blocked",
-    "bing": "ok",
+    "bing": "broken",
     "duckduckgo": "blocked"
   },
   "warnings": [
-    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, DuckDuckGo blocked the bot, so it used Bing."
+    "Every search engine blocked the bot, so it stopped early. The rest will be checked next run.",
+    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, Bing didn't work, DuckDuckGo blocked the bot."
   ],
   "error": null
 }
