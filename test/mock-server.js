@@ -47,7 +47,7 @@ Object.assign(PLACES_EXTRA, {
   'pipe-masters': { title: 'Pipe Masters', website: 'https://pipemasters.example/', address: '1 Canal Rd, Lahore' },
   'ace-drain-co': { title: 'Ace Drain Co', website: 'https://acedrainco.example/', phone: '+923001234500', phoneLabel: '0300 1234500', address: '2 Mall Rd, Lahore', rating: '4.6', reviews: '88' },
   'mike-pipe-fix': { title: 'Mike Pipe Fix', phone: '+923211234567', phoneLabel: '0321 1234567', address: '3 Ferozepur Rd, Lahore', rating: '4.8', reviews: '64',
-    category: 'Plumber', hours: [['Monday', '9 AM–6 PM'], ['Tuesday', '9 AM–6 PM'], ['Sunday', 'Closed']] },
+    category: 'Plumber', hours: [['Sunday', 'Closed'], ['Monday', '9 AM–6 PM Hours might differ'], ['Tuesday', '9 AM–6 PM']] },
   'delta-rooter': { title: 'Delta Rooter', phone: '+924235550000', phoneLabel: '042 35550000', address: '4 Jail Rd, Lahore' },
 });
 
@@ -79,11 +79,10 @@ const RESULTS = [
     { url: 'https://www.instagram.com/p/C9xYz/', title: 'Mike Pipe Fix (@mikepipefix) • Instagram photos and videos',
       snippet: '1,234 Followers, 10 Following, 56 Posts - See Instagram photos and videos from Mike Pipe Fix' },
     { url: 'https://www.instagram.com/pipefixers_uk/', title: 'Pipe Fixers UK (@pipefixers_uk) • Instagram' },
-  ] },
-  { match: 'Mike Pipe Fix Lahore facebook', results: [
     { url: 'https://www.facebook.com/MikePipeFixLahore/', title: 'Mike Pipe Fix - Lahore | Facebook',
       snippet: 'Mike Pipe Fix, Lahore. 890 likes · 4 talking about this · 12 were here.' },
   ] },
+
   { match: 'Mike Pipe Fix Lahore', results: [
     { url: 'https://www.yellowpages.com.pk/mike-pipe-fix', title: 'Mike Pipe Fix - Plumbers in Lahore', snippet: 'Mike Pipe Fix, established in 2008, offers plumbing repairs.' },
   ] },
