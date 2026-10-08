@@ -17,7 +17,7 @@ import { MAX_LINK, hoursText, leadShareLink, leadText, leadsText } from '../src/
 import { findSocials, orderSocials, socialLabel, socialProfile } from '../src/socials.js';
 import { confirmByPhone, fetchPage, phonePattern, siteOrigins } from '../src/verify.js';
 import { activityFor, listingsFrom, sinceFrom, socialActivityFrom } from '../src/details.js';
-import { normalizeConfig } from '../src/run.js';
+import { INSTITUTION_NAME, normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
 
 const biz = (name, alt = []) => {
@@ -139,7 +139,7 @@ test('analyzeResults: one common word of the name ("Bishop", "Johnson") does not
   assert.ok(has('https://pinebelt.net/', 'Pinebelt Plumbing, LLC', 'Pinebelt Plumbing - Hattiesburg, MS'));
   const bare = analyzeResults([{ url: 'https://haveli.com.pk/', title: 'Home' }], biz('Haveli Restaurant'));
   assert.equal(bare.hasWebsite, false);
-  assert.deepEqual(bare.possible, ['haveli.com.pk']); // shown as "Check first"
+  assert.deepEqual(bare.possible, []); // a one-word domain is usually a big brand (crest.com), so not even "Check first"
   // An extra word is fine when the page is titled with the business's name
   assert.ok(has('https://barberbrandon.com/', 'Barber & Sons Plumbing Co', 'Barber & Sons Plumbing | Brandon, MS'));
   assert.equal(has('https://barberbrandon.com/', 'Barber & Sons Plumbing Co', 'Barber shop in Brandon'), false);
@@ -564,6 +564,7 @@ test('socialProfile: reads the account (ID) from social links', () => {
   assert.equal(id('https://m.facebook.com/McAlpins-Plumbing-Gas-Inc-1707962926088209/about'), 'McAlpins-Plumbing-Gas-Inc-1707962926088209');
   assert.equal(id('https://www.facebook.com/profile.php?id=100089'), '100089');
   assert.equal(id('https://www.facebook.com/groups/123/'), null);
+  assert.equal(id('https://m.facebook.com/pages/category/Bakery/La-Estrella-Bakery-Y-Familia-1111-Singleton-119611598054703/'), 'La-Estrella-Bakery-Y-Familia-1111-Singleton-119611598054703');
   assert.equal(id('https://www.tiktok.com/@roys.plumbing'), '@roys.plumbing');
   assert.equal(id('https://www.youtube.com/watch?v=EKm6TBB58iA'), null);
   assert.equal(id('https://www.linkedin.com/company/roys-plumbing/'), 'roys-plumbing');
@@ -595,6 +596,10 @@ test('findSocials: keeps only the business own accounts, Instagram first', () =>
   assert.deepEqual(orderSocials([
     'https://www.facebook.com/roys/', 'https://www.instagram.com/roysplumbing', 'https://instagram.com/RoysPlumbing/',
   ]), ['https://www.instagram.com/roysplumbing/', 'https://www.facebook.com/roys/']);
+  // The same Facebook page under two link forms (from a real Dallas run) is listed once
+  assert.equal(orderSocials([
+    'https://www.facebook.com/people/Cloud-9-Nail-Spa/100052005895186/', 'https://www.facebook.com/p/Cloud-9-Nail-Spa-100052005895186/',
+  ]).length, 1);
 });
 
 test('Phone check: finds the number however a site writes it, and only on real websites', async () => {
@@ -668,4 +673,11 @@ test('fetchPage: never throws, and gives up on dead or slow sites', async () => 
     server.closeAllConnections?.();
     server.close();
   }
+});
+
+test('Organisations are not leads; small businesses with similar words still are', () => {
+  for (const name of ['Texas A&M School of Dentistry Urgent Care Clinic', 'Baylor University Medical Center', 'City of Dallas Water Utilities', 'Dallas Police Department'])
+    assert.ok(INSTITUTION_NAME.test(name), name);
+  for (const name of ['County Line BBQ', 'State of Grace', 'College Hill Barbers', 'Federal Pizza', 'Cloud 9 Nail Spa'])
+    assert.ok(!INSTITUTION_NAME.test(name), name);
 });
