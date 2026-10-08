@@ -112,7 +112,7 @@ test('full run: 3 layers, Google blocked mid-run → falls back, Discord gets le
     // Discord: first POST got a 429 and was retried; one message with the summary + 3 lead cards
     assert.equal(server.requests.discord.length, 1);
     const msg = server.requests.discord[0];
-    for (const e of msg.embeds) assert.match(e.fields.at(-1).value, /^\[Send this lead to WhatsApp\]\(https:\/\/wa\.me\/\?text=/);
+    for (const e of msg.embeds) assert.match(e.description, /^📲 \*\*\[Send this lead to WhatsApp\]\(https:\/\/wa\.me\/\?text=/);
     const runLeads = fs.readFileSync(path.join(dataDir, 'run-leads.txt'), 'utf8');
     assert.match(runLeads, /^🎯 3 website leads · Lahore, Pakistan/);
     assert.match(msg.content, /Each card has a "Send this lead to WhatsApp" link/);
@@ -422,9 +422,18 @@ test('Social media: finds the Instagram and Facebook of a lead by searching, ski
     assert.deepEqual(mike.socials, ['https://www.instagram.com/mikepipefix/', 'https://www.facebook.com/MikePipeFixLahore/']);
     assert.ok(server.requests.google.some((q) => q === 'Mike Pipe Fix Lahore instagram'), server.requests.google.join(' | '));
     assert.match(logText, /📱 Instagram: @mikepipefix/);
+    // The card's extra details
+    assert.equal(mike.category, 'Plumber');
+    assert.deepEqual(mike.hours.days, [['Monday', '9 AM–6 PM'], ['Tuesday', '9 AM–6 PM'], ['Sunday', 'Closed']]);
+    assert.equal(mike.since, '2008 (Yellow Pages)');
+    assert.deepEqual(mike.listings.map((l) => l.name), ['Yellow Pages']);
+    assert.deepEqual(mike.socialActivity, { 'instagram/mikepipefix': '1,234 followers · 56 posts', 'facebook/mikepipefixlahore': '890 likes · 4 talking about this · 12 check-ins' });
     const delta = result.leads.find((l) => l.name === 'Delta Rooter');
     assert.deepEqual(delta.socials, []); // the only Instagram result is another business
     const card = server.requests.discord.at(-1).embeds.find((e) => e.title.endsWith('Mike Pipe Fix'));
+    assert.equal(card.fields.find((f) => f.name === '🕒 Hours').value, 'Monday: 9 AM–6 PM\nTuesday: 9 AM–6 PM\nSunday: Closed');
+    const shared = decodeURIComponent(new URL(card.description.match(/\((https:\/\/wa\.me[^)\s]+)\)/)[1]).searchParams.get('text'));
+    for (const detail of ['🕒 Mon 9 AM–6 PM', '📅 Open since 2008', '1,234 followers', '📋 Also listed on: Yellow Pages']) assert.ok(shared.includes(detail), detail);
     assert.match(card.fields.find((f) => f.name === 'Social media').value, /📸 \[Instagram @mikepipefix\]\(https:\/\/www\.instagram\.com\/mikepipefix\/\)/);
   });
 });

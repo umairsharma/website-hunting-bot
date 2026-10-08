@@ -46,7 +46,8 @@ const MAPS_PLUMBERS = [
 Object.assign(PLACES_EXTRA, {
   'pipe-masters': { title: 'Pipe Masters', website: 'https://pipemasters.example/', address: '1 Canal Rd, Lahore' },
   'ace-drain-co': { title: 'Ace Drain Co', website: 'https://acedrainco.example/', phone: '+923001234500', phoneLabel: '0300 1234500', address: '2 Mall Rd, Lahore', rating: '4.6', reviews: '88' },
-  'mike-pipe-fix': { title: 'Mike Pipe Fix', phone: '+923211234567', phoneLabel: '0321 1234567', address: '3 Ferozepur Rd, Lahore', rating: '4.8', reviews: '64' },
+  'mike-pipe-fix': { title: 'Mike Pipe Fix', phone: '+923211234567', phoneLabel: '0321 1234567', address: '3 Ferozepur Rd, Lahore', rating: '4.8', reviews: '64',
+    category: 'Plumber', hours: [['Monday', '9 AM–6 PM'], ['Tuesday', '9 AM–6 PM'], ['Sunday', 'Closed']] },
   'delta-rooter': { title: 'Delta Rooter', phone: '+924235550000', phoneLabel: '042 35550000', address: '4 Jail Rd, Lahore' },
 });
 
@@ -75,11 +76,16 @@ function discoveryPage(q) {
 const RESULTS = [
   // Social media searches (more specific, so listed before the plain names)
   { match: 'Mike Pipe Fix Lahore instagram', results: [
-    { url: 'https://www.instagram.com/p/C9xYz/', title: 'Mike Pipe Fix (@mikepipefix) • Instagram photos and videos' },
+    { url: 'https://www.instagram.com/p/C9xYz/', title: 'Mike Pipe Fix (@mikepipefix) • Instagram photos and videos',
+      snippet: '1,234 Followers, 10 Following, 56 Posts - See Instagram photos and videos from Mike Pipe Fix' },
     { url: 'https://www.instagram.com/pipefixers_uk/', title: 'Pipe Fixers UK (@pipefixers_uk) • Instagram' },
   ] },
   { match: 'Mike Pipe Fix Lahore facebook', results: [
-    { url: 'https://www.facebook.com/MikePipeFixLahore/', title: 'Mike Pipe Fix - Lahore | Facebook' },
+    { url: 'https://www.facebook.com/MikePipeFixLahore/', title: 'Mike Pipe Fix - Lahore | Facebook',
+      snippet: 'Mike Pipe Fix, Lahore. 890 likes · 4 talking about this · 12 were here.' },
+  ] },
+  { match: 'Mike Pipe Fix Lahore', results: [
+    { url: 'https://www.yellowpages.com.pk/mike-pipe-fix', title: 'Mike Pipe Fix - Plumbers in Lahore', snippet: 'Mike Pipe Fix, established in 2008, offers plumbing repairs.' },
   ] },
   { match: 'Delta Rooter Lahore instagram', results: [
     { url: 'https://www.instagram.com/deltafaucet/', title: 'Delta Faucet (@deltafaucet) • Instagram' },
@@ -142,6 +148,9 @@ function placeHtml(p) {
     ${p.address ? `<button data-item-id="address" aria-label="Address: ${esc(p.address)}"><div>${esc(p.address)}</div></button>` : ''}
     ${p.website ? `<a data-item-id="authority" href="${esc(p.website)}" aria-label="Website: ${esc(host)}"><div>${esc(host)}</div></a>` : ''}
     ${p.phone ? `<button data-item-id="phone:tel:${esc(p.phone)}" aria-label="Phone: ${esc(p.phoneLabel)}"><div>${esc(p.phoneLabel)}</div></button>` : ''}
+    ${p.category ? `<button jsaction="pane.wfvdle1.category">${esc(p.category)}</button>` : ''}
+    ${p.hours ? `<div jsaction="pane.openhours.wfvdle23.dropdown" onclick="document.getElementById('week').hidden=false"><span role="img" aria-label="Show open hours for the week"></span>Open · Closes 6 PM</div>
+      <table id="week" hidden>${p.hours.map(([d, t]) => `<tr><td>${d}</td><td>${t.replace(' ', '\u202f')}</td></tr>`).join('')}</table>` : ''}
     ${p.claimable ? '<a href="#claim">Claim this business</a>' : ''}
     ${p.review ? `<div class="jftiEf"><span class="wiI7pd">${esc(p.review)}</span></div>` : ''}
   </div>`;
@@ -180,7 +189,7 @@ function mapsSearch(q, scenario) {
 }
 
 const googleHtml = (results) => page(`<div id="search"><div id="rso">${results.map((r) =>
-  `<div class="g"><div class="yuRUbf"><div><span><a href="${esc(r.url)}"><h3 class="LC20lb">${esc(r.title)}</h3><cite>${esc(r.url)}</cite></a></span></div></div><div class="VwiC3b">Snippet</div></div>`).join('')}</div></div>`);
+  `<div class="g"><div class="yuRUbf"><div><span><a href="${esc(r.url)}"><h3 class="LC20lb">${esc(r.title)}</h3><cite>${esc(r.url)}</cite></a></span></div></div><div class="VwiC3b">${esc(r.snippet || 'Snippet')}</div></div>`).join('')}</div></div>`);
 
 const bingHtml = (results) => page(`<div id="b_content"><ol id="b_results">${results.map((r) =>
   `<li class="b_algo"><h2><a href="https://www.bing.com/ck/a?!&amp;&amp;p=abc&amp;u=a1${Buffer.from(r.url).toString('base64url')}&amp;ntb=1">${esc(r.title)}</a></h2></li>`).join('')}</ol></div>`);

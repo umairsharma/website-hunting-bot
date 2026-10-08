@@ -2,7 +2,8 @@
 
 import { hostOf, prettySite } from './matching.js';
 import { sleep } from './util.js';
-import { leadShareLink } from './share.js';
+import { hoursText, leadShareLink } from './share.js';
+import { activityFor } from './details.js';
 import { socialIcon, socialLabel } from './socials.js';
 
 const MAX_EMBEDS_PER_MESSAGE = 10; // Discord limit
@@ -29,7 +30,8 @@ function mapsField(lead) {
 
 export function leadEmbed(lead) {
   const hot = (lead.reviews || 0) >= HOT_REVIEWS;
-  const fields = [{ name: 'Category', value: clip(lead.categoryLabel || '—', 1024), inline: true }];
+  const category = [lead.categoryLabel, lead.category && lead.category !== lead.categoryLabel ? `(${lead.category})` : null].filter(Boolean).join(' ');
+  const fields = [{ name: 'Category', value: clip(category || '—', 1024), inline: true }];
   if (lead.phone) {
     const wa = lead.whatsapp ? `\n[Open in WhatsApp](${safeUrl(lead.whatsapp)})` : '';
     fields.push({ name: 'Phone', value: clip(`${lead.phone}${wa}`, 1024), inline: true });
@@ -42,17 +44,28 @@ export function leadEmbed(lead) {
   const maps = mapsField(lead);
   if (maps) fields.push(maps);
   if (lead.email) fields.push({ name: 'Email', value: clip(lead.email, 1024) });
+  const hours = lead.hours?.days?.length > 1
+    ? lead.hours.days.map(([d, t]) => `${d}: ${t}`).join('\n')
+    : hoursText(lead.hours);
+  if (hours) fields.push({ name: '🕒 Hours', value: clip(hours, 1024), inline: true });
+  if (lead.since) fields.push({ name: '📅 Open since', value: clip(lead.since, 1024), inline: true });
   if (lead.socials?.length) {
-    // "📸 Instagram @roysplumbing", each a link to the page.
-    const links = lead.socials.map((u) => `${socialIcon(u)} [${socialLabel(u) || prettySite(hostOf(u))}](${safeUrl(u)})`).join('\n');
+    // "📸 Instagram @roysplumbing — 2,345 followers · 1,024 posts", each a link to the page.
+    const links = lead.socials.map((u) => {
+      const activity = activityFor(u, lead.socialActivity);
+      return `${socialIcon(u)} [${socialLabel(u) || prettySite(hostOf(u))}](${safeUrl(u)})${activity ? ` — ${activity}` : ''}`;
+    }).join('\n');
     fields.push({ name: 'Social media', value: clip(links, 1024) });
   }
+  if (lead.listings?.length) {
+    fields.push({ name: '📋 Also listed on', value: clip(lead.listings.map((l) => `[${l.name}](${safeUrl(l.url)})`).join(' · '), 1024) });
+  }
   if (lead.notes?.length) fields.push({ name: 'Notes', value: clip(lead.notes.map((n) => `• ${n}`).join('\n'), 1024) });
-  // Opens WhatsApp with everything above typed in; pick a chat (or "Message yourself") and send.
-  fields.push({ name: '📲 Share', value: `[Send this lead to WhatsApp](${leadShareLink(lead)})` });
 
   const embed = {
     title: clip(`${hot ? '🔥 ' : ''}${lead.name}`, 256),
+    // Opens WhatsApp with everything on this card typed in; pick a chat (or "Message yourself") and send.
+    description: `📲 **[Send this lead to WhatsApp](${leadShareLink(lead)})**`,
     color: hot ? 0xf97316 : 0x22c55e,
     fields,
     footer: { text: clip(lead.checks || '', 2048) },
@@ -63,6 +76,7 @@ export function leadEmbed(lead) {
 
 function embedSize(e) {
   return (e.title || '').length
+    + (e.description || '').length
     + (e.footer?.text || '').length
     + e.fields.reduce((n, f) => n + f.name.length + f.value.length, 0);
 }

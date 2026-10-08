@@ -16,7 +16,11 @@ const ENGINES = {
     ready: '#search, #rso, #botstuff, #topstuff',
     extract: () => Array.from(document.querySelectorAll('#search a, #rso a'))
       .filter((a) => a.querySelector('h3'))
-      .map((a) => ({ url: a.href, title: a.querySelector('h3').textContent.trim() })),
+      .map((a) => ({
+        url: a.href,
+        title: a.querySelector('h3').textContent.trim(),
+        snippet: (a.closest('div.g, div.MjjYud, [data-hveid]')?.innerText || '').slice(0, 600),
+      })),
   },
   brave: {
     label: 'Brave',
@@ -27,7 +31,11 @@ const ENGINES = {
       const root = document.querySelector('#results') || document.querySelector('main') || document.body;
       return Array.from(root.querySelectorAll('a[href^="http"]'))
         .filter((a) => !/(^|\.)brave\.com$/i.test(a.hostname) && !a.closest('[data-type="ad"], .ad, [class*="sponsored"]'))
-        .map((a) => ({ url: a.href, title: ((a.querySelector('.title, [class*="title"]') || a).textContent || '').trim() }))
+        .map((a) => ({
+          url: a.href,
+          title: ((a.querySelector('.title, [class*="title"]') || a).textContent || '').trim(),
+          snippet: (a.closest('.snippet, [data-type="web"], [class*="result"]')?.innerText || '').slice(0, 600),
+        }))
         .filter((r) => r.title);
     },
   },
@@ -39,7 +47,11 @@ const ENGINES = {
       const root = document.querySelector('.w-gl') || document.querySelector('#main') || document.body;
       return Array.from(root.querySelectorAll('a[href^="http"]'))
         .filter((a) => !/(^|\.)startpage\.com$/i.test(a.hostname) && !a.closest('[class*="ad-"], [class*="sponsored"]'))
-        .map((a) => ({ url: a.href, title: ((a.querySelector('h2, h3, .wgl-title, [class*="title"]') || a).textContent || '').trim() }))
+        .map((a) => ({
+          url: a.href,
+          title: ((a.querySelector('h2, h3, .wgl-title, [class*="title"]') || a).textContent || '').trim(),
+          snippet: (a.closest('.w-gl__result, .result, [class*="result"]')?.innerText || '').slice(0, 600),
+        }))
         .filter((r) => r.title);
     },
   },
@@ -48,14 +60,14 @@ const ENGINES = {
     url: (ep, q) => `${ep.bing}/search?q=${encodeURIComponent(q)}&setlang=en`,
     ready: '#b_results, #b_content',
     extract: () => Array.from(document.querySelectorAll('#b_results li.b_algo h2 a'))
-      .map((a) => ({ url: a.href, title: a.textContent.trim() })),
+      .map((a) => ({ url: a.href, title: a.textContent.trim(), snippet: (a.closest('li.b_algo')?.innerText || '').slice(0, 600) })),
   },
   duckduckgo: {
     label: 'DuckDuckGo',
     url: (ep, q) => `${ep.duckduckgo}/html/?q=${encodeURIComponent(q)}`,
     ready: '.results, .result, .no-results, #links',
     extract: () => Array.from(document.querySelectorAll('.result:not(.result--ad) a.result__a'))
-      .map((a) => ({ url: a.href, title: a.textContent.trim() })),
+      .map((a) => ({ url: a.href, title: a.textContent.trim(), snippet: (a.closest('.result')?.innerText || '').slice(0, 600) })),
   },
 };
 
@@ -79,7 +91,11 @@ async function runBraveApi(query, ep, key) {
     const json = await res.json();
     const results = (json.web?.results || [])
       .filter((r) => /^https?:\/\//i.test(r.url || ''))
-      .map((r) => ({ url: r.url, title: String(r.title || '').replace(/<[^>]+>/g, '').trim() }));
+      .map((r) => ({
+        url: r.url,
+        title: String(r.title || '').replace(/<[^>]+>/g, '').trim(),
+        snippet: [r.description, ...(r.extra_snippets || [])].filter(Boolean).join(' ').replace(/<[^>]+>/g, '').slice(0, 600),
+      }));
     return { results };
   } catch (err) {
     return { error: String(err.message || err).split('\n')[0] };
@@ -101,7 +117,7 @@ async function runEngine(page, name, query, ep) {
       const url = unwrapRedirect(r.url);
       if (!/^https?:\/\//i.test(url) || seen.has(url)) continue;
       seen.add(url);
-      results.push({ url, title: r.title });
+      results.push({ url, title: r.title, snippet: r.snippet || '' }); // snippet: the text under the result
     }
     return { results };
   } catch (err) {

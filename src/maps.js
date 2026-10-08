@@ -119,7 +119,24 @@ function readPlace(page) {
       temporarilyClosed: status(/^temporarily closed[\s.·]*$/i),
       claimable: /claim this business/i.test(main.innerText || ''),
       limitedView: /limited view/i.test(document.body ? document.body.innerText : ''),
+      category: ((main.querySelector('button[jsaction*="category"]') || {}).textContent || '').trim() || null,
+      hours: readHours(main),
     };
+
+    // "Closed · Opens 9 AM", plus each day's hours that are shown: [["Thursday", "9 AM–7 PM"], …].
+    function readHours(root) {
+      const clean = (t) => String(t || '').replace(/[\u202f\u00a0]/g, ' ').replace(/[\ue000-\uf8ff]/g, '').replace(/\s+/g, ' ').trim();
+      const days = [];
+      for (const row of root.querySelectorAll('table tr')) {
+        const cells = Array.from(row.querySelectorAll('td, th')).map((c) => clean(c.innerText));
+        const day = cells.find((c) => /^(mon|tues|wednes|thurs|fri|satur|sun)day\b/i.test(c));
+        const time = cells.find((c) => c !== day && /\d|closed|open 24/i.test(c));
+        if (day && time) days.push([day.match(/^\w+day/i)[0], time]);
+      }
+      const toggle = root.querySelector('[jsaction*="openhours"]');
+      const status = toggle ? clean(toggle.innerText).split(/ (?=See more hours)/)[0] : '';
+      return days.length || status ? { status: status.slice(0, 80) || null, days } : null;
+    }
   });
 }
 
@@ -156,6 +173,15 @@ export async function checkMaps(page, biz, { mapsBase, timeoutMs = 20000 }) {
     await page
       .waitForSelector('button[data-item-id="address"], a[data-item-id="authority"], button[data-item-id^="phone:tel:"]', { state: 'attached', timeout: 4000 })
       .catch(() => {});
+    // Open the week's hours (only today's show until clicked). Best effort: the listing reads fine without.
+    const opened = await page.evaluate(() => {
+      const icon = document.querySelector('[aria-label="Show open hours for the week"]');
+      const toggle = icon && (icon.closest('[jsaction*="openhours"], [role="button"], button') || icon.parentElement);
+      if (!toggle) return false;
+      toggle.click();
+      return true;
+    }).catch(() => false);
+    if (opened) await page.waitForTimeout(800);
     const info = await readPlace(page);
     if (!namesMatch(info.title, biz.names)) return { status: 'not_found', searchUrl, shownInstead: info.title };
     // When a search opens a listing directly, Maps swaps the address bar from /search/ to the listing's
