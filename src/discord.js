@@ -149,6 +149,7 @@ export async function sendMessages(webhookUrl, messages, log = () => {}) {
         if (res.status === 401 || res.status === 404) log('   → The DISCORD_WEBHOOK_URL secret looks wrong or the webhook was deleted.');
         break;
       }
+      await res.body?.cancel().catch(() => {}); // an unread body can crash Node's fetch
       sent += 1;
       break;
     }
