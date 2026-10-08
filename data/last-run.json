@@ -1,27 +1,27 @@
 {
-  "startedAt": "2026-10-08T05:26:50.227Z",
-  "finishedAt": "2026-10-08T05:29:42.283Z",
-  "minutes": 2.9,
+  "startedAt": "2026-10-08T05:35:07.961Z",
+  "finishedAt": "2026-10-08T05:42:38.374Z",
+  "minutes": 7.5,
   "place": "San Antonio, United States",
   "area": "San Antonio, Bexar County, Texas, United States",
   "candidates": 2,
-  "discovered": 2,
-  "mapsListed": 30,
-  "checked": 4,
-  "leads": 3,
-  "hasWebsite": 1,
+  "discovered": 15,
+  "mapsListed": 120,
+  "checked": 15,
+  "leads": 10,
+  "hasWebsite": 5,
   "closed": 0,
   "unverified": 0,
   "pending": 0,
   "searchEngines": {
     "google": "broken",
-    "brave": "blocked",
+    "brave": "ok",
     "startpage": "blocked",
     "bing": "ok",
     "duckduckgo": "untested"
   },
   "warnings": [
-    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
+    "Web search: Google didn't work, Startpage blocked the bot, so it used Brave + Bing."
   ],
   "error": null
 }
