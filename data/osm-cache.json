@@ -6170,5 +6170,9 @@
    {"type":"node","id":7044405328,"lat":36.140062,"lon":-86.7694555,"tags":{"name":"Village Real Estate","office":"estate_agent"}},
    {"type":"way","id":573984091,"center":{"lat":36.1503095,"lon":-86.7948133},"tags":{"building":"yes","name":"CHORD Real Estate","office":"estate_agent"}},
    {"type":"way","id":573984115,"center":{"lat":36.1515735,"lon":-86.7937368},"tags":{"building":"yes","name":"Tarkington & Harwell Company","office":"estate_agent"}}
+ ]},
+ "San Antonio|United States|0||no-chains|craft=plumber": {"fetched": "2026-10-08T05:27:24.354Z", "elements": [
+   {"type":"way","id":679389455,"center":{"lat":29.5273855,"lon":-98.3921034},"tags":{"addr:city":"San Antonio","addr:housenumber":"9710","addr:postcode":"78233","addr:state":"TX","addr:street":"Interstate Highway 35 Frontage Road","building":"yes","check_date":"2025-02-07","craft":"plumber","name":"On Time Elmer Plumbing"}},
+   {"type":"way","id":972687051,"center":{"lat":29.5689218,"lon":-98.6623854},"tags":{"addr:city":"Helotes","addr:housenumber":"13407","addr:postcode":"78023","addr:state":"TX","addr:street":"Western Oak Drive","building":"yes","craft":"plumber","name":"Bolin Plumbing"}}
  ]}
 }
