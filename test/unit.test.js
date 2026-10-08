@@ -15,7 +15,7 @@ import { buildMessages, googleSearchUrl, leadEmbed, sendMessages } from '../src/
 import { shortMapsUrl } from '../src/maps.js';
 import { MAX_LINK, hoursText, leadShareLink, leadText, leadsText } from '../src/share.js';
 import { findSocials, orderSocials, socialLabel, socialProfile } from '../src/socials.js';
-import { confirmByPhone, phonePattern, siteOrigins } from '../src/verify.js';
+import { confirmByPhone, fetchPage, phonePattern, siteOrigins } from '../src/verify.js';
 import { activityFor, listingsFrom, sinceFrom, socialActivityFrom } from '../src/details.js';
 import { normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
@@ -634,4 +634,30 @@ test('Lead details: hours, other listings, year started, social activity', () =>
   const activity = socialActivityFrom(results);
   assert.equal(activityFor('https://www.facebook.com/cobbplumbing/', activity), '1.2K likes · 12 talking about this · 30 check-ins');
   assert.equal(activityFor('https://www.instagram.com/cobbplumbing/', activity), '2,345 followers · 120 posts');
+});
+
+test('fetchPage: never throws, and gives up on dead or slow sites', async () => {
+  const http = await import('node:http');
+  const server = http.createServer((req, res) => {
+    if (req.url.startsWith('/slow')) return; // never answers
+    if (req.url.startsWith('/pdf')) { res.writeHead(200, { 'Content-Type': 'application/pdf' }); return res.end('x'.repeat(100000)); }
+    if (req.url.startsWith('/gone')) { res.writeHead(500); return res.end('error page'); }
+    if (req.url.startsWith('/moved')) { res.writeHead(301, { Location: '/ok' }); return res.end(); }
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end('<p>Call (901) 685-8842</p>');
+  });
+  await new Promise((r) => server.listen(0, '127.0.0.1', r));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  try {
+    assert.equal(await fetchPage(`${base}/ok`), '<p>Call (901) 685-8842</p>');
+    assert.equal(await fetchPage(`${base}/moved`), '<p>Call (901) 685-8842</p>');
+    assert.equal(await fetchPage(`${base}/pdf`), null);
+    assert.equal(await fetchPage(`${base}/gone`), null);
+    assert.equal(await fetchPage(`${base}/slow`, { timeoutMs: 500 }), null);
+    assert.equal(await fetchPage('http://127.0.0.1:1/'), null);
+    assert.equal(await fetchPage('not a url'), null);
+  } finally {
+    server.closeAllConnections?.();
+    server.close();
+  }
 });

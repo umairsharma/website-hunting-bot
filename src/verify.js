@@ -1,6 +1,8 @@
 // Is this website theirs? A business's own site shows its phone number, whatever the domain is called
 // (Culpepper Plumbing at cpimemphis.com). So when the domain doesn't give it away, open the site and look.
 
+import http from 'node:http';
+import https from 'node:https';
 import { classifyUrl } from './matching.js';
 
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
@@ -30,21 +32,65 @@ export function siteOrigins(results, limit = 3) {
   return out;
 }
 
-/** The page's HTML, or null. Tests point this at the fake server with SITE_FETCH_BASE. */
-export async function fetchPage(url, { timeoutMs = 10000 } = {}) {
+/**
+ * The page's HTML, or null. Uses Node's plain http/https rather than fetch(): fetch() on a page whose
+ * body is never read can crash the whole run (a Node bug), and websites are often slow or odd.
+ * Tests point this at the fake server with SITE_FETCH_BASE.
+ */
+export function fetchPage(url, { timeoutMs = 10000, maxBytes = 2_000_000, redirects = 4 } = {}) {
   const base = process.env.SITE_FETCH_BASE;
   const target = base ? `${base}/site?url=${encodeURIComponent(url)}` : url;
-  try {
-    const res = await fetch(target, {
-      headers: { 'User-Agent': BROWSER_UA, Accept: 'text/html,*/*;q=0.8', 'Accept-Language': 'en' },
-      redirect: 'follow',
-      signal: AbortSignal.timeout(timeoutMs),
-    });
-    if (!res.ok || !/html|text/i.test(res.headers.get('content-type') || 'text/html')) return null;
-    return (await res.text()).slice(0, 2_000_000);
-  } catch {
-    return null;
-  }
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = (value) => {
+      if (!done) {
+        done = true;
+        resolve(value);
+      }
+    };
+    let req;
+    try {
+      const u = new URL(target);
+      const lib = u.protocol === 'http:' ? http : https;
+      req = lib.get(u, { headers: { 'User-Agent': BROWSER_UA, Accept: 'text/html,*/*;q=0.8', 'Accept-Language': 'en' }, timeout: timeoutMs }, (res) => {
+        const { statusCode = 0, headers } = res;
+        if (statusCode >= 300 && statusCode < 400 && headers.location && redirects > 0 && !base) {
+          res.resume();
+          fetchPage(new URL(headers.location, u).href, { timeoutMs, maxBytes, redirects: redirects - 1 }).then(finish);
+          return;
+        }
+        if (statusCode !== 200 || !/html|text/i.test(headers['content-type'] || 'text/html')) {
+          res.resume(); // read and drop the body, so the connection closes cleanly
+          finish(null);
+          return;
+        }
+        let size = 0;
+        const chunks = [];
+        res.on('data', (chunk) => {
+          size += chunk.length;
+          chunks.push(chunk);
+          if (size > maxBytes) {
+            finish(Buffer.concat(chunks).toString('utf8'));
+            res.destroy();
+          }
+        });
+        res.on('end', () => finish(Buffer.concat(chunks).toString('utf8')));
+        res.on('error', () => finish(null));
+      });
+      req.on('timeout', () => {
+        req.destroy();
+        finish(null);
+      });
+      req.on('error', () => finish(null));
+    } catch {
+      finish(null);
+    }
+    // Belt and braces: a site that trickles data forever still ends.
+    setTimeout(() => {
+      req?.destroy();
+      finish(null);
+    }, timeoutMs + 5000).unref();
+  });
 }
 
 /** The first of these sites that shows the business's phone number (homepage, then /contact), or null. */

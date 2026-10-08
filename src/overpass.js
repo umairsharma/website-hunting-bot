@@ -25,7 +25,10 @@ export async function resolveArea(cfg, ep, log = () => {}) {
       headers: { 'User-Agent': botUserAgent(), 'Accept-Language': 'en' },
       signal: AbortSignal.timeout(30000),
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) {
+      await res.body?.cancel().catch(() => {}); // an unread body can crash Node's fetch
+      throw new Error(`HTTP ${res.status}`);
+    }
     results = await res.json();
   } catch (err) {
     // Place lookup is down — fall back to matching the city's name inside Overpass.
@@ -99,6 +102,7 @@ async function runOverpass(query, servers, log, deadline, retryDelayMs) {
           signal: AbortSignal.timeout(Math.min(135000, left)),
         });
         if (!res.ok) {
+          await res.body?.cancel().catch(() => {}); // an unread body can crash Node's fetch
           log(`   Overpass ${host}: HTTP ${res.status}, trying another server…`);
           continue;
         }

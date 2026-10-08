@@ -83,6 +83,7 @@ async function runBraveApi(query, ep, key) {
       headers: { Accept: 'application/json', 'X-Subscription-Token': key },
       signal: AbortSignal.timeout(20000),
     });
+    if (!res.ok) await res.body?.cancel().catch(() => {}); // an unread body can crash Node's fetch
     if (res.status === 429) return { blocked: true }; // over the plan's limit
     if (res.status === 401 || res.status === 403 || res.status === 422) {
       return { error: `the BRAVE_API_KEY was refused (HTTP ${res.status})`, fatal: true };
