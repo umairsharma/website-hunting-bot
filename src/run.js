@@ -157,7 +157,7 @@ async function checkBusiness(biz, ctx) {
 
   const mapsSite = maps?.website ? classifyUrl(maps.website) : null;
   const phone = maps?.phone || biz.phone || null;
-  const socials = [...biz.socials, mapsSite?.kind === 'social' ? mapsSite.url : null, ...result.socials,
+  const socials = [...biz.socials, mapsSite?.kind === 'social' ? mapsSite.url : null,
     ...(found ? findSocials(found.results, biz).map((p) => p.url) : [])];
   if (found && cfg.findSocials) socials.push(...await findSocialPages(biz, socials, maps?.address || biz.address, ctx));
   return {
