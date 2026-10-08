@@ -23,6 +23,7 @@ const CONFIG = {
   searchCooldownMinutes: 0.005, // 0.3 s instead of 5 min
   mapsDiscovery: false, // tested on its own below
   findSocials: false, // tested on its own below
+  phoneCheck: false, // tested on its own below
 };
 
 async function withServer(scenario, fn) {
@@ -37,6 +38,7 @@ async function withServer(scenario, fn) {
     BRAVE_API_URL: `${server.base}/brave-api`,
     STARTPAGE_BASE_URL: `${server.base}/startpage`,
     DDG_BASE_URL: `${server.base}/ddg`,
+    SITE_FETCH_BASE: server.base,
   };
   const saved = {};
   for (const [k, v] of Object.entries(env)) {
@@ -424,5 +426,24 @@ test('Social media: finds the Instagram and Facebook of a lead by searching, ski
     assert.deepEqual(delta.socials, []); // the only Instagram result is another business
     const card = server.requests.discord.at(-1).embeds.find((e) => e.title.endsWith('Mike Pipe Fix'));
     assert.match(card.fields.find((f) => f.name === 'Social media').value, /📸 \[Instagram @mikepipefix\]\(https:\/\/www\.instagram\.com\/mikepipefix\/\)/);
+  });
+});
+
+test('Phone check: a site with a different name counts when their phone number is on it', { timeout: 180000 }, async () => {
+  await withServer({ phoneSites: true }, async (server) => {
+    const logs = [];
+    const result = await run({
+      config: { ...CONFIG, categories: ['plumber'], mapsDiscovery: true, phoneCheck: true },
+      dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m),
+    });
+    const logText = logs.join('\n');
+    assert.equal(result.error, null, logText);
+    // Delta Rooter: drainheroes-lhr.example came up in the name search and shows their number
+    assert.match(logText, /Has a website: drainheroes-lhr\.example \(found by web search, their phone number is on it\)/);
+    // Mike Pipe Fix: found by searching the number; OLX is a directory and the plumbers hub shows another number
+    assert.ok(server.requests.google.includes('"0321 1234567"'), server.requests.google.join(' | '));
+    assert.match(logText, /Has a website: mpf-services\.example/);
+    assert.ok(!server.requests.sites.some((u) => u.includes('olx')));
+    assert.deepEqual(result.leads.map((l) => l.name), []);
   });
 });

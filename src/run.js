@@ -11,6 +11,7 @@ import { buildMessages, sendMessages } from './discord.js';
 import { appendLead, loadState, saveState, writeLastRun, writeRunLeads } from './storage.js';
 import { leadsText } from './share.js';
 import { findSocials, orderSocials, socialProfile } from './socials.js';
+import { confirmByPhone, phonePattern, siteOrigins } from './verify.js';
 import { endpoints, randomDelayMs, sleep, today } from './util.js';
 
 const KNOWN_ENGINES = ENGINE_NAMES; // google, brave, startpage, bing, duckduckgo
@@ -29,6 +30,7 @@ const DEFAULTS = {
   requireWebSearch: true,
   mapsDiscovery: true, // when OpenStreetMap runs short, find more businesses by searching Google Maps
   findSocials: true, // search for each lead's Instagram (and Facebook) page
+  phoneCheck: true, // a site with the business's phone number on it is theirs, whatever its name
   mapsSearch: [], // extra Google Maps searches, e.g. ['roofers'] (the Run workflow form's "any business type" box)
   delaySeconds: [4, 9],
   postSummaryWhenEmpty: true,
@@ -53,6 +55,7 @@ export function normalizeConfig(raw = {}) {
   cfg.requireWebSearch = cfg.requireWebSearch !== false;
   cfg.mapsDiscovery = cfg.mapsDiscovery !== false;
   cfg.findSocials = cfg.findSocials !== false;
+  cfg.phoneCheck = cfg.phoneCheck !== false;
   cfg.mapsSearch = (Array.isArray(cfg.mapsSearch) ? cfg.mapsSearch : [cfg.mapsSearch])
     .map((t) => String(t ?? '').trim()).filter(Boolean);
   const engines = (Array.isArray(cfg.searchEngines) ? cfg.searchEngines : [cfg.searchEngines])
@@ -152,6 +155,20 @@ async function checkBusiness(biz, ctx) {
   }
   const result = found ? analyzeResults(found.results, biz) : { hasWebsite: false, possible: [], socials: [] };
   if (result.hasWebsite) return { status: 'has_website', layer: 3, website: hostOf(result.website) };
+
+  // A website named differently from the business (cpimemphis.com for "Culpepper Plumbing") only
+  // shows itself by having their phone number on it: check the sites the search found, then search
+  // for the number itself.
+  const phoneForCheck = maps?.phoneTel || maps?.phone || biz.phone;
+  if (found && cfg.phoneCheck && phonePattern(phoneForCheck)) {
+    let site = await confirmByPhone(siteOrigins(found.results), phoneForCheck);
+    if (!site && ctx.searchOn) {
+      await sleep(delay());
+      const byPhone = await searcher.find(`"${maps?.phone || biz.phone || phoneForCheck}"`);
+      if (byPhone) site = await confirmByPhone(siteOrigins(byPhone), phoneForCheck);
+    }
+    if (site) return { status: 'has_website', layer: 3, website: hostOf(site), how: 'their phone number is on it' };
+  }
   for (const host of result.possible) notes.push(`Check first: ${host} might be their website`);
   if (!found) notes.push("Web search wasn't available, so double-check they don't have a website before pitching");
 
@@ -199,7 +216,7 @@ function record(outcome, biz, { cfg, state, stats, leads, dataDir, dryRun, log }
     case 'has_website':
       state.places[biz.key] = { status: 'has_website', ...base, website: outcome.website, layer: outcome.layer };
       stats.hasWebsite += 1;
-      log(`   🌐 Has a website: ${outcome.website} (found by ${outcome.layer === 2 ? 'Google Maps' : 'web search'})`);
+      log(`   🌐 Has a website: ${outcome.website} (found by ${outcome.layer === 2 ? 'Google Maps' : 'web search'}${outcome.how ? `, ${outcome.how}` : ''})`);
       break;
     case 'closed':
       state.places[biz.key] = { status: 'closed', ...base };

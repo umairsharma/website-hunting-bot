@@ -105,7 +105,25 @@ const RESULTS = [
     { url: 'https://smilecare-lahore.com/', title: 'Rehman Dental Clinic - Smile Care Lahore' },
   ] },
 ];
-const resultsFor = (q) => (RESULTS.find((r) => q.includes(r.match)) || { results: [] }).results;
+// Sites whose domain doesn't match the business's name; only their phone number shows they're theirs.
+const PHONE_RESULTS = [
+  { match: 'Delta Rooter Lahore', results: [{ url: 'https://drainheroes-lhr.example/services/rooter', title: 'Drain services | Lahore' }] },
+  { match: '"0321 1234567"', results: [
+    { url: 'https://www.olx.com.pk/item/plumber-1234', title: 'Plumber 0321 1234567 | OLX' },
+    { url: 'https://pk-plumbing-hub.example/listing/42', title: 'Plumbers in Lahore' },
+    { url: 'https://mpf-services.example/about', title: 'About us' },
+  ] },
+];
+export const SITES = {
+  'https://drainheroes-lhr.example/': '<h1>Drain Heroes</h1><p>Call us: 042-3555 0000</p>',
+  'https://pk-plumbing-hub.example/': '<h1>Find a plumber</h1><p>Our hotline: 0300 0000000</p>',
+  'https://mpf-services.example/': '<h1>MPF Services</h1><p>Plumbing and repairs</p>',
+  'https://mpf-services.example/contact': '<p>WhatsApp <a href="tel:+923211234567">+92 321 1234567</a></p>',
+};
+const resultsFor = (q, scenario = {}) => {
+  const lists = scenario.phoneSites ? [...PHONE_RESULTS, ...RESULTS] : RESULTS;
+  return (lists.find((r) => q.includes(r.match)) || { results: [] }).results;
+};
 
 const page = (body, script = '') =>
   `<!doctype html><html><head><meta charset="utf-8"><title>mock</title></head><body>${body}${script ? `<script>${script}</script>` : ''}</body></html>`;
@@ -197,7 +215,7 @@ function readBody(req) {
  *   bingEmptyFirst?: boolean (Bing's first page has no results), mapsSearchBlocked?: boolean }
  */
 export async function startMockServer(scenario = {}) {
-  const requests = { overpass: [], maps: [], google: [], brave: [], braveApi: [], startpage: [], bing: [], ddg: [], discord: [] };
+  const requests = { overpass: [], maps: [], google: [], brave: [], braveApi: [], startpage: [], bing: [], ddg: [], discord: [], sites: [] };
   let discordCalls = 0;
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://mock');
@@ -231,7 +249,7 @@ export async function startMockServer(scenario = {}) {
       if (scenario.searchDown || (scenario.googleBlockOn && q.includes(scenario.googleBlockOn))) {
         return send(302, 'text/plain', '', { Location: '/google/sorry/index?continue=search' });
       }
-      return html(googleHtml(resultsFor(q)));
+      return html(googleHtml(resultsFor(q, scenario)));
     }
     if (p.startsWith('/google/sorry')) {
       return html(page('<p>Our systems have detected unusual traffic from your computer network.</p>'), 429);
@@ -242,20 +260,20 @@ export async function startMockServer(scenario = {}) {
       if (scenario.braveWebBlocked || scenario.searchDown || requests.brave.length <= (scenario.braveBlockFirst || 0)) {
         return html(page('<p>Too many requests</p>'), 429);
       }
-      return html(braveHtml(resultsFor(q)));
+      return html(braveHtml(resultsFor(q, scenario)));
     }
     if (p === '/brave-api/res/v1/web/search') {
       const q = url.searchParams.get('q');
       requests.braveApi.push({ q, key: req.headers['x-subscription-token'] });
       if (req.headers['x-subscription-token'] !== 'good-key') return send(401, 'application/json', '{"type":"ErrorResponse"}');
-      const results = resultsFor(q).map((r) => ({ url: r.url, title: r.title.replace('Eiffel', '<strong>Eiffel</strong>') }));
+      const results = resultsFor(q, scenario).map((r) => ({ url: r.url, title: r.title.replace('Eiffel', '<strong>Eiffel</strong>') }));
       return send(200, 'application/json', JSON.stringify({ web: { results } }));
     }
     if (p === '/startpage/sp/search') {
       const q = url.searchParams.get('query');
       requests.startpage.push(q);
       if (scenario.startpageBlocked || scenario.searchDown) return send(302, 'text/plain', '', { Location: '/startpage/sp/captcha-block?x=1' });
-      return html(startpageHtml(resultsFor(q)));
+      return html(startpageHtml(resultsFor(q, scenario)));
     }
     if (p.startsWith('/startpage/sp/captcha-block')) return html(page('<p>Please confirm you are not a robot.</p>'));
     if (p === '/bing/search') {
@@ -263,13 +281,18 @@ export async function startMockServer(scenario = {}) {
       requests.bing.push(q);
       if (scenario.searchDown) return html(page('<div id="b_captcha">Verify you are human</div>'));
       if (scenario.bingEmptyFirst && requests.bing.length === 1) return html(bingHtml([]));
-      return html(bingHtml(scenario.bingWorks ? resultsFor(q) : []));
+      return html(bingHtml(scenario.bingWorks ? resultsFor(q, scenario) : []));
     }
     if (p === '/ddg/html/') {
       const q = url.searchParams.get('q');
       requests.ddg.push(q);
       if (scenario.searchDown) return html(page('<p>Unfortunately, bots use DuckDuckGo too.</p>'));
-      return html(ddgHtml(resultsFor(q)));
+      return html(ddgHtml(resultsFor(q, scenario)));
+    }
+    if (p === '/site') {
+      const target = url.searchParams.get('url');
+      requests.sites.push(target);
+      return SITES[target] ? html(page(SITES[target])) : send(404, 'text/plain', 'not found');
     }
     if (p === '/discord/webhook' && req.method === 'POST') {
       discordCalls += 1;

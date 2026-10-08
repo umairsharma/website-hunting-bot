@@ -15,6 +15,7 @@ import { buildMessages, leadEmbed, sendMessages } from '../src/discord.js';
 import { shortMapsUrl } from '../src/maps.js';
 import { leadShareLink, leadText, leadsText } from '../src/share.js';
 import { findSocials, orderSocials, socialLabel, socialProfile } from '../src/socials.js';
+import { confirmByPhone, phonePattern, siteOrigins } from '../src/verify.js';
 import { normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
 
@@ -573,4 +574,23 @@ test('findSocials: keeps only the business own accounts, Instagram first', () =>
   assert.deepEqual(orderSocials([
     'https://www.facebook.com/roys/', 'https://www.instagram.com/roysplumbing', 'https://instagram.com/RoysPlumbing/',
   ]), ['https://www.instagram.com/roysplumbing/', 'https://www.facebook.com/roys/']);
+});
+
+test('Phone check: finds the number however a site writes it, and only on real websites', async () => {
+  const p = phonePattern('+19016858842');
+  for (const text of ['Call (901) 685-8842', '901.685.8842', '<a href="tel:+19016858842">', '+1 901 685 8842']) assert.ok(p.test(text), text);
+  assert.equal(p.test('901-685-8843'), false);
+  assert.equal(p.test('9016858842123'), false);
+  assert.equal(phonePattern('12345'), null);
+  assert.ok(phonePattern('0321 1234567').test('0321-1234567'));
+
+  assert.deepEqual(siteOrigins([
+    { url: 'https://www.yelp.com/biz/x' }, { url: 'https://www.facebook.com/x' },
+    { url: 'https://cpimemphis.com/services/drains' }, { url: 'https://cpimemphis.com/about' }, { url: 'https://other.example/' },
+  ]), ['https://cpimemphis.com', 'https://other.example']);
+
+  const pages = { 'https://cpimemphis.com/': '<p>Culpepper Plumbing</p>', 'https://cpimemphis.com/contact': '<p>(901) 685-8842</p>' };
+  const fetchFn = async (url) => pages[url] ?? null;
+  assert.equal(await confirmByPhone(['https://jackson.com', 'https://cpimemphis.com'], '(901) 685-8842', fetchFn), 'https://cpimemphis.com');
+  assert.equal(await confirmByPhone(['https://cpimemphis.com'], '(901) 555-0000', fetchFn), null);
 });
