@@ -12,6 +12,7 @@ import { appendLead, loadState, saveState, writeLastRun, writeRunLeads } from '.
 import { leadsText } from './share.js';
 import { findSocials, orderSocials, socialProfile } from './socials.js';
 import { confirmByPhone, phonePattern, siteOrigins } from './verify.js';
+import { listingsFrom, sinceFrom, socialActivityFrom } from './details.js';
 import { endpoints, randomDelayMs, sleep, today } from './util.js';
 
 const KNOWN_ENGINES = ENGINE_NAMES; // google, brave, startpage, bing, duckduckgo
@@ -80,6 +81,7 @@ function websiteNote(site) {
  * A lead's Instagram (and Facebook, if none was found yet): one more search each, e.g.
  * "Roy's Plumbing Abbeville instagram". Only profiles that are clearly this business are kept.
  */
+// Returns { urls: the new profiles, results: all search results looked at }.
 async function findSocialPages(biz, known, address, ctx) {
   const has = (network) => known.some((url) => socialProfile(url)?.network === network);
   // For a run over a whole state, the business's own town from its address ("…, Abbeville, MS 38601").
@@ -87,15 +89,17 @@ async function findSocialPages(biz, known, address, ctx) {
   const inCity = compact(address).includes(compact(biz.city));
   const town = (!inCity && parts.length >= 3 && !/\d/.test(parts.at(-2)) ? parts.at(-2) : null) || biz.city;
   const found = [];
+  const seen = []; // every result, for the card's extra details (followers, other listings)
   for (const network of ['instagram', 'facebook']) {
     if (has(network) || found.some((p) => p.network === network)) continue;
     await sleep(ctx.delay());
     const results = await ctx.searcher.find([biz.searchName, town, network].filter(Boolean).join(' '));
     if (!results) break; // every engine is busy; not worth stopping the run for
+    seen.push(...results);
     found.push(...findSocials(results, biz).filter((p) => !has(p.network)));
   }
   for (const p of found) ctx.log(`   📱 ${p.label}: ${p.display}`);
-  return found.map((p) => p.url);
+  return { urls: found.map((p) => p.url), results: seen };
 }
 
 async function checkBusiness(biz, ctx) {
@@ -160,12 +164,16 @@ async function checkBusiness(biz, ctx) {
   // shows itself by having their phone number on it: check the sites the search found, then search
   // for the number itself.
   const phoneForCheck = maps?.phoneTel || maps?.phone || biz.phone;
+  const allResults = found ? [...found.results] : []; // for the card's extra details
   if (found && cfg.phoneCheck && phonePattern(phoneForCheck)) {
     let site = await confirmByPhone(siteOrigins(found.results), phoneForCheck);
     if (!site && ctx.searchOn) {
       await sleep(delay());
       const byPhone = await searcher.find(`"${maps?.phone || biz.phone || phoneForCheck}"`);
-      if (byPhone) site = await confirmByPhone(siteOrigins(byPhone), phoneForCheck);
+      if (byPhone) {
+        allResults.push(...byPhone);
+        site = await confirmByPhone(siteOrigins(byPhone), phoneForCheck);
+      }
     }
     if (site) return { status: 'has_website', layer: 3, website: hostOf(site), how: 'their phone number is on it' };
   }
@@ -176,7 +184,12 @@ async function checkBusiness(biz, ctx) {
   const phone = maps?.phone || biz.phone || null;
   const socials = [...biz.socials, mapsSite?.kind === 'social' ? mapsSite.url : null,
     ...(found ? findSocials(found.results, biz).map((p) => p.url) : [])];
-  if (found && cfg.findSocials) socials.push(...await findSocialPages(biz, socials, maps?.address || biz.address, ctx));
+  if (found && cfg.findSocials) {
+    const extra = await findSocialPages(biz, socials, maps?.address || biz.address, ctx);
+    socials.push(...extra.urls);
+    allResults.push(...extra.results);
+  }
+  const since = sinceFrom(allResults, biz);
   return {
     status: 'lead',
     lead: {
@@ -193,6 +206,11 @@ async function checkBusiness(biz, ctx) {
       mapsUrl: maps?.status === 'found' ? maps.mapsUrl : (biz.placeUrl || `https://www.google.com/maps/search/?api=1&query=${biz.lat},${biz.lon}`),
       onMaps: maps?.status === 'found', // mapsUrl is their own listing, not just the spot on the map
       socials: orderSocials(socials).slice(0, 4),
+      socialActivity: socialActivityFrom(allResults), // { 'instagram/handle': '1.2K followers · 340 posts' }
+      listings: listingsFrom(allResults, biz), // [{ name: 'Yelp', url }]
+      since: since ? `${since.year} (${since.source})` : null,
+      category: maps?.category || null, // Google's category, e.g. "Hair salon"
+      hours: maps?.hours || (biz.openingHours ? { status: null, days: [], text: biz.openingHours } : null),
       notes,
       checks: `Checked: OpenStreetMap ✓ · Google Maps ${maps ? '✓' : '✗'} · ${found ? `${engineLabel(found.engine)} ✓` : 'web search ✗'}`,
       city: cfg.city,

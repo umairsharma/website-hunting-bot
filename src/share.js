@@ -3,9 +3,29 @@
 
 import { hostOf, prettySite } from './matching.js';
 import { socialIcon, socialLabel } from './socials.js';
+import { activityFor } from './details.js';
 
-// A Discord field holds 1024 characters, including the "[Send this lead to WhatsApp](…)" around the link.
-const MAX_LINK = 980;
+const DAY_SHORT = { monday: 'Mon', tuesday: 'Tue', wednesday: 'Wed', thursday: 'Thu', friday: 'Fri', saturday: 'Sat', sunday: 'Sun' };
+
+/**
+ * Opening hours as one line: the whole week when Google showed it ("Mon 9 AM–7 PM, Tue …"), otherwise
+ * the one day it showed ("Thursday 9 AM–7 PM (only today's shown)"), or OpenStreetMap's hours.
+ */
+export function hoursText(hours, { short = false } = {}) {
+  if (!hours) return null;
+  const days = hours.days || [];
+  if (days.length > 1) {
+    const week = days.map(([d, t]) => `${DAY_SHORT[d.toLowerCase()] || d} ${t}`).join(', ');
+    return short && week.length > 120 ? `${week.slice(0, 119)}…` : week;
+  }
+  // Google shows only today's hours to the bot. "Open now"/"Closed" is left out: it was only true when the bot ran.
+  if (days.length === 1) return `${days[0][0]} ${days[0][1]} (only today's shown)`;
+  return hours.text || null;
+}
+
+// The link goes at the top of the card (the embed description, up to 4096 characters). Long links are
+// kept under 2000, which Discord and WhatsApp both open reliably.
+export const MAX_LINK = 2000;
 
 // wa.me opens WhatsApp with the text typed in. Brackets are escaped so the link survives Discord's [label](url).
 const waLink = (text) => `https://wa.me/?text=${encodeURIComponent(text).replace(/\(/g, '%28').replace(/\)/g, '%29')}`;
@@ -23,8 +43,16 @@ export function leadText(lead, { n = null, level = 0 } = {}) {
   if (lead.address) lines.push(`🏠 ${level >= 5 && lead.address.length > 70 ? `${lead.address.slice(0, 69)}…` : lead.address}`);
   if (lead.mapsUrl) lines.push(`📍 ${lead.mapsUrl}`);
   if (lead.email) lines.push(`✉️ ${lead.email}`);
+  if (lead.category && level < 4) lines.push(`🏷️ ${lead.category}`);
+  const hours = hoursText(lead.hours, { short: level >= 2 });
+  if (hours) lines.push(`🕒 ${hours}`);
+  if (lead.since) lines.push(`📅 Open since ${lead.since}`);
   const socials = (lead.socials || []).slice(0, level >= 4 ? 0 : level >= 3 ? 1 : 4);
-  for (const url of socials) lines.push(`${socialIcon(url)} ${socialLabel(url) || prettySite(hostOf(url))}: ${url}`);
+  for (const url of socials) {
+    const activity = activityFor(url, lead.socialActivity);
+    lines.push(`${socialIcon(url)} ${socialLabel(url) || prettySite(hostOf(url))}${activity ? ` (${activity})` : ''}: ${url}`);
+  }
+  if (lead.listings?.length && level < 3) lines.push(`📋 Also listed on: ${lead.listings.map((l) => (level >= 1 ? l.name : `${l.name} ${l.url}`)).join(level >= 1 ? ', ' : ' · ')}`);
   const notes = level >= 2 ? [] : (lead.notes || []).slice(0, level >= 1 ? 2 : 10);
   for (const note of notes) lines.push(`📝 ${note}`);
   return lines.join('\n');

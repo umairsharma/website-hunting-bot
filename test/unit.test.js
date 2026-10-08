@@ -13,9 +13,10 @@ import { placeIdOf } from '../src/discover.js';
 import { applyRunInputs, callingCodeFor, DEFAULT_NICHE } from '../src/inputs.js';
 import { buildMessages, leadEmbed, sendMessages } from '../src/discord.js';
 import { shortMapsUrl } from '../src/maps.js';
-import { leadShareLink, leadText, leadsText } from '../src/share.js';
+import { MAX_LINK, hoursText, leadShareLink, leadText, leadsText } from '../src/share.js';
 import { findSocials, orderSocials, socialLabel, socialProfile } from '../src/socials.js';
 import { confirmByPhone, phonePattern, siteOrigins } from '../src/verify.js';
+import { activityFor, listingsFrom, sinceFrom, socialActivityFrom } from '../src/details.js';
 import { normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
 
@@ -488,11 +489,21 @@ test('Send to WhatsApp: each card shares the full lead, within Discord limits', 
     address: '1234 Westheimer Rd, Houston, TX 77006', mapsUrl: 'https://maps.google.com/?cid=1841144998116252209',
     socials: ['https://www.facebook.com/snowflakedonuts', 'https://www.instagram.com/snowflakedonuts/'],
     notes: ['Their Google Maps "website" is just a Facebook page', 'Their Google listing is unclaimed'],
+    category: 'Donut shop',
+    hours: { status: 'Closed · Opens 6 AM', days: [['Monday', '6 AM–2 PM'], ['Tuesday', '6 AM–2 PM'], ['Sunday', 'Closed']] },
+    since: '1998 (BBB)',
+    socialActivity: { 'instagram/snowflakedonuts': '12.4K followers · 830 posts', 'facebook/snowflakedonuts': '3.1K likes' },
+    listings: [{ name: 'Yelp', url: 'https://www.yelp.com/biz/snowflake-donuts-houston' }, { name: 'BBB', url: 'https://www.bbb.org/x' }],
   };
   const card = leadEmbed(lead);
-  const share = card.fields.find((f) => f.name === '📲 Share');
-  assert.ok(share.value.length <= 1024, `${share.value.length} characters`);
-  const url = share.value.match(/^\[Send this lead to WhatsApp\]\((https:\/\/wa\.me\/\?text=[^)\s]+)\)$/)[1]; // brackets in the name don't break it
+  assert.equal(card.fields.find((f) => f.name === '🕒 Hours').value, 'Monday: 6 AM–2 PM\nTuesday: 6 AM–2 PM\nSunday: Closed');
+  assert.equal(card.fields.find((f) => f.name === '📅 Open since').value, '1998 (BBB)');
+  assert.equal(card.fields.find((f) => f.name === '📋 Also listed on').value, '[Yelp](https://www.yelp.com/biz/snowflake-donuts-houston) · [BBB](https://www.bbb.org/x)');
+  assert.match(card.fields.find((f) => f.name === 'Social media').value, /📸 \[Instagram @snowflakedonuts\]\(https:\/\/www\.instagram\.com\/snowflakedonuts\/\) — 12\.4K followers · 830 posts/);
+  assert.equal(card.fields.find((f) => f.name === 'Category').value, 'Bakery / sweets (Donut shop)');
+  // The share link is at the top of the card, where it has room for every detail.
+  assert.ok(card.description.length <= 4096, `${card.description.length} characters`);
+  const url = card.description.match(/^📲 \*\*\[Send this lead to WhatsApp\]\((https:\/\/wa\.me\/\?text=[^)\s]+)\)\*\*$/)[1]; // brackets in the name don't break it
   const text = decodeURIComponent(new URL(url).searchParams.get('text'));
   assert.equal(text, [
     '🔥 *Snowflake (Donuts) & Co* (Bakery / sweets)',
@@ -502,19 +513,23 @@ test('Send to WhatsApp: each card shares the full lead, within Discord limits', 
     '🏠 1234 Westheimer Rd, Houston, TX 77006',
     '📍 https://maps.google.com/?cid=1841144998116252209',
     '✉️ hello@snowflake.example',
-    '🔗 Facebook snowflakedonuts: https://www.facebook.com/snowflakedonuts',
-    '📸 Instagram @snowflakedonuts: https://www.instagram.com/snowflakedonuts/',
+    '🏷️ Donut shop',
+    '🕒 Mon 6 AM–2 PM, Tue 6 AM–2 PM, Sun Closed',
+    '📅 Open since 1998 (BBB)',
+    '🔗 Facebook snowflakedonuts (3.1K likes): https://www.facebook.com/snowflakedonuts',
+    '📸 Instagram @snowflakedonuts (12.4K followers · 830 posts): https://www.instagram.com/snowflakedonuts/',
+    '📋 Also listed on: Yelp https://www.yelp.com/biz/snowflake-donuts-houston · BBB https://www.bbb.org/x',
     '📝 Their Google Maps "website" is just a Facebook page',
     '📝 Their Google listing is unclaimed',
   ].join('\n'));
 
   // Too much for one link: notes go first, then extra social pages; the essentials always stay.
-  const huge = { ...lead, notes: Array(6).fill('n'.repeat(120)), socials: Array(4).fill(`https://www.facebook.com/${'p'.repeat(120)}`) };
+  const huge = { ...lead, notes: Array(8).fill('n'.repeat(300)), socials: Array(4).fill(`https://www.facebook.com/${'p'.repeat(300)}`) };
   const hugeText = decodeURIComponent(new URL(leadShareLink(huge)).searchParams.get('text'));
-  assert.ok(leadShareLink(huge).length <= 980);
+  assert.ok(leadShareLink(huge).length <= MAX_LINK);
   for (const must of ['*Snowflake', '(713) 827-2808', 'Westheimer', 'maps.google.com/?cid=']) assert.ok(hugeText.includes(must), must);
   assert.ok(!hugeText.includes('📝'));
-  assert.ok(leadShareLink({ name: 'x'.repeat(3000), phone: '1' }).length <= 980);
+  assert.ok(leadShareLink({ name: 'x'.repeat(3000), phone: '1' }).length <= MAX_LINK);
 
   // run-leads.txt: every lead, numbered, every detail.
   const all = leadsText([lead, { name: 'B', phone: '1' }], 'Houston, United States');
@@ -593,4 +608,25 @@ test('Phone check: finds the number however a site writes it, and only on real w
   const fetchFn = async (url) => pages[url] ?? null;
   assert.equal(await confirmByPhone(['https://jackson.com', 'https://cpimemphis.com'], '(901) 685-8842', fetchFn), 'https://cpimemphis.com');
   assert.equal(await confirmByPhone(['https://cpimemphis.com'], '(901) 555-0000', fetchFn), null);
+});
+
+test('Lead details: hours, other listings, year started, social activity', () => {
+  assert.equal(hoursText({ status: 'Closed', days: [['Thursday', '9 AM–7 PM']] }), "Thursday 9 AM–7 PM (only today's shown)");
+  assert.equal(hoursText({ status: null, days: [], text: 'Mo-Sa 09:00-19:00' }), 'Mo-Sa 09:00-19:00');
+  assert.equal(hoursText(null), null);
+
+  const cobb = { name: 'Cobb Plumbing Co', names: ['Cobb Plumbing Co'], city: 'Memphis' };
+  const results = [
+    { url: 'https://www.bbb.org/us/tn/memphis/profile/x', title: 'Cobb Plumbing Company Inc | BBB', snippet: 'BBB Accredited since 1996. Business Started: 1/1/1990' },
+    { url: 'https://www.yelp.com/biz/cobb-plumbing-memphis', title: 'Cobb Plumbing Co - Memphis - Yelp', snippet: 'Yelping since 2009' },
+    { url: 'https://www.yelp.com/biz/someone-else', title: 'Other Plumber - Memphis - Yelp' },
+    { url: 'https://www.facebook.com/CobbPlumbing/', title: 'Cobb Plumbing Co | Memphis', snippet: 'Cobb Plumbing Co, Memphis. 1.2K likes · 12 talking about this · 30 were here.' },
+    { url: 'https://www.instagram.com/cobbplumbing/', title: 'Cobb Plumbing (@cobbplumbing)', snippet: '2,345 Followers, 50 Following, 120 Posts - See Instagram photos' },
+  ];
+  assert.deepEqual(listingsFrom(results, cobb).map((l) => l.name), ['BBB', 'Yelp']);
+  assert.deepEqual(sinceFrom(results, cobb), { year: 1990, source: 'BBB' });
+  assert.equal(sinceFrom([{ url: 'https://www.yelp.com/biz/x', title: 'Cobb Plumbing Co', snippet: 'Yelping since 2009' }], cobb), null);
+  const activity = socialActivityFrom(results);
+  assert.equal(activityFor('https://www.facebook.com/cobbplumbing/', activity), '1.2K likes · 12 talking about this · 30 check-ins');
+  assert.equal(activityFor('https://www.instagram.com/cobbplumbing/', activity), '2,345 followers · 120 posts');
 });
