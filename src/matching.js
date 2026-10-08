@@ -136,7 +136,7 @@ function titleStartsWithName(title, names) {
   });
 }
 
-function titleMentionsName(title, profile) {
+export function titleMentionsName(title, profile) {
   const t = compact(title);
   if (profile.keys.some((k) => k.length >= 5 && t.includes(k))) return true;
   return profile.tokenSets.some((tokens) => tokens.join('').length >= 5 && tokens.every((x) => t.includes(x)));

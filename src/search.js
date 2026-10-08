@@ -110,7 +110,7 @@ async function runEngine(page, name, query, ep) {
 }
 
 /**
- * Returns { search(biz), state }.
+ * Returns { search(biz), find(query), state }.
  * search → { status: 'ok', engine, results } | { status: 'unavailable', allDead }
  * Each engine is self-tested the first time it's needed. A broken engine is skipped for the rest of the run.
  * A blocked engine gets a second chance after a break (blocks like Brave's "too many requests" wear off),
@@ -217,5 +217,11 @@ export function createSearcher({
     return { status: 'unavailable', allDead };
   }
 
-  return { search, state };
+  /** One extra search (e.g. for a lead's Instagram), with no waiting: results, or null if no engine answered. */
+  async function find(query) {
+    const found = await tryEngines(query);
+    return found ? found.results : null;
+  }
+
+  return { search, find, state };
 }

@@ -2,6 +2,7 @@
 // of that lead typed in (the same details the card shows). The user picks the chat.
 
 import { hostOf, prettySite } from './matching.js';
+import { socialIcon, socialLabel } from './socials.js';
 
 // A Discord field holds 1024 characters, including the "[Send this lead to WhatsApp](…)" around the link.
 const MAX_LINK = 980;
@@ -23,7 +24,7 @@ export function leadText(lead, { n = null, level = 0 } = {}) {
   if (lead.mapsUrl) lines.push(`📍 ${lead.mapsUrl}`);
   if (lead.email) lines.push(`✉️ ${lead.email}`);
   const socials = (lead.socials || []).slice(0, level >= 4 ? 0 : level >= 3 ? 1 : 4);
-  for (const url of socials) lines.push(`🔗 ${prettySite(hostOf(url))}: ${url}`);
+  for (const url of socials) lines.push(`${socialIcon(url)} ${socialLabel(url) || prettySite(hostOf(url))}: ${url}`);
   const notes = level >= 2 ? [] : (lead.notes || []).slice(0, level >= 1 ? 2 : 10);
   for (const note of notes) lines.push(`📝 ${note}`);
   return lines.join('\n');
