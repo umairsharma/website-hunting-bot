@@ -73,6 +73,17 @@ function discoveryPage(q) {
 }
 
 const RESULTS = [
+  // Social media searches (more specific, so listed before the plain names)
+  { match: 'Mike Pipe Fix Lahore instagram', results: [
+    { url: 'https://www.instagram.com/p/C9xYz/', title: 'Mike Pipe Fix (@mikepipefix) • Instagram photos and videos' },
+    { url: 'https://www.instagram.com/pipefixers_uk/', title: 'Pipe Fixers UK (@pipefixers_uk) • Instagram' },
+  ] },
+  { match: 'Mike Pipe Fix Lahore facebook', results: [
+    { url: 'https://www.facebook.com/MikePipeFixLahore/', title: 'Mike Pipe Fix - Lahore | Facebook' },
+  ] },
+  { match: 'Delta Rooter Lahore instagram', results: [
+    { url: 'https://www.instagram.com/deltafaucet/', title: 'Delta Faucet (@deltafaucet) • Instagram' },
+  ] },
   { match: 'Eiffel Tower', results: [
     { url: 'https://www.toureiffel.paris/en', title: 'Official website Eiffel Tower' },
     { url: 'https://en.wikipedia.org/wiki/Eiffel_Tower', title: 'Eiffel Tower - Wikipedia' },

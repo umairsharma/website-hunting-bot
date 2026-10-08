@@ -6,10 +6,11 @@ import { launchBrowser } from './browser.js';
 import { checkMaps, mapsSelfTest } from './maps.js';
 import { discoverOnMaps, toCandidate } from './discover.js';
 import { createSearcher, engineLabel, ENGINE_NAMES } from './search.js';
-import { analyzeResults, classifyUrl, compact, hostOf, prettySite, toWhatsApp, uniqueUrls } from './matching.js';
+import { analyzeResults, classifyUrl, compact, hostOf, prettySite, toWhatsApp } from './matching.js';
 import { buildMessages, sendMessages } from './discord.js';
 import { appendLead, loadState, saveState, writeLastRun, writeRunLeads } from './storage.js';
 import { leadsText } from './share.js';
+import { findSocials, orderSocials, socialProfile } from './socials.js';
 import { endpoints, randomDelayMs, sleep, today } from './util.js';
 
 const KNOWN_ENGINES = ENGINE_NAMES; // google, brave, startpage, bing, duckduckgo
@@ -27,6 +28,7 @@ const DEFAULTS = {
   requireMapsCheck: true,
   requireWebSearch: true,
   mapsDiscovery: true, // when OpenStreetMap runs short, find more businesses by searching Google Maps
+  findSocials: true, // search for each lead's Instagram (and Facebook) page
   mapsSearch: [], // extra Google Maps searches, e.g. ['roofers'] (the Run workflow form's "any business type" box)
   delaySeconds: [4, 9],
   postSummaryWhenEmpty: true,
@@ -50,6 +52,7 @@ export function normalizeConfig(raw = {}) {
   cfg.phoneCountryCode = String(cfg.phoneCountryCode || '').replace(/\D/g, '');
   cfg.requireWebSearch = cfg.requireWebSearch !== false;
   cfg.mapsDiscovery = cfg.mapsDiscovery !== false;
+  cfg.findSocials = cfg.findSocials !== false;
   cfg.mapsSearch = (Array.isArray(cfg.mapsSearch) ? cfg.mapsSearch : [cfg.mapsSearch])
     .map((t) => String(t ?? '').trim()).filter(Boolean);
   const engines = (Array.isArray(cfg.searchEngines) ? cfg.searchEngines : [cfg.searchEngines])
@@ -68,6 +71,28 @@ function websiteNote(site) {
   if (site.kind === 'dead') return 'Their Google Maps "website" is an old Google site (shut down in 2024)';
   if (site.kind === 'social') return `Their Google Maps "website" is just a ${name} page`;
   return `Their Google Maps "website" is a ${name} listing, not their own site`;
+}
+
+/**
+ * A lead's Instagram (and Facebook, if none was found yet): one more search each, e.g.
+ * "Roy's Plumbing Abbeville instagram". Only profiles that are clearly this business are kept.
+ */
+async function findSocialPages(biz, known, address, ctx) {
+  const has = (network) => known.some((url) => socialProfile(url)?.network === network);
+  // For a run over a whole state, the business's own town from its address ("…, Abbeville, MS 38601").
+  const parts = String(address || '').split(',').map((x) => x.trim()).filter(Boolean);
+  const inCity = compact(address).includes(compact(biz.city));
+  const town = (!inCity && parts.length >= 3 && !/\d/.test(parts.at(-2)) ? parts.at(-2) : null) || biz.city;
+  const found = [];
+  for (const network of ['instagram', 'facebook']) {
+    if (has(network) || found.some((p) => p.network === network)) continue;
+    await sleep(ctx.delay());
+    const results = await ctx.searcher.find([biz.searchName, town, network].filter(Boolean).join(' '));
+    if (!results) break; // every engine is busy; not worth stopping the run for
+    found.push(...findSocials(results, biz).filter((p) => !has(p.network)));
+  }
+  for (const p of found) ctx.log(`   📱 ${p.label}: ${p.display}`);
+  return found.map((p) => p.url);
 }
 
 async function checkBusiness(biz, ctx) {
@@ -132,6 +157,9 @@ async function checkBusiness(biz, ctx) {
 
   const mapsSite = maps?.website ? classifyUrl(maps.website) : null;
   const phone = maps?.phone || biz.phone || null;
+  const socials = [...biz.socials, mapsSite?.kind === 'social' ? mapsSite.url : null, ...result.socials,
+    ...(found ? findSocials(found.results, biz).map((p) => p.url) : [])];
+  if (found && cfg.findSocials) socials.push(...await findSocialPages(biz, socials, maps?.address || biz.address, ctx));
   return {
     status: 'lead',
     lead: {
@@ -147,7 +175,7 @@ async function checkBusiness(biz, ctx) {
       reviews: maps?.reviews ?? null,
       mapsUrl: maps?.status === 'found' ? maps.mapsUrl : (biz.placeUrl || `https://www.google.com/maps/search/?api=1&query=${biz.lat},${biz.lon}`),
       onMaps: maps?.status === 'found', // mapsUrl is their own listing, not just the spot on the map
-      socials: uniqueUrls([...biz.socials, mapsSite?.kind === 'social' ? mapsSite.url : null, ...result.socials]).slice(0, 4),
+      socials: orderSocials(socials).slice(0, 4),
       notes,
       checks: `Checked: OpenStreetMap ✓ · Google Maps ${maps ? '✓' : '✗'} · ${found ? `${engineLabel(found.engine)} ✓` : 'web search ✗'}`,
       city: cfg.city,

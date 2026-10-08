@@ -22,6 +22,7 @@ const CONFIG = {
   delaySeconds: [0, 0],
   searchCooldownMinutes: 0.005, // 0.3 s instead of 5 min
   mapsDiscovery: false, // tested on its own below
+  findSocials: false, // tested on its own below
 };
 
 async function withServer(scenario, fn) {
@@ -403,5 +404,25 @@ test('OpenStreetMap down: still searches Google Maps instead of failing the run'
     assert.ok(server.requests.overpass.length > 0);
     assert.deepEqual(result.leads.map((l) => l.name).sort(), ['Delta Rooter', 'Mike Pipe Fix']);
     assert.ok(result.warnings.some((w) => /only Google Maps was searched/.test(w)), result.warnings.join(' | '));
+  });
+});
+
+test('Social media: finds the Instagram and Facebook of a lead by searching, skips pages of other businesses', { timeout: 180000 }, async () => {
+  await withServer({}, async (server) => {
+    const logs = [];
+    const result = await run({
+      config: { ...CONFIG, categories: ['plumber'], mapsDiscovery: true, findSocials: true },
+      dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m),
+    });
+    const logText = logs.join('\n');
+    assert.equal(result.error, null, logText);
+    const mike = result.leads.find((l) => l.name === 'Mike Pipe Fix');
+    assert.deepEqual(mike.socials, ['https://www.instagram.com/mikepipefix/', 'https://www.facebook.com/MikePipeFixLahore/']);
+    assert.ok(server.requests.google.some((q) => q === 'Mike Pipe Fix Lahore instagram'), server.requests.google.join(' | '));
+    assert.match(logText, /📱 Instagram: @mikepipefix/);
+    const delta = result.leads.find((l) => l.name === 'Delta Rooter');
+    assert.deepEqual(delta.socials, []); // the only Instagram result is another business
+    const card = server.requests.discord.at(-1).embeds.find((e) => e.title.endsWith('Mike Pipe Fix'));
+    assert.match(card.fields.find((f) => f.name === 'Social media').value, /📸 \[Instagram @mikepipefix\]\(https:\/\/www\.instagram\.com\/mikepipefix\/\)/);
   });
 });

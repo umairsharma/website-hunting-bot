@@ -14,6 +14,7 @@ import { applyRunInputs, callingCodeFor, DEFAULT_NICHE } from '../src/inputs.js'
 import { buildMessages, leadEmbed, sendMessages } from '../src/discord.js';
 import { shortMapsUrl } from '../src/maps.js';
 import { leadShareLink, leadText, leadsText } from '../src/share.js';
+import { findSocials, orderSocials, socialLabel, socialProfile } from '../src/socials.js';
 import { normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
 
@@ -292,7 +293,7 @@ test('Discord messages stay within Discord limits', () => {
   }
   const card = leadEmbed(leads[0]);
   assert.ok(card.title.startsWith('🔥'));
-  assert.ok(card.fields.find((f) => f.name === 'Social pages').value.includes('%28y%29'));
+  assert.ok(card.fields.find((f) => f.name === 'Social media').value.includes('%28y%29'));
   assert.deepEqual(buildMessages('only text', []), [{ content: 'only text', embeds: [] }]);
 });
 
@@ -497,8 +498,8 @@ test('Send to WhatsApp: each card shares the full lead, within Discord limits', 
     '🏠 1234 Westheimer Rd, Houston, TX 77006',
     '📍 https://maps.google.com/?cid=1841144998116252209',
     '✉️ hello@snowflake.example',
-    '🔗 Facebook: https://www.facebook.com/snowflakedonuts',
-    '🔗 Instagram: https://www.instagram.com/snowflakedonuts/',
+    '🔗 Facebook snowflakedonuts: https://www.facebook.com/snowflakedonuts',
+    '📸 Instagram @snowflakedonuts: https://www.instagram.com/snowflakedonuts/',
     '📝 Their Google Maps "website" is just a Facebook page',
     '📝 Their Google listing is unclaimed',
   ].join('\n'));
@@ -525,4 +526,34 @@ test('Google Maps search phrases: every category has one; place IDs read from li
   assert.equal(defs[1].search, 'bicycle');
   assert.equal(placeIdOf('https://www.google.com/maps/place/X/data=!4m7!3m6!1s0x4870bc5f0d3bb1c3:0x8a5e3f44a2b1c0d9!8m2'), BigInt('0x8a5e3f44a2b1c0d9').toString());
   assert.equal(placeIdOf('https://www.google.com/maps/place/X'), null);
+});
+
+test('socialProfile: reads the account (ID) from social links', () => {
+  const id = (url, title) => socialProfile(url, title)?.display ?? null;
+  assert.equal(id('https://www.instagram.com/roysplumbing/'), '@roysplumbing');
+  assert.equal(id('https://instagram.com/roys.plumbing?igsh=abc'), '@roys.plumbing');
+  assert.equal(id('https://www.instagram.com/p/C9xYz/', "Roy's Plumbing (@roysplumbing) • Instagram photos and videos"), '@roysplumbing');
+  assert.equal(id('https://www.instagram.com/p/C9xYz/', 'A post'), null);
+  assert.equal(id('https://www.instagram.com/explore/tags/plumbing/'), null);
+  assert.equal(id('https://www.facebook.com/NorthMsPlumbing/'), 'NorthMsPlumbing');
+  assert.equal(id('https://m.facebook.com/McAlpins-Plumbing-Gas-Inc-1707962926088209/about'), 'McAlpins-Plumbing-Gas-Inc-1707962926088209');
+  assert.equal(id('https://www.facebook.com/profile.php?id=100089'), '100089');
+  assert.equal(id('https://www.facebook.com/groups/123/'), null);
+  assert.equal(id('https://www.tiktok.com/@roys.plumbing'), '@roys.plumbing');
+  assert.equal(id('https://www.youtube.com/watch?v=EKm6TBB58iA'), null);
+  assert.equal(id('https://www.linkedin.com/company/roys-plumbing/'), 'roys-plumbing');
+  assert.equal(socialLabel('https://www.instagram.com/roysplumbing/'), 'Instagram @roysplumbing');
+});
+
+test('findSocials: keeps only the business own accounts, Instagram first', () => {
+  const roy = biz("Roy's Plumbing, Heating & Cooling");
+  const found = findSocials([
+    { url: 'https://www.instagram.com/roysplumbingms/', title: 'Instagram' }, // handle is their name
+    { url: 'https://www.instagram.com/royalflush/', title: 'Royal Flush Plumbing (@royalflush)' },
+    { url: 'https://www.facebook.com/116228315383391/', title: 'Joe Plumbing | Facebook' }, // a number says nothing
+  ], roy);
+  assert.deepEqual(found.map((p) => p.display), ['@roysplumbingms']);
+  assert.deepEqual(orderSocials([
+    'https://www.facebook.com/roys/', 'https://www.instagram.com/roysplumbing', 'https://instagram.com/RoysPlumbing/',
+  ]), ['https://www.instagram.com/roysplumbing/', 'https://www.facebook.com/roys/']);
 });

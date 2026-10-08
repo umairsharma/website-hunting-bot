@@ -3,6 +3,7 @@
 import { hostOf, prettySite } from './matching.js';
 import { sleep } from './util.js';
 import { leadShareLink } from './share.js';
+import { socialIcon, socialLabel } from './socials.js';
 
 const MAX_EMBEDS_PER_MESSAGE = 10; // Discord limit
 const MAX_CHARS_PER_MESSAGE = 5800; // Discord limit is 6000 across all embeds
@@ -42,8 +43,9 @@ export function leadEmbed(lead) {
   if (maps) fields.push(maps);
   if (lead.email) fields.push({ name: 'Email', value: clip(lead.email, 1024) });
   if (lead.socials?.length) {
-    const links = lead.socials.map((u) => `[${prettySite(hostOf(u))}](${safeUrl(u)})`).join(' · ');
-    fields.push({ name: 'Social pages', value: clip(links, 1024) });
+    // "📸 Instagram @roysplumbing", each a link to the page.
+    const links = lead.socials.map((u) => `${socialIcon(u)} [${socialLabel(u) || prettySite(hostOf(u))}](${safeUrl(u)})`).join('\n');
+    fields.push({ name: 'Social media', value: clip(links, 1024) });
   }
   if (lead.notes?.length) fields.push({ name: 'Notes', value: clip(lead.notes.map((n) => `• ${n}`).join('\n'), 1024) });
   // Opens WhatsApp with everything above typed in; pick a chat (or "Message yourself") and send.
