@@ -11,7 +11,7 @@ import { buildOverpassQuery, fetchCandidates, pickQueue, toCandidates } from '..
 import { CATEGORIES, MAPS_SEARCH, resolveCategories } from '../src/categories.js';
 import { placeIdOf } from '../src/discover.js';
 import { applyRunInputs, callingCodeFor, DEFAULT_NICHE } from '../src/inputs.js';
-import { buildMessages, leadEmbed, sendMessages } from '../src/discord.js';
+import { buildMessages, googleSearchUrl, leadEmbed, sendMessages } from '../src/discord.js';
 import { shortMapsUrl } from '../src/maps.js';
 import { MAX_LINK, hoursText, leadShareLink, leadText, leadsText } from '../src/share.js';
 import { findSocials, orderSocials, socialLabel, socialProfile } from '../src/socials.js';
@@ -501,9 +501,14 @@ test('Send to WhatsApp: each card shares the full lead, within Discord limits', 
   assert.equal(card.fields.find((f) => f.name === '📋 Also listed on').value, '[Yelp](https://www.yelp.com/biz/snowflake-donuts-houston) · [BBB](https://www.bbb.org/x)');
   assert.match(card.fields.find((f) => f.name === 'Social media').value, /📸 \[Instagram @snowflakedonuts\]\(https:\/\/www\.instagram\.com\/snowflakedonuts\/\) — 12\.4K followers · 830 posts/);
   assert.equal(card.fields.find((f) => f.name === 'Category').value, 'Bakery / sweets (Donut shop)');
+  // A Google search for them by name and town, for checking by hand
+  assert.match(card.description, /\n🔎 \*\*\[Search them on Google\]\(https:\/\/www\.google\.com\/search\?q=Snowflake%20%28Donuts%29%20%26%20Co%20Houston%20TX\)\*\*$/);
+  assert.equal(googleSearchUrl({ name: 'Cobb Plumbing Co', city: 'Memphis' }), 'https://www.google.com/search?q=Cobb%20Plumbing%20Co%20Memphis');
+  assert.equal(googleSearchUrl({ name: 'Dabbles Hair Company', address: '19 N Cooper St, Memphis, TN 38104, United States', city: 'Memphis' }),
+    'https://www.google.com/search?q=Dabbles%20Hair%20Company%20Memphis%20TN');
   // The share link is at the top of the card, where it has room for every detail.
   assert.ok(card.description.length <= 4096, `${card.description.length} characters`);
-  const url = card.description.match(/^📲 \*\*\[Send this lead to WhatsApp\]\((https:\/\/wa\.me\/\?text=[^)\s]+)\)\*\*$/)[1]; // brackets in the name don't break it
+  const url = card.description.match(/^📲 \*\*\[Send this lead to WhatsApp\]\((https:\/\/wa\.me\/\?text=[^)\s]+)\)\*\*\n/)[1]; // brackets in the name don't break it
   const text = decodeURIComponent(new URL(url).searchParams.get('text'));
   assert.equal(text, [
     '🔥 *Snowflake (Donuts) & Co* (Bakery / sweets)',

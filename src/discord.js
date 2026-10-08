@@ -28,6 +28,16 @@ function mapsField(lead) {
   return { name: '📍 Google Maps', value };
 }
 
+/** A Google search for the business by name and town, for checking it by hand ("do they have a website?"). */
+export function googleSearchUrl(lead) {
+  // The town from the address ("…, Memphis, TN 38104, United States" → "Memphis, TN"), else the run's city.
+  const parts = String(lead.address || '').split(',').map((x) => x.trim()).filter(Boolean);
+  if (/^(united states|usa|us|united kingdom|uk|pakistan)$/i.test(parts.at(-1) || '')) parts.pop();
+  const town = parts.length >= 2 ? parts.slice(-2).join(' ').replace(/\b\d{4,6}\b/g, '').trim() : lead.city;
+  const q = [lead.name, town || lead.city].filter(Boolean).join(' ').replace(/\s+/g, ' ');
+  return `https://www.google.com/search?q=${encodeURIComponent(q).replace(/\(/g, '%28').replace(/\)/g, '%29')}`;
+}
+
 export function leadEmbed(lead) {
   const hot = (lead.reviews || 0) >= HOT_REVIEWS;
   const category = [lead.categoryLabel, lead.category && lead.category !== lead.categoryLabel ? `(${lead.category})` : null].filter(Boolean).join(' ');
@@ -65,7 +75,7 @@ export function leadEmbed(lead) {
   const embed = {
     title: clip(`${hot ? '🔥 ' : ''}${lead.name}`, 256),
     // Opens WhatsApp with everything on this card typed in; pick a chat (or "Message yourself") and send.
-    description: `📲 **[Send this lead to WhatsApp](${leadShareLink(lead)})**`,
+    description: `📲 **[Send this lead to WhatsApp](${leadShareLink(lead)})**\n🔎 **[Search them on Google](${googleSearchUrl(lead)})**`,
     color: hot ? 0xf97316 : 0x22c55e,
     fields,
     footer: { text: clip(lead.checks || '', 2048) },
