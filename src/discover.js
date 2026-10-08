@@ -2,7 +2,7 @@
 // doesn't have enough. OpenStreetMap rarely maps trades (plumbers, roofers, …) in the US, for example.
 
 import { gotoPage, isBlocked } from './browser.js';
-import { businessProfile } from './matching.js';
+import { businessProfile, classifyUrl } from './matching.js';
 
 const FEED_LINK = 'div[role="feed"] a[href*="/maps/place/"]';
 
@@ -32,7 +32,8 @@ function coordsOf(href) {
 
 /**
  * Searches Google Maps for `term` in the city and scrolls the results until it has `want` places the
- * bot hasn't seen before (isKnown(key) → true for already-checked ones) or the list ends.
+ * bot hasn't seen before (isKnown(key) → true for already-checked ones) whose card shows no website of
+ * their own, or the list ends.
  * Returns { blocked, places: [{ key, name, href, website, lat, lon }] } with only new places.
  */
 export async function discoverOnMaps(page, { term, city, country, area, mapsBase, want = 30, isKnown = () => false, log = () => {} }) {
@@ -55,7 +56,9 @@ export async function discoverOnMaps(page, { term, city, country, area, mapsBase
       if (!item.name || found.has(key)) continue;
       found.set(key, { key, ...item, ...coordsOf(item.href) });
     }
-    const fresh = [...found.values()].filter((p) => !isKnown(p.key)).length;
+    // Places whose card already shows their own website are filed straight away, so they don't count:
+    // in a big city most plumbers have one, and the list has to go further to find enough without.
+    const fresh = [...found.values()].filter((p) => !isKnown(p.key) && classifyUrl(p.website || '')?.kind !== 'website').length;
     if (fresh >= want) break;
     const ended = await page.evaluate(() => /reached the end of the list/i.test(document.querySelector('div[role="feed"]')?.innerText || '')).catch(() => true);
     if (ended) break;
