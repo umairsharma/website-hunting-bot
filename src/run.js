@@ -104,10 +104,15 @@ async function findSocialPages(biz, known, address, ctx) {
   return { urls: found.map((p) => p.url), results: seen };
 }
 
+// Universities, hospitals, councils, schools and the like have their organisation's website: not leads.
+// Only clear signs: "County Line BBQ" or "State of Grace" are real small businesses.
+export const INSTITUTION_NAME = /\b(university|school of|school district|isd|hospital|health system|department of|dept\.? of|city of|police department|fire department|public library|embassy|consulate)\b/i;
+
 async function checkBusiness(biz, ctx) {
   const { cfg, ep, mapsPage, searcher, delay, warnings } = ctx;
   const notes = [];
   let maps = null;
+  if (INSTITUTION_NAME.test(biz.name)) return { status: 'excluded', reason: 'part of a larger organisation (university, hospital, council…)' };
 
   // ── Layer 2: Google Maps ──
   if (ctx.mapsOn) {
@@ -237,6 +242,10 @@ function record(outcome, biz, { cfg, state, stats, leads, dataDir, dryRun, log }
       state.places[biz.key] = { status: 'has_website', ...base, website: outcome.website, layer: outcome.layer };
       stats.hasWebsite += 1;
       log(`   🌐 Has a website: ${outcome.website} (found by ${outcome.layer === 2 ? 'Google Maps' : 'web search'}${outcome.how ? `, ${outcome.how}` : ''})`);
+      break;
+    case 'excluded':
+      state.places[biz.key] = { status: 'excluded', ...base, reason: outcome.reason };
+      log(`   ⏭️  Not a lead: ${outcome.reason}`);
       break;
     case 'closed':
       state.places[biz.key] = { status: 'closed', ...base };

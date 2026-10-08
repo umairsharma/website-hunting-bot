@@ -11,7 +11,7 @@ const DIRECTORY_NAMES = {
   tripadvisor: 'Tripadvisor', foursquare: 'Foursquare', mapquest: 'MapQuest', manta: 'Manta', chamberofcommerce: 'Chamber of Commerce',
   superpages: 'Superpages', birdeye: 'Birdeye', groupon: 'Groupon', booksy: 'Booksy', vagaro: 'Vagaro', fresha: 'Fresha',
   styleseat: 'StyleSeat', schedulicity: 'Schedulicity', opentable: 'OpenTable', doordash: 'DoorDash', ubereats: 'Uber Eats',
-  grubhub: 'Grubhub', foodpanda: 'foodpanda', checkatrade: 'Checkatrade', yell: 'Yell', zocdoc: 'Zocdoc', healthgrades: 'Healthgrades',
+  grubhub: 'Grubhub', foodpanda: 'foodpanda', apple: 'Apple Maps', wanderlog: 'Wanderlog', restaurantguru: 'Restaurant Guru', checkatrade: 'Checkatrade', yell: 'Yell', zocdoc: 'Zocdoc', healthgrades: 'Healthgrades',
 };
 
 const label = (host) => {
@@ -119,5 +119,12 @@ export function socialActivityFrom(results) {
 /** The activity line for one of a lead's social links, if known. */
 export function activityFor(url, activity = {}) {
   const p = socialProfile(url);
-  return p ? activity[`${p.network}/${p.id.toLowerCase()}`] || null : null;
+  if (!p) return null;
+  const direct = activity[`${p.network}/${p.id.toLowerCase()}`];
+  if (direct) return direct;
+  // The same Facebook page under another link form (people/Name/123 vs p/Name-123)
+  const num = (p.id.match(/(\d{8,})$/) || [])[1];
+  if (!num) return null;
+  const hit = Object.entries(activity).find(([k]) => k.startsWith(`${p.network}/`) && k.endsWith(num));
+  return hit ? hit[1] : null;
 }

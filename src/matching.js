@@ -305,8 +305,9 @@ export function analyzeResults(results, biz) {
     }
     if (site.kind !== 'website') continue;
     if (siteMatchesBusiness(site.siteKey, profile, r.title)) return { hasWebsite: true, website: site.url, socials, possible };
-    const oneWord = pathDepth(site.url) <= 1 && profile.tokenSets.some((tokens) => tokens.length === 1 && tokens[0] === site.siteKey);
-    if (possible.length < 2 && pathDepth(site.url) <= 1 && (oneWord || titleStartsWithName(r.title, biz.names))) {
+    // A homepage titled with their name, on another domain: maybe theirs. (A domain that's just one word
+    // of the name, like crest.com for "Crest Tailor", is nearly always a famous brand, so not flagged.)
+    if (possible.length < 2 && pathDepth(site.url) <= 1 && titleStartsWithName(r.title, biz.names)) {
       if (!possible.includes(site.host)) possible.push(site.host);
     }
   }

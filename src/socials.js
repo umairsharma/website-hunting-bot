@@ -37,6 +37,7 @@ export function socialProfile(raw, title = '') {
   let id = null;
   if (net.id === 'facebook') {
     if (parts[0] === 'profile.php') id = u.searchParams.get('id');
+    else if (parts[0] === 'pages' && parts[1] === 'category') id = parts[3] || null; // pages/category/Bakery/Name-123
     else if (['people', 'pages'].includes(parts[0])) id = parts[2] || parts[1] || null; // pages/Name/123 → 123
     else if (parts[0] === 'p' && parts[1]) id = parts[1];
     else if (parts[0] && !net.skip.test(parts[0])) id = parts[0];
@@ -109,7 +110,8 @@ export function orderSocials(urls) {
   for (const url of urls) {
     const p = url ? socialProfile(url) : null;
     if (!p) continue;
-    const key = `${p.network}/${p.id.toLowerCase()}`;
+    // facebook.com/people/Name/123 and facebook.com/p/Name-123 are the same page: compare the number.
+    const key = `${p.network}/${(p.id.match(/(\d{8,})$/) || [])[1] || p.id.toLowerCase()}`;
     if (seen.has(key)) continue;
     seen.add(key);
     out.push({ url: p.url, rank: NETWORKS.findIndex((n) => n.id === p.network) });
