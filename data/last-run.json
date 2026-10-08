@@ -1,27 +1,27 @@
 {
-  "startedAt": "2026-10-08T05:35:07.961Z",
-  "finishedAt": "2026-10-08T05:42:38.374Z",
-  "minutes": 7.5,
-  "place": "San Antonio, United States",
-  "area": "San Antonio, Bexar County, Texas, United States",
-  "candidates": 2,
-  "discovered": 15,
-  "mapsListed": 120,
-  "checked": 15,
-  "leads": 10,
-  "hasWebsite": 5,
+  "startedAt": "2026-10-08T06:40:33.014Z",
+  "finishedAt": "2026-10-08T06:54:56.835Z",
+  "minutes": 14.4,
+  "place": "Memphis, United States",
+  "area": "Memphis, Shelby County, West Tennessee, Tennessee, United States",
+  "candidates": 0,
+  "discovered": 16,
+  "mapsListed": 60,
+  "checked": 16,
+  "leads": 14,
+  "hasWebsite": 1,
   "closed": 0,
-  "unverified": 0,
+  "unverified": 1,
   "pending": 0,
   "searchEngines": {
     "google": "broken",
-    "brave": "ok",
+    "brave": "blocked",
     "startpage": "blocked",
     "bing": "ok",
-    "duckduckgo": "untested"
+    "duckduckgo": "blocked"
   },
   "warnings": [
-    "Web search: Google didn't work, Startpage blocked the bot, so it used Brave + Bing."
+    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, DuckDuckGo blocked the bot, so it used Bing."
   ],
   "error": null
 }
