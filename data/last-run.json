@@ -1,18 +1,18 @@
 {
-  "startedAt": "2026-10-08T11:39:40.360Z",
-  "finishedAt": "2026-10-08T11:57:53.500Z",
-  "minutes": 18.2,
-  "place": "El Paso, United States",
-  "area": "El Paso, El Paso County, Texas, United States",
-  "candidates": 0,
-  "discovered": 30,
-  "mapsListed": 93,
+  "startedAt": "2026-10-08T16:23:41.558Z",
+  "finishedAt": "2026-10-08T16:52:39.184Z",
+  "minutes": 29,
+  "place": "Dallas, United States",
+  "area": "Dallas, Dallas County, Texas, United States",
+  "candidates": 833,
+  "discovered": 0,
+  "mapsListed": 0,
   "checked": 30,
-  "leads": 27,
-  "hasWebsite": 3,
-  "closed": 0,
+  "leads": 13,
+  "hasWebsite": 15,
+  "closed": 2,
   "unverified": 0,
-  "pending": 0,
+  "pending": 803,
   "searchEngines": {
     "google": "broken",
     "brave": "blocked",
@@ -21,6 +21,7 @@
     "duckduckgo": "untested"
   },
   "warnings": [
+    "OpenStreetMap servers were busy, so these were skipped this run: Café, Clinic / doctor, Real estate agent.",
     "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
   ],
   "error": null
