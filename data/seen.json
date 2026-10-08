@@ -940,6 +940,12 @@
   "gmaps/8695630384584454659": {"status":"lead","name":"Sumthing Different Hair Salon","checked":"2026-10-08"},
   "gmaps/8490902462623423237": {"status":"has_website","name":"LIMITLESS Naturals Salon","checked":"2026-10-08","website":"limitlessnaturalssalon.com","layer":2},
   "gmaps/16514117576937474040": {"status":"lead","name":"Miss Bonita Hair","checked":"2026-10-08"},
-  "gmaps/10921482221079130224": {"status":"has_website","name":"Holly Woods Colorist","checked":"2026-10-08","website":"hollywoodscolorist.com","layer":2}
+  "gmaps/10921482221079130224": {"status":"has_website","name":"Holly Woods Colorist","checked":"2026-10-08","website":"hollywoodscolorist.com","layer":2},
+  "gmaps/5974683269634162522": {"status":"has_website","name":"Minnie's Natural Hair Lounge","checked":"2026-10-08","website":"pocketsuite.io","layer":"maps list"},
+  "gmaps/8782405388309731101": {"status":"has_website","name":"Sport Clips Haircuts of Memphis - Midtown","checked":"2026-10-08","website":"sportclips.bookedby.com","layer":"maps list"},
+  "gmaps/15592191816617261820": {"status":"has_website","name":"Supercuts","checked":"2026-10-08","website":"supercuts.com","layer":"maps list"},
+  "gmaps/307911400723827190": {"status":"has_website","name":"Pigtails & Crewcuts: Haircuts for Kids - East Memphis, TN","checked":"2026-10-08","website":"mytime.com","layer":"maps list"},
+  "gmaps/11339506167870507762": {"status":"lead","name":"Posh’d Salon","checked":"2026-10-08"},
+  "gmaps/12750890079631582864": {"status":"lead","name":"Mirror Mirror Salon & Blowout Bar","checked":"2026-10-08"}
  }
 }
