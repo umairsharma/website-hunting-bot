@@ -1,7 +1,7 @@
 // A lead's social media pages and IDs (@handles), especially Instagram: a business with no website
 // usually has one of these, and it's the easiest way to reach them.
 
-import { businessProfile, compact, normalizeText, siteMatchesBusiness, titleMentionsName } from './matching.js';
+import { businessProfile, compact, normalizeText, siteMatchesBusiness } from './matching.js';
 
 const STOP_WORDS = new Set(['the', 'and', 'pvt', 'ltd', 'llc', 'inc', 'co', 'company']);
 const tokensOf = (s) => normalizeText(s).split(' ').filter(Boolean);
@@ -81,9 +81,19 @@ export function findSocials(results, biz) {
     const start = words.some((w) => profile.tokenSets.some((t) => t.includes(w))) ? words.join('') : '';
     const ownHandle = !/^\d+$/.test(p.id)
       && ((start.length >= 8 && handle.includes(start)) || siteMatchesBusiness(handle, profile, r.title));
-    if (ownHandle || titleMentionsName(r.title || '', profile)) out.set(p.network, p);
+    if (ownHandle || titleNames(r.title || '', profile)) out.set(p.network, p);
   }
   return [...out.values()];
+}
+
+/**
+ * The page title names the business: its full name, or all its distinctive words when there are several.
+ * One word alone isn't enough ("Myers Industries" is not "Myers Repair Services").
+ */
+function titleNames(title, profile) {
+  const t = compact(title);
+  if (profile.keys.some((k) => k.length >= 6 && t.includes(k))) return true;
+  return profile.tokenSets.some((tokens) => tokens.length > 1 && tokens.every((x) => t.includes(x)));
 }
 
 /** "Instagram @roysplumbing" for a social link (falls back to the site's name). */
@@ -92,17 +102,17 @@ export function socialLabel(url) {
   return p ? `${p.label} ${p.display}` : null;
 }
 
-/** Social links, one per account, the business's Instagram first. */
+/** Social accounts, one link each, the business's Instagram first. Single posts and videos are left out. */
 export function orderSocials(urls) {
   const seen = new Set();
   const out = [];
   for (const url of urls) {
-    if (!url) continue;
-    const p = socialProfile(url);
-    const key = p ? `${p.network}/${p.id.toLowerCase()}` : url.toLowerCase().replace(/^https?:\/\/(www\.|m\.)?/, '').replace(/\/+$/, '');
+    const p = url ? socialProfile(url) : null;
+    if (!p) continue;
+    const key = `${p.network}/${p.id.toLowerCase()}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    out.push({ url: p ? p.url : url, rank: p ? NETWORKS.findIndex((n) => n.id === p.network) : NETWORKS.length });
+    out.push({ url: p.url, rank: NETWORKS.findIndex((n) => n.id === p.network) });
   }
   return out.sort((a, b) => a.rank - b.rank).map((x) => x.url);
 }

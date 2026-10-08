@@ -121,6 +121,7 @@ test('analyzeResults: one common word of the name ("Bishop", "Johnson") does not
   assert.ok(has('https://bishopplumbingms.com/', 'Bishop Plumbing Service LLC'));
   assert.ok(has('https://mancusoservices.com/', 'Mancuso Brothers Plumbing'));
   assert.ok(has('https://harbornegarage.co.uk/', 'Harborne Auto Centre'));
+  assert.equal(has('https://www.friendlysrestaurants.com/', 'Friendly Plumbers', "Friendly's Restaurants"), false);
   assert.equal(has('https://chapmannews.org/', 'Chapman Plumbing Co', 'Chapman News'), false);
   assert.equal(has('https://douglasus.com/', 'Douglas Plumbing, LLC', 'Douglas Products'), false);
   assert.equal(has('https://www.clarks.com/', 'Clark & Clark', 'Clarks Shoes'), false);
@@ -555,6 +556,11 @@ test('findSocials: keeps only the business own accounts, Instagram first', () =>
     { url: 'https://www.facebook.com/116228315383391/', title: 'Joe Plumbing | Facebook' }, // a number says nothing
   ], roy);
   assert.deepEqual(found.map((p) => p.display), ['@roysplumbingms']);
+  // One shared word in the title isn't enough; videos aren't accounts (from a real San Antonio run)
+  const myers = biz('Myers Repair Services');
+  assert.deepEqual(findSocials([{ url: 'https://www.linkedin.com/company/myers-industries', title: 'Myers Industries | LinkedIn' }], myers), []);
+  assert.deepEqual(orderSocials(['https://www.youtube.com/watch?v=Wptv2iDdTZM', 'https://www.facebook.com/myersrepair/']),
+    ['https://www.facebook.com/myersrepair/']);
   // A handle that's only the city + trade is someone else's (from a real San Antonio run)
   const dueSouth = { name: 'San Antonio Due South Plumbing', names: ['San Antonio Due South Plumbing'], city: 'San Antonio',
     profile: businessProfile(['San Antonio Due South Plumbing'], 'San Antonio') };

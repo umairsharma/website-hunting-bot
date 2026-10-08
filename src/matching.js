@@ -83,6 +83,10 @@ export function businessProfile(names, city) {
   return { keys: [...keys].filter((k) => k.length >= 4), tokenSets, cityTokens, words };
 }
 
+// Words any kind of business can have in its domain.
+const NEUTRAL_WORDS = ['service', 'services', 'company', 'group', 'solutions', 'enterprises', 'repair', 'repairs', 'garage',
+  'center', 'centre', 'studio', 'shop', 'store', 'experts', 'pros', 'brothers', 'sons', 'family'];
+
 // Extra words sites add to a business name (joesplumbingonline.com, bishopplumbingms.com).
 const SITE_FILLER = ['online', 'web', 'site', 'usa', 'official', 'team', 'home', 'call', 'now', 'get', 'local', 'pro'];
 
@@ -118,8 +122,9 @@ export function siteMatchesBusiness(siteKey, profile, title = '') {
   if (profile.tokenSets.some((tokens) => tokens.length === 1 && [plain, plain.replace(/s$/, '')].includes(tokens[0]))) return titled;
   if (profile.keys.some((key) => siteKey.length >= 5 && key.includes(siteKey) && siteKey.length >= key.length * 0.5)) return true;
   // One distinctive word plus another word of the name (bishopplumbing.com), not some other word (douglasus.com).
-  // A longer trade word counts too (harbornegarage.co.uk for "Harborne Auto Centre").
-  const otherNameWord = (tokens) => [...profile.words, ...[...GENERIC_WORDS].filter((w) => w.length >= 5)]
+  // A neutral business word counts too (harbornegarage.co.uk for "Harborne Auto Centre"), but not another
+  // trade's (friendlysrestaurants.com is not "Friendly Plumbers").
+  const otherNameWord = (tokens) => [...profile.words, ...NEUTRAL_WORDS]
     .some((w) => w.length >= 3 && !tokens.includes(w) && !STOP_WORDS.has(w) && siteKey.includes(w));
   const holds = (tokens) => tokens.join('').length >= 5 && tokens.every((x) => siteKey.includes(x));
   if (titled && profile.tokenSets.some(holds)) return true;
