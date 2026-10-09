@@ -1,25 +1,27 @@
 {
-  "startedAt": "2026-10-09T16:24:51.497Z",
-  "finishedAt": "2026-10-09T16:33:27.740Z",
-  "minutes": 8.6,
+  "startedAt": "2026-10-09T16:34:33.397Z",
+  "finishedAt": "2026-10-09T16:43:32.961Z",
+  "minutes": 9,
   "place": "Oklahoma, United States",
   "area": "Oklahoma, United States",
-  "candidates": 0,
-  "discovered": 30,
-  "mapsListed": 49,
+  "candidates": 146,
+  "discovered": 0,
+  "mapsListed": 0,
   "checked": 30,
-  "leads": 0,
-  "hasWebsite": 30,
+  "leads": 1,
+  "hasWebsite": 29,
   "closed": 0,
   "unverified": 0,
-  "pending": 0,
+  "pending": 56,
   "searchEngines": {
-    "google": "untested",
-    "brave": "untested",
+    "google": "broken",
+    "brave": "ok",
     "startpage": "untested",
     "bing": "untested",
     "duckduckgo": "untested"
   },
-  "warnings": [],
+  "warnings": [
+    "Web search: Google didn't work, so it used Brave."
+  ],
   "error": null
 }
