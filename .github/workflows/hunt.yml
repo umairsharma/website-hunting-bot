@@ -70,9 +70,15 @@ on:
         description: "Or type ANY business type, e.g. pool cleaners (optional, found by searching Google Maps)"
         required: false
         default: ""
+      recheck_leads:
+        description: "Recheck earlier leads with the latest checks instead (keeps going by itself until done)"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write # lets the bot save data/ (leads.csv, seen.json) back to the repo
+  actions: write # lets a recheck run start the next batch
 
 concurrency:
   group: website-hunting-bot
@@ -106,6 +112,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Hunt for leads
+        id: hunt
         run: node src/index.js
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
@@ -115,6 +122,7 @@ jobs:
           HUNT_COUNTRY: ${{ inputs.country }}
           HUNT_NICHE: ${{ inputs.niche }}
           HUNT_CUSTOM_NICHE: ${{ inputs.custom_niche }}
+          HUNT_RECHECK: ${{ inputs.recheck_leads }}
 
       - name: Save progress
         if: always()
@@ -140,3 +148,10 @@ jobs:
           done
           echo "::error::Couldn't save data/ back to the repo. The next run may send some leads again."
           exit 1
+
+      - name: Start the next recheck batch
+        # Rechecking earlier leads takes several runs; each one starts the next until none are left.
+        if: always() && steps.hunt.outputs.continue == 'true'
+        run: gh workflow run hunt.yml --ref "$GITHUB_REF_NAME" -f recheck_leads=true
+        env:
+          GH_TOKEN: ${{ github.token }}

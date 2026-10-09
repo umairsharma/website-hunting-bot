@@ -12,6 +12,7 @@ import { appendLead, loadState, saveState, writeLastRun, writeRunLeads } from '.
 import { leadsText } from './share.js';
 import { findSocials, orderSocials, socialProfile } from './socials.js';
 import { confirmByPhone, phonePattern, siteOrigins } from './verify.js';
+import { loadRecheck, recheckCandidate, saveRecheck } from './recheck.js';
 import { listingsFrom, sinceFrom, socialActivityFrom } from './details.js';
 import { endpoints, randomDelayMs, sleep, today } from './util.js';
 
@@ -31,6 +32,7 @@ const DEFAULTS = {
   requireWebSearch: true,
   mapsDiscovery: true, // when OpenStreetMap runs short, find more businesses by searching Google Maps
   findSocials: true, // search for each lead's Instagram (and Facebook) page
+  recheck: false, // recheck earlier leads (data/recheck.json) instead of finding new ones
   phoneCheck: true, // a site with the business's phone number on it is theirs, whatever its name
   mapsSearch: [], // extra Google Maps searches, e.g. ['roofers'] (the Run workflow form's "any business type" box)
   delaySeconds: [4, 9],
@@ -57,6 +59,12 @@ export function normalizeConfig(raw = {}) {
   cfg.mapsDiscovery = cfg.mapsDiscovery !== false;
   cfg.findSocials = cfg.findSocials !== false;
   cfg.phoneCheck = cfg.phoneCheck !== false;
+  cfg.recheck = cfg.recheck === true;
+  if (cfg.recheck) {
+    // Earlier leads come from many cities; each keeps its own city and country.
+    cfg.city = 'Earlier leads';
+    cfg.country = '';
+  }
   cfg.mapsSearch = (Array.isArray(cfg.mapsSearch) ? cfg.mapsSearch : [cfg.mapsSearch])
     .map((t) => String(t ?? '').trim()).filter(Boolean);
   const engines = (Array.isArray(cfg.searchEngines) ? cfg.searchEngines : [cfg.searchEngines])
@@ -144,9 +152,14 @@ async function checkBusiness(biz, ctx) {
       if (!site || site.kind === 'website') return { status: 'has_website', layer: 2, website: site ? site.host : maps.website };
       notes.push(websiteNote(site));
     }
+    // Their site can also be a "booking link" (spinkandspan.square.site) rather than the Website button.
+    for (const link of maps.links || []) {
+      const site = classifyUrl(link);
+      if (site?.kind === 'website') return { status: 'has_website', layer: 2, website: site.host, how: 'their booking/menu link on Google Maps' };
+      if (site && ['booking', 'delivery'].includes(site.kind)) notes.push(`Takes bookings/orders through ${prettySite(site.host)}`);
+    }
     if (maps.temporarilyClosed) notes.push('Google Maps says it is temporarily closed');
     if (maps.claimable) notes.push('Their Google listing is unclaimed');
-    if (maps.limitedView) notes.push('Google Maps showed a limited view, so double-check the listing before pitching');
   }
 
   // ── Layer 3: web search ──
@@ -205,7 +218,7 @@ async function checkBusiness(biz, ctx) {
       category: biz.category,
       categoryLabel: biz.categoryLabel,
       phone,
-      whatsapp: toWhatsApp(maps?.phoneTel || phone, cfg.phoneCountryCode),
+      whatsapp: toWhatsApp(maps?.phoneTel || phone, biz.phoneCountryCode ?? cfg.phoneCountryCode),
       email: biz.email,
       address: maps?.address || biz.address,
       rating: maps?.rating ?? null,
@@ -220,7 +233,7 @@ async function checkBusiness(biz, ctx) {
       hours: maps?.hours || (biz.openingHours ? { status: null, days: [], text: biz.openingHours } : null),
       notes,
       checks: `Checked: OpenStreetMap ✓ · Google Maps ${maps ? '✓' : '✗'} · ${found ? `${engineLabel(found.engine)} ✓` : 'web search ✗'}`,
-      city: cfg.city,
+      city: biz.city || cfg.city,
       osmUrl: biz.osmUrl,
       foundOn: today(),
     },
@@ -229,7 +242,8 @@ async function checkBusiness(biz, ctx) {
 
 function record(outcome, biz, { cfg, state, stats, leads, dataDir, dryRun, log }) {
   const prev = state.places[biz.key];
-  const base = { name: biz.name, checked: today() };
+  biz.outcome = outcome.status; // rechecks look at this
+  const base = { name: biz.name, checked: today(), ...(biz.recheck ? { recheckedOn: today() } : {}) };
   switch (outcome.status) {
     case 'lead':
       state.places[biz.key] = { status: 'lead', ...base };
@@ -398,15 +412,21 @@ function summaryText(cfg, stats, warnings, fatal) {
   if (fatal) {
     lines.push(`❌ **Run failed:** ${String(fatal.message).split('\n')[0].slice(0, 300)}`);
   } else {
-    lines.push(stats.leads
-      ? `✅ **${stats.leads} new lead${stats.leads === 1 ? '' : 's'}**: no website on OpenStreetMap, Google Maps or web search`
-      : '➖ No new leads this run.');
+    if (cfg?.recheck) {
+      lines.push(`♻️ **Rechecked ${stats.checked} earlier lead${stats.checked === 1 ? '' : 's'}** with the latest checks: ${stats.leads} still have no website (below), ${stats.hasWebsite} have one (dropped)${stats.closed ? `, ${stats.closed} closed` : ''}`);
+    } else {
+      lines.push(stats.leads
+        ? `✅ **${stats.leads} new lead${stats.leads === 1 ? '' : 's'}**: no website on OpenStreetMap, Google Maps or web search`
+        : '➖ No new leads this run.');
+    }
     const bits = [];
-    if (stats.hasWebsite) bits.push(`🌐 ${stats.hasWebsite} already have a website`);
+    if (stats.hasWebsite && !cfg?.recheck) bits.push(`🌐 ${stats.hasWebsite} already have a website`);
     if (stats.closed) bits.push(`🚫 ${stats.closed} closed`);
     if (stats.unverified) bits.push(`⏳ ${stats.unverified} to retry`);
     if (bits.length) lines.push(bits.join(' · '));
-    lines.push(`🔎 Checked ${stats.checked} this run${stats.discovered ? ` (${stats.discovered} found by searching Google Maps)` : ''} · ${stats.pending.toLocaleString('en-US')} still in the queue`);
+    lines.push(cfg?.recheck
+      ? `🔎 ${stats.pending.toLocaleString('en-US')} earlier leads still to recheck${stats.pending ? ' (the next run starts by itself)' : ' · all done ✅'}`
+      : `🔎 Checked ${stats.checked} this run${stats.discovered ? ` (${stats.discovered} found by searching Google Maps)` : ''} · ${stats.pending.toLocaleString('en-US')} still in the queue`);
     if (stats.leads) {
       const all = runLeadsLink();
       lines.push(`📲 Each card has a "Send this lead to WhatsApp" link${all ? ` · [All ${stats.leads} leads as text](${all}) (tap Copy raw file)` : ''}`);
@@ -441,35 +461,60 @@ export async function run({ config, dataDir, dryRun = false, webhookUrl = proces
 
     log(`🎯 Website Hunting Bot · ${placeName(cfg)}`);
 
-    // ── Layer 1: OpenStreetMap ──
-    const area = await resolveArea(cfg, ep, log);
-    areaLabel = area.label;
-    log(`📍 Area: ${area.label}`);
-    const canDiscover = cfg.mapsDiscovery && [...custom, ...defs].some((d) => d.search);
-    const { candidates, notes: osmNotes } = defs.length
-      ? await fetchCandidates({ cfg, area, defs, ep, dataDir, save: !dryRun, log }).catch((err) => {
-        // OpenStreetMap down (or the area too big for it): Google Maps can still find businesses.
-        if (!canDiscover) throw err;
-        log(`⚠️ ${err.message} Searching Google Maps only.`);
-        return { candidates: [], notes: ['OpenStreetMap servers could not be reached, so only Google Maps was searched this run.'] };
-      })
-      : { candidates: [], notes: [] };
-    warnings.push(...osmNotes);
-    stats.candidates = candidates.length;
-    if (defs.length) log(`🗺️  Layer 1, OpenStreetMap: ${candidates.length} businesses with no website listed`);
+    if (cfg.recheck) {
+      // ── Rechecking earlier leads ──
+      const todo = loadRecheck(dataDir);
+      const batch = todo.slice(0, cfg.maxChecksPerRun);
+      log(`♻️ Rechecking earlier leads: ${todo.length} to go, ${batch.length} this run`);
+      if (batch.length) {
+        const queue = batch.map(recheckCandidate);
+        searcher = await checkQueue({ cfg, ep, queue, state, stats, leads, warnings, dataDir, dryRun, startedAt, log, area: null, discover: [] });
+        const outcomeOf = new Map(batch.map((item, i) => [item, queue[i].outcome])); // set by record()
+        const left = todo.filter((item) => {
+          const outcome = outcomeOf.get(item);
+          if (!outcome || outcome === 'skipped') return true; // not reached this run
+          if (outcome !== 'unverified') return false; // done: still a lead (sent) or dropped
+          item.attempts = (item.attempts || 0) + 1;
+          return item.attempts < cfg.maxAttempts;
+        });
+        // Still to do go first, the ones that couldn't be verified to the back.
+        left.sort((a, b) => (a.attempts || 0) - (b.attempts || 0));
+        if (!dryRun) saveRecheck(dataDir, left);
+        stats.pending = left.length;
+      }
+      stats.recheckLeft = stats.pending;
+    } else {
 
-    const { queue } = pickQueue(candidates, state, cfg.maxChecksPerRun, cfg.maxAttempts);
-    // Not enough from OpenStreetMap (or a typed-in business type): search Google Maps for more.
-    const discover = cfg.mapsDiscovery && queue.length < cfg.maxChecksPerRun ? [...custom, ...defs].filter((d) => d.search) : [];
-    if (queue.length || discover.length) {
-      searcher = await checkQueue({ cfg, ep, queue, state, stats, leads, warnings, dataDir, dryRun, startedAt, log, area, discover });
+      // ── Layer 1: OpenStreetMap ──
+      const area = await resolveArea(cfg, ep, log);
+      areaLabel = area.label;
+      log(`📍 Area: ${area.label}`);
+      const canDiscover = cfg.mapsDiscovery && [...custom, ...defs].some((d) => d.search);
+      const { candidates, notes: osmNotes } = defs.length
+        ? await fetchCandidates({ cfg, area, defs, ep, dataDir, save: !dryRun, log }).catch((err) => {
+          // OpenStreetMap down (or the area too big for it): Google Maps can still find businesses.
+          if (!canDiscover) throw err;
+          log(`⚠️ ${err.message} Searching Google Maps only.`);
+          return { candidates: [], notes: ['OpenStreetMap servers could not be reached, so only Google Maps was searched this run.'] };
+        })
+        : { candidates: [], notes: [] };
+      warnings.push(...osmNotes);
+      stats.candidates = candidates.length;
+      if (defs.length) log(`🗺️  Layer 1, OpenStreetMap: ${candidates.length} businesses with no website listed`);
+
+      const { queue } = pickQueue(candidates, state, cfg.maxChecksPerRun, cfg.maxAttempts);
+      // Not enough from OpenStreetMap (or a typed-in business type): search Google Maps for more.
+      const discover = cfg.mapsDiscovery && queue.length < cfg.maxChecksPerRun ? [...custom, ...defs].filter((d) => d.search) : [];
+      if (queue.length || discover.length) {
+        searcher = await checkQueue({ cfg, ep, queue, state, stats, leads, warnings, dataDir, dryRun, startedAt, log, area, discover });
+      }
+      if (!stats.checked && !stats.discovered && !stats.leads) {
+        warnings.push(candidates.length || stats.mapsListed
+          ? 'Every business found has already been checked. Add categories or change the area to find new ones.'
+          : 'No businesses without a website were found here for these categories. Try more categories, a bigger radius or another city.');
+      }
+      stats.pending = pickQueue(candidates, state, Infinity, cfg.maxAttempts).pending;
     }
-    if (!stats.checked && !stats.discovered && !stats.leads) {
-      warnings.push(candidates.length || stats.mapsListed
-        ? 'Every business found has already been checked. Add categories or change the area to find new ones.'
-        : 'No businesses without a website were found here for these categories. Try more categories, a bigger radius or another city.');
-    }
-    stats.pending = pickQueue(candidates, state, Infinity, cfg.maxAttempts).pending;
   } catch (err) {
     fatal = err;
     log(`❌ ${err.message}`);

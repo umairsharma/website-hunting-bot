@@ -100,3 +100,13 @@ npx playwright install chromium
 npm test                          # unit tests + full runs against fake Google/OSM/Discord
 node src/index.js --dry-run       # real run, but saves nothing and posts nothing
 ```
+
+## Rechecking earlier leads
+
+The bot's checks get better over time (booking links on Google Maps, phone-number matching, stricter
+website matching). To run every earlier lead through the latest checks: **Actions → Website Hunting Bot →
+Run workflow → tick "Recheck earlier leads"**. The leads waiting for a recheck are in `data/recheck.json`.
+Each run rechecks a batch (free search engines allow a few dozen searches per run) and starts the next
+run by itself until the list is empty. Leads that still have no website are sent to Discord again and
+saved to `leads.csv`; the ones that turn out to have a website are dropped.
+

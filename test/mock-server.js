@@ -150,6 +150,7 @@ function placeHtml(p) {
     ${p.category ? `<button jsaction="pane.wfvdle1.category">${esc(p.category)}</button>` : ''}
     ${p.hours ? `<div jsaction="pane.openhours.wfvdle23.dropdown" onclick="document.getElementById('week').hidden=false"><span role="img" aria-label="Show open hours for the week"></span>Open · Closes 6 PM</div>
       <table id="week" hidden>${p.hours.map(([d, t]) => `<tr><td>${d}</td><td>${t.replace(' ', '\u202f')}</td></tr>`).join('')}</table>` : ''}
+    ${p.bookingLink ? `<a data-item-id="action:3" data-tooltip="Open booking link" aria-label="${esc(new URL(p.bookingLink).hostname)}" href="${esc(p.bookingLink)}">${esc(new URL(p.bookingLink).hostname)}</a>` : ''}
     ${p.claimable ? '<a href="#claim">Claim this business</a>' : ''}
     ${p.review ? `<div class="jftiEf"><span class="wiI7pd">${esc(p.review)}</span></div>` : ''}
   </div>`;
@@ -248,7 +249,9 @@ export async function startMockServer(scenario = {}) {
     }
     if (p.startsWith('/maps/place/')) {
       const slug = p.slice('/maps/place/'.length).split('/')[0];
-      const place = PLACES[slug] || PLACES_EXTRA[slug];
+      let place = PLACES[slug] || PLACES_EXTRA[slug];
+      // scenario.bookingLinks: { slug: url } — a "booking link" on the listing instead of a Website button
+      if (place && scenario.bookingLinks?.[slug]) place = { ...place, bookingLink: scenario.bookingLinks[slug] };
       return html(place ? renderLater(placeHtml(place)) : page('Not found'), place ? 200 : 404);
     }
     if (p === '/google/search') {
