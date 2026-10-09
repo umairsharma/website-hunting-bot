@@ -425,7 +425,7 @@ function summaryText(cfg, stats, warnings, fatal) {
     if (stats.unverified) bits.push(`⏳ ${stats.unverified} to retry`);
     if (bits.length) lines.push(bits.join(' · '));
     lines.push(cfg?.recheck
-      ? `🔎 ${stats.pending.toLocaleString('en-US')} earlier leads still to recheck${stats.pending ? ' (the next run starts by itself)' : ' · all done ✅'}`
+      ? `🔎 ${stats.pending.toLocaleString('en-US')} earlier leads still to recheck${stats.pending ? '' : ' · all done ✅'}`
       : `🔎 Checked ${stats.checked} this run${stats.discovered ? ` (${stats.discovered} found by searching Google Maps)` : ''} · ${stats.pending.toLocaleString('en-US')} still in the queue`);
     if (stats.leads) {
       const all = runLeadsLink();
