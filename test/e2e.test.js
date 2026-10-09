@@ -457,3 +457,61 @@ test('Phone check: a site with a different name counts when their phone number i
     assert.deepEqual(result.leads.map((l) => l.name), []);
   });
 });
+
+test('Google Maps booking link: a Square/Wix site there counts as their website; a booking app is a note', { timeout: 180000 }, async () => {
+  const bookingLinks = { 'delta-rooter': 'http://deltarooter.square.site/', 'mike-pipe-fix': 'https://www.fresha.com/a/mike-pipe-fix-lahore' };
+  await withServer({ bookingLinks }, async (server) => {
+    const logs = [];
+    const result = await run({
+      config: { ...CONFIG, categories: ['plumber'], mapsDiscovery: true },
+      dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m),
+    });
+    const logText = logs.join('\n');
+    assert.equal(result.error, null, logText);
+    assert.match(logText, /Has a website: deltarooter\.square\.site \(found by Google Maps, their booking\/menu link on Google Maps\)/);
+    const mike = result.leads.find((l) => l.name === 'Mike Pipe Fix');
+    assert.ok(mike.notes.some((n) => /Takes bookings\/orders through Fresha/.test(n)), mike.notes.join(' | '));
+    assert.deepEqual(result.leads.map((l) => l.name), ['Mike Pipe Fix']);
+  });
+});
+
+test('Recheck: earlier leads go through the latest checks; ones with a website are dropped, the rest re-sent', { timeout: 240000 }, async () => {
+  await withServer({}, async (server) => {
+    const dataDir = tempDir();
+    fs.writeFileSync(path.join(dataDir, 'recheck.json'), JSON.stringify([
+      { key: 'node/2', name: 'Butt Karahi House', category: 'Restaurant', city: 'Lahore', country: 'Pakistan', phone: '+92 300 1112222', address: null, email: null, mapsUrl: null, osmUrl: null },
+      { key: 'node/1', name: 'Ali Bakers', category: 'Bakery', city: 'Lahore', country: 'Pakistan', phone: null, address: null, email: null, mapsUrl: null, osmUrl: null },
+      { key: 'node/5', name: 'Rehman Dental Clinic', category: 'Dentist', city: 'Lahore', country: 'Pakistan', phone: null, address: null, email: null, mapsUrl: null, osmUrl: null },
+    ]));
+    fs.writeFileSync(path.join(dataDir, 'seen.json'), JSON.stringify({ version: 1, places: {
+      'node/1': { status: 'lead', name: 'Ali Bakers', checked: '2026-09-01' },
+      'node/2': { status: 'lead', name: 'Butt Karahi House', checked: '2026-09-01' },
+      'node/5': { status: 'lead', name: 'Rehman Dental Clinic', checked: '2026-09-01' },
+    } }));
+    const logs = [];
+    const config = { ...CONFIG, city: 'Nashville', country: 'United States', phoneCountryCode: '1', recheck: true, maxChecksPerRun: 2 };
+    const result = await run({ config, dataDir, webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m) });
+    const logText = logs.join('\n');
+    assert.equal(result.error, null, logText);
+    assert.equal(server.requests.overpass.length, 0); // no new businesses are looked for
+    assert.equal(result.checked, 2, logText); // a batch of 2
+    assert.deepEqual(result.leads.map((l) => l.name), ['Butt Karahi House']);
+    assert.equal(result.leads[0].whatsapp, 'https://wa.me/923001112222'); // its own country, not the config's
+    assert.equal(result.leads[0].city, 'Lahore');
+    assert.equal(result.hasWebsite, 1); // Ali Bakers: website on Google Maps, dropped
+    const seen = readJson(dataDir, 'seen.json').places;
+    assert.equal(seen['node/1'].status, 'has_website');
+    // One left, for the next run
+    assert.deepEqual(readJson(dataDir, 'recheck.json').map((i) => i.name), ['Rehman Dental Clinic']);
+    assert.equal(result.recheckLeft, 1);
+    assert.match(server.requests.discord.at(-1).content, /Rechecked 2 earlier leads\*\* with the latest checks: 1 still have no website \(below\), 1 have one \(dropped\)/);
+    assert.match(server.requests.discord.at(-1).content, /1 earlier leads still to recheck \(the next run starts by itself\)/);
+    const csv = fs.readFileSync(path.join(dataDir, 'leads.csv'), 'utf8');
+    assert.ok(csv.includes('Butt Karahi House') && !csv.includes('Ali Bakers'));
+
+    // The last one: the list is finished and its file removed.
+    const done = await run({ config, dataDir, webhookUrl: `${server.base}/discord/webhook`, log: () => {} });
+    assert.equal(done.recheckLeft, 0);
+    assert.ok(!fs.existsSync(path.join(dataDir, 'recheck.json')));
+  });
+});

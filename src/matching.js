@@ -121,7 +121,9 @@ export function siteMatchesBusiness(siteKey, profile, title = '') {
   // as it's the business, so it counts only when the page title names the business.
   const plain = siteKey.replace(/\d+/g, '');
   if (profile.tokenSets.some((tokens) => tokens.length === 1 && [plain, plain.replace(/s$/, '')].includes(tokens[0]))) return titled;
-  if (profile.keys.some((key) => siteKey.length >= 5 && key.includes(siteKey) && siteKey.length >= key.length * 0.5)) return true;
+  // Most of the name, but only if it has every distinctive word: detail.de is not "Detail Depot".
+  if (profile.keys.some((key) => siteKey.length >= 5 && key.includes(siteKey) && siteKey.length >= key.length * 0.5)
+    && profile.tokenSets.some((tokens) => tokens.every((x) => siteKey.includes(x)))) return true;
   // One distinctive word plus another word of the name (bishopplumbing.com), not some other word (douglasus.com).
   // A neutral business word counts too (harbornegarage.co.uk for "Harborne Auto Centre"), but not another
   // trade's (friendlysrestaurants.com is not "Friendly Plumbers").

@@ -36,6 +36,11 @@ export function applyRunInputs(config, env = process.env) {
   const out = { ...config };
   const parts = [];
 
+  if (/^(true|1|yes)$/i.test(String(env.HUNT_RECHECK || '').trim())) {
+    // Recheck earlier leads instead of finding new ones (the other boxes don't apply).
+    return { config: { ...out, recheck: true }, label: '♻️ Rechecking earlier leads with the latest checks' };
+  }
+
   if (city) {
     // A new place: the old centre point and country no longer apply.
     out.city = city;

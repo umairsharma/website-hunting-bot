@@ -17,6 +17,7 @@ import { MAX_LINK, hoursText, leadShareLink, leadText, leadsText } from '../src/
 import { findSocials, orderSocials, socialLabel, socialProfile } from '../src/socials.js';
 import { confirmByPhone, fetchPage, phonePattern, siteOrigins } from '../src/verify.js';
 import { activityFor, listingsFrom, sinceFrom, socialActivityFrom } from '../src/details.js';
+import { buildRecheckList, recheckCandidate } from '../src/recheck.js';
 import { INSTITUTION_NAME, normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
 
@@ -123,6 +124,8 @@ test('analyzeResults: one common word of the name ("Bishop", "Johnson") does not
   assert.ok(has('https://bishopplumbingms.com/', 'Bishop Plumbing Service LLC'));
   assert.ok(has('https://mancusoservices.com/', 'Mancuso Brothers Plumbing'));
   assert.ok(has('https://harbornegarage.co.uk/', 'Harborne Auto Centre'));
+  assert.equal(has('https://detail.de/', 'Detail Depot', 'detail.de - Online-Marktplatz'), false);
+  assert.ok(has('https://detaildepotatl.com/', 'Detail Depot'));
   assert.equal(has('https://avantemedicalcenter.com/', 'Avante Plumbing Co Contractors', 'Avante Medical Center'), false);
   assert.equal(has('https://www.friendlysrestaurants.com/', 'Friendly Plumbers', "Friendly's Restaurants"), false);
   assert.equal(has('https://chapmannews.org/', 'Chapman Plumbing Co', 'Chapman News'), false);
@@ -680,4 +683,24 @@ test('Organisations are not leads; small businesses with similar words still are
     assert.ok(INSTITUTION_NAME.test(name), name);
   for (const name of ['County Line BBQ', 'State of Grace', 'College Hill Barbers', 'Federal Pizza', 'Cloud 9 Nail Spa'])
     assert.ok(!INSTITUTION_NAME.test(name), name);
+});
+
+test('Recheck list: from leads.csv, one per business, with its seen.json key and country', () => {
+  const csv = [
+    'found_on,name,category,phone,whatsapp,email,address,google_rating,google_reviews,google_maps,social_pages,notes,city,osm_link',
+    '2026-09-26,"Joe\'s Grill, Inc",Restaurant,0121 496 0000,,,"1 High St, Birmingham",4.5,10,https://maps.google.com/?cid=123,,,Birmingham,',
+    "2026-10-01,'=Odd Name,Bakery,,,,,,,\"https://www.google.com/maps/search/?api=1&query=1,2\",,,Memphis,https://www.openstreetmap.org/node/9",
+    '2026-10-02,"Joe\'s Grill, Inc",Restaurant,0121 496 0000,,,"1 High St, Birmingham",4.6,12,https://maps.google.com/?cid=123,,,Birmingham,',
+  ].join('\n');
+  const state = { places: { 'node/7': { status: 'lead', name: "Joe's Grill, Inc" }, 'gmaps/123': { status: 'lead', name: "Joe's Grill, Inc", sameAs: 'node/7' } } };
+  const list = buildRecheckList(csv, state);
+  assert.equal(list.length, 2);
+  assert.deepEqual(list[0], {
+    key: 'node/7', name: "Joe's Grill, Inc", category: 'Restaurant', city: 'Birmingham', country: 'United Kingdom', phone: '0121 496 0000',
+    address: '1 High St, Birmingham', email: null, mapsUrl: 'https://maps.google.com/?cid=123', osmUrl: null, foundOn: '2026-10-02',
+  });
+  assert.equal(list[1].name, '=Odd Name');
+  assert.equal(list[1].key, 'recheck/=Odd Name|Memphis');
+  assert.equal(list[1].country, 'United States');
+  assert.equal(recheckCandidate(list[0]).phoneCountryCode, '44');
 });

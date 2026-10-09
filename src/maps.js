@@ -120,6 +120,10 @@ function readPlace(page) {
       claimable: /claim this business/i.test(main.innerText || ''),
       limitedView: /limited view/i.test(document.body ? document.body.innerText : ''),
       category: ((main.querySelector('button[jsaction*="category"]') || {}).textContent || '').trim() || null,
+      // Booking, menu and order links ("Open booking link"): often the business's own site (a Square or
+      // Wix page), shown there instead of under "Website".
+      links: [...new Set(Array.from(main.querySelectorAll('a[data-item-id^="action:"], a[data-tooltip^="Open booking"], a[data-tooltip^="Open menu"], a[data-tooltip^="Open order"]'))
+        .map((a) => a.href).filter((h) => /^https?:/.test(h) && !/google\.[a-z.]+\//.test(h)))],
       hours: readHours(main),
     };
 
