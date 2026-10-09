@@ -1218,13 +1218,13 @@
   "gmaps/13219843666277517265": {"status":"lead","name":"LuxeCare Detailing Atlanta","checked":"2026-10-09"},
   "gmaps/5578865137756804204": {"status":"lead","name":"Zone 3 Car Wash","checked":"2026-10-09"},
   "gmaps/9758121967990399273": {"status":"lead","name":"Oosh Motorsports And Detailing","checked":"2026-10-09"},
-  "gmaps/1917281441236876548": {"status":"lead","name":"Car Wash","checked":"2026-10-09"},
-  "gmaps/5210395502954268987": {"status":"lead","name":"Georgia Detailing Company","checked":"2026-10-09"},
+  "gmaps/1917281441236876548": {"status":"lead","name":"Car Wash","checked":"2026-10-09","recheckedOn":"2026-10-09"},
+  "gmaps/5210395502954268987": {"status":"lead","name":"Georgia Detailing Company","checked":"2026-10-09","recheckedOn":"2026-10-09"},
   "gmaps/3095369880230002391": {"status":"has_website","name":"Detail Depot","checked":"2026-10-09","website":"detail.de","layer":3},
-  "gmaps/14381829635104292695": {"status":"lead","name":"The Office Car Wash","checked":"2026-10-09"},
-  "gmaps/1703992863749879730": {"status":"lead","name":"Panda Hub","checked":"2026-10-09"},
-  "gmaps/579329332486658713": {"status":"lead","name":"GEO's Mobile Detailing, LLC.","checked":"2026-10-09"},
-  "gmaps/11277999415794976621": {"status":"lead","name":"Chuck’s Mobile Car Lavar","checked":"2026-10-09"},
-  "gmaps/15223984414528326811": {"status":"lead","name":"Foam Busters Mobile Cleaning LLC","checked":"2026-10-09"}
+  "gmaps/14381829635104292695": {"status":"lead","name":"The Office Car Wash","checked":"2026-10-09","recheckedOn":"2026-10-09"},
+  "gmaps/1703992863749879730": {"status":"has_website","name":"Panda Hub","checked":"2026-10-09","recheckedOn":"2026-10-09","website":"pandahub.com","layer":2},
+  "gmaps/579329332486658713": {"status":"lead","name":"GEO's Mobile Detailing, LLC.","checked":"2026-10-09","recheckedOn":"2026-10-09"},
+  "gmaps/11277999415794976621": {"status":"has_website","name":"Chuck’s Mobile Car Lavar","checked":"2026-10-09","recheckedOn":"2026-10-09","website":"chucks-mobile-car-lavar.square.site","layer":3},
+  "gmaps/15223984414528326811": {"status":"lead","name":"Foam Busters Mobile Cleaning LLC","checked":"2026-10-09","recheckedOn":"2026-10-09"}
  }
 }
