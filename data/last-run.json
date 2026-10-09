@@ -1,27 +1,27 @@
 {
-  "startedAt": "2026-10-09T10:21:59.395Z",
-  "finishedAt": "2026-10-09T10:44:56.418Z",
-  "minutes": 23,
-  "place": "Atlanta, United States",
-  "area": "Atlanta, Fulton County, Georgia, United States",
-  "candidates": 0,
-  "discovered": 30,
-  "mapsListed": 104,
+  "startedAt": "2026-10-09T11:17:55.052Z",
+  "finishedAt": "2026-10-09T11:27:50.870Z",
+  "minutes": 9.9,
+  "place": "Nashville, United States",
+  "area": "Nashville, Davidson County, Middle Tennessee, Tennessee, United States",
+  "candidates": 414,
+  "discovered": 0,
+  "mapsListed": 0,
   "checked": 30,
-  "leads": 28,
-  "hasWebsite": 2,
+  "leads": 2,
+  "hasWebsite": 28,
   "closed": 0,
   "unverified": 0,
-  "pending": 0,
+  "pending": 308,
   "searchEngines": {
     "google": "broken",
     "brave": "blocked",
     "startpage": "blocked",
     "bing": "ok",
-    "duckduckgo": "blocked"
+    "duckduckgo": "untested"
   },
   "warnings": [
-    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, DuckDuckGo blocked the bot, so it used Bing."
+    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
   ],
   "error": null
 }
