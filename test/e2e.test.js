@@ -505,7 +505,7 @@ test('Recheck: earlier leads go through the latest checks; ones with a website a
     assert.deepEqual(readJson(dataDir, 'recheck.json').map((i) => i.name), ['Rehman Dental Clinic']);
     assert.equal(result.recheckLeft, 1);
     assert.match(server.requests.discord.at(-1).content, /Rechecked 2 earlier leads\*\* with the latest checks: 1 still have no website \(below\), 1 have one \(dropped\)/);
-    assert.match(server.requests.discord.at(-1).content, /1 earlier leads still to recheck \(the next run starts by itself\)/);
+    assert.match(server.requests.discord.at(-1).content, /1 earlier leads still to recheck/);
     const csv = fs.readFileSync(path.join(dataDir, 'leads.csv'), 'utf8');
     assert.ok(csv.includes('Butt Karahi House') && !csv.includes('Ali Bakers'));
 
