@@ -1,28 +1,27 @@
 {
-  "startedAt": "2026-10-08T16:23:41.558Z",
-  "finishedAt": "2026-10-08T16:52:39.184Z",
-  "minutes": 29,
-  "place": "Dallas, United States",
-  "area": "Dallas, Dallas County, Texas, United States",
-  "candidates": 833,
-  "discovered": 0,
-  "mapsListed": 0,
+  "startedAt": "2026-10-09T10:21:59.395Z",
+  "finishedAt": "2026-10-09T10:44:56.418Z",
+  "minutes": 23,
+  "place": "Atlanta, United States",
+  "area": "Atlanta, Fulton County, Georgia, United States",
+  "candidates": 0,
+  "discovered": 30,
+  "mapsListed": 104,
   "checked": 30,
-  "leads": 13,
-  "hasWebsite": 15,
-  "closed": 2,
+  "leads": 28,
+  "hasWebsite": 2,
+  "closed": 0,
   "unverified": 0,
-  "pending": 803,
+  "pending": 0,
   "searchEngines": {
     "google": "broken",
     "brave": "blocked",
     "startpage": "blocked",
     "bing": "ok",
-    "duckduckgo": "untested"
+    "duckduckgo": "blocked"
   },
   "warnings": [
-    "OpenStreetMap servers were busy, so these were skipped this run: Café, Clinic / doctor, Real estate agent.",
-    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
+    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, DuckDuckGo blocked the bot, so it used Bing."
   ],
   "error": null
 }
