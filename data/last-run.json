@@ -1,15 +1,15 @@
 {
-  "startedAt": "2026-10-09T12:28:23.346Z",
-  "finishedAt": "2026-10-09T12:37:25.449Z",
-  "minutes": 9,
+  "startedAt": "2026-10-09T12:47:46.495Z",
+  "finishedAt": "2026-10-09T13:07:46.691Z",
+  "minutes": 20,
   "place": "Atlanta, United States",
   "area": "Atlanta, Fulton County, Georgia, United States",
   "candidates": 0,
-  "discovered": 13,
-  "mapsListed": 78,
-  "checked": 13,
-  "leads": 13,
-  "hasWebsite": 0,
+  "discovered": 25,
+  "mapsListed": 104,
+  "checked": 25,
+  "leads": 23,
+  "hasWebsite": 2,
   "closed": 0,
   "unverified": 0,
   "pending": 0,
@@ -18,10 +18,10 @@
     "brave": "blocked",
     "startpage": "blocked",
     "bing": "ok",
-    "duckduckgo": "untested"
+    "duckduckgo": "blocked"
   },
   "warnings": [
-    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
+    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, DuckDuckGo blocked the bot, so it used Bing."
   ],
   "error": null
 }
