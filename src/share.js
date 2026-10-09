@@ -5,6 +5,16 @@ import { hostOf, prettySite } from './matching.js';
 import { socialIcon, socialLabel } from './socials.js';
 import { activityFor } from './details.js';
 
+/** A Google search for the business by name and town, for checking it by hand ("do they have a website?"). */
+export function googleSearchUrl(lead) {
+  // The town from the address ("…, Memphis, TN 38104, United States" → "Memphis, TN"), else the run's city.
+  const parts = String(lead.address || '').split(',').map((x) => x.trim()).filter(Boolean);
+  if (/^(united states|usa|us|united kingdom|uk|pakistan)$/i.test(parts.at(-1) || '')) parts.pop();
+  const town = parts.length >= 2 ? parts.slice(-2).join(' ').replace(/\b\d{4,6}\b/g, '').trim() : lead.city;
+  const q = [lead.name, town || lead.city].filter(Boolean).join(' ').replace(/\s+/g, ' ');
+  return `https://www.google.com/search?q=${encodeURIComponent(q).replace(/\(/g, '%28').replace(/\)/g, '%29')}`;
+}
+
 const DAY_SHORT = { monday: 'Mon', tuesday: 'Tue', wednesday: 'Wed', thursday: 'Thu', friday: 'Fri', saturday: 'Sat', sunday: 'Sun' };
 
 /**
@@ -39,9 +49,10 @@ export function leadText(lead, { n = null, level = 0 } = {}) {
   const lines = [`${n ? `${n}. ` : ''}${hot}*${lead.name}*${lead.categoryLabel ? ` (${lead.categoryLabel})` : ''}`];
   if (lead.rating != null) lines.push(`⭐ ${lead.rating}${lead.reviews ? ` (${Number(lead.reviews).toLocaleString('en-US')} reviews)` : ''}`);
   if (lead.phone) lines.push(`📞 ${lead.phone}`);
-  if (lead.whatsapp) lines.push(`💬 ${lead.whatsapp}`);
+
   if (lead.address) lines.push(`🏠 ${level >= 5 && lead.address.length > 70 ? `${lead.address.slice(0, 69)}…` : lead.address}`);
   if (lead.mapsUrl) lines.push(`📍 ${lead.mapsUrl}`);
+  lines.push(`🔎 ${googleSearchUrl(lead)}`); // a Google search for them, to check by hand
   if (lead.email) lines.push(`✉️ ${lead.email}`);
   if (lead.category && level < 4) lines.push(`🏷️ ${lead.category}`);
   const hours = hoursText(lead.hours, { short: level >= 2 });

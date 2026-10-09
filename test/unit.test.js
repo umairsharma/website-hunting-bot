@@ -513,14 +513,14 @@ test('Send to WhatsApp: each card shares the full lead, within Discord limits', 
   // The share link is at the top of the card, where it has room for every detail.
   assert.ok(card.description.length <= 4096, `${card.description.length} characters`);
   const url = card.description.match(/^📲 \*\*\[Send this lead to WhatsApp\]\((https:\/\/wa\.me\/\?text=[^)\s]+)\)\*\*\n/)[1]; // brackets in the name don't break it
-  const text = decodeURIComponent(new URL(url).searchParams.get('text'));
+  const text = new URL(url).searchParams.get('text');
   assert.equal(text, [
     '🔥 *Snowflake (Donuts) & Co* (Bakery / sweets)',
     '⭐ 4.8 (358 reviews)',
     '📞 (713) 827-2808',
-    '💬 https://wa.me/17138272808',
     '🏠 1234 Westheimer Rd, Houston, TX 77006',
     '📍 https://maps.google.com/?cid=1841144998116252209',
+    '🔎 https://www.google.com/search?q=Snowflake%20%28Donuts%29%20%26%20Co%20Houston%20TX',
     '✉️ hello@snowflake.example',
     '🏷️ Donut shop',
     '🕒 Mon 6 AM–2 PM, Tue 6 AM–2 PM, Sun Closed',
@@ -534,7 +534,7 @@ test('Send to WhatsApp: each card shares the full lead, within Discord limits', 
 
   // Too much for one link: notes go first, then extra social pages; the essentials always stay.
   const huge = { ...lead, notes: Array(8).fill('n'.repeat(300)), socials: Array(4).fill(`https://www.facebook.com/${'p'.repeat(300)}`) };
-  const hugeText = decodeURIComponent(new URL(leadShareLink(huge)).searchParams.get('text'));
+  const hugeText = new URL(leadShareLink(huge)).searchParams.get('text');
   assert.ok(leadShareLink(huge).length <= MAX_LINK);
   for (const must of ['*Snowflake', '(713) 827-2808', 'Westheimer', 'maps.google.com/?cid=']) assert.ok(hugeText.includes(must), must);
   assert.ok(!hugeText.includes('📝'));
@@ -544,7 +544,8 @@ test('Send to WhatsApp: each card shares the full lead, within Discord limits', 
   const all = leadsText([lead, { name: 'B', phone: '1' }], 'Houston, United States');
   assert.ok(all.startsWith('🎯 2 website leads · Houston, United States\n\n1. 🔥 *Snowflake (Donuts) & Co*'));
   assert.ok(all.includes('📝 Their Google listing is unclaimed') && all.includes('2. *B*\n📞 1'));
-  assert.equal(leadText({ name: 'C' }), '*C*');
+  assert.ok(!all.includes('wa.me')); // the shared text never links to WhatsApp itself
+  assert.equal(leadText({ name: 'C', city: 'Memphis' }), '*C*\n🔎 https://www.google.com/search?q=C%20Memphis');
 });
 
 test('Google Maps search phrases: every category has one; place IDs read from listing links', () => {

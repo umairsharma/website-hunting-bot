@@ -433,7 +433,7 @@ test('Social media: finds the Instagram and Facebook of a lead by searching, ski
     assert.deepEqual(delta.socials, []); // the only Instagram result is another business
     const card = server.requests.discord.at(-1).embeds.find((e) => e.title.endsWith('Mike Pipe Fix'));
     assert.equal(card.fields.find((f) => f.name === '🕒 Hours').value, 'Monday: 9 AM–6 PM\nTuesday: 9 AM–6 PM\nSunday: Closed');
-    const shared = decodeURIComponent(new URL(card.description.match(/\((https:\/\/wa\.me[^)\s]+)\)/)[1]).searchParams.get('text'));
+    const shared = new URL(card.description.match(/\((https:\/\/wa\.me[^)\s]+)\)/)[1]).searchParams.get('text');
     for (const detail of ['🕒 Mon 9 AM–6 PM', '📅 Open since 2008', '1,234 followers', '📋 Also listed on: Yellow Pages']) assert.ok(shared.includes(detail), detail);
     assert.match(card.fields.find((f) => f.name === 'Social media').value, /📸 \[Instagram @mikepipefix\]\(https:\/\/www\.instagram\.com\/mikepipefix\/\)/);
   });

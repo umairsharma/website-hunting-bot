@@ -2,7 +2,9 @@
 
 import { hostOf, prettySite } from './matching.js';
 import { sleep } from './util.js';
-import { hoursText, leadShareLink } from './share.js';
+import { googleSearchUrl, hoursText, leadShareLink } from './share.js';
+
+export { googleSearchUrl };
 import { activityFor } from './details.js';
 import { socialIcon, socialLabel } from './socials.js';
 
@@ -26,16 +28,6 @@ function mapsField(lead) {
   if (!url) return null;
   const value = lead.onMaps ? `[Open their Google Maps listing](${url})` : `Not listed on Google Maps · [See the location](${url})`;
   return { name: '📍 Google Maps', value };
-}
-
-/** A Google search for the business by name and town, for checking it by hand ("do they have a website?"). */
-export function googleSearchUrl(lead) {
-  // The town from the address ("…, Memphis, TN 38104, United States" → "Memphis, TN"), else the run's city.
-  const parts = String(lead.address || '').split(',').map((x) => x.trim()).filter(Boolean);
-  if (/^(united states|usa|us|united kingdom|uk|pakistan)$/i.test(parts.at(-1) || '')) parts.pop();
-  const town = parts.length >= 2 ? parts.slice(-2).join(' ').replace(/\b\d{4,6}\b/g, '').trim() : lead.city;
-  const q = [lead.name, town || lead.city].filter(Boolean).join(' ').replace(/\s+/g, ' ');
-  return `https://www.google.com/search?q=${encodeURIComponent(q).replace(/\(/g, '%28').replace(/\)/g, '%29')}`;
 }
 
 export function leadEmbed(lead) {
