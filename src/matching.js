@@ -15,6 +15,7 @@ const GENERIC_WORDS = new Set([
   'electrician', 'electricians', 'roofing', 'roofer', 'roofers', 'painting', 'painters', 'cleaning', 'cleaners',
   'landscaping', 'lawn', 'construction', 'contractor', 'contractors', 'repair', 'repairs', 'drain', 'sewer', 'gas',
   'pest', 'control', 'locksmith', 'carpentry', 'remodeling', 'solutions', 'pros', 'experts', 'llc',
+  'car', 'cars', 'wash', 'carwash', 'detailing', 'detail', 'details', 'mobile', 'hand', 'salons',
 ]);
 
 const STOP_WORDS = new Set(['the', 'and', 'pvt', 'ltd', 'llc', 'inc', 'company', 'limited']);

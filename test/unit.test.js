@@ -705,3 +705,11 @@ test('Recheck list: from leads.csv, one per business, with its seen.json key and
   assert.equal(list[1].country, 'United States');
   assert.equal(recheckCandidate(list[0]).phoneCountryCode, '44');
 });
+
+test('A name made only of the city and the trade has nothing to match an Instagram on', () => {
+  const generic = businessProfile(['Atlanta car detailing'], 'Atlanta');
+  assert.deepEqual(generic.tokenSets, []);
+  assert.deepEqual(findSocials([{ url: 'https://www.instagram.com/blackposhmobilewash/', title: 'Black Posh Mobile Wash (@blackposhmobilewash)' }],
+    { name: 'Atlanta car detailing', names: ['Atlanta car detailing'], city: 'Atlanta', profile: generic }), []);
+  assert.deepEqual(businessProfile(["Leo's Hand Car Wash & Auto Detailing"], 'Atlanta').tokenSets, [['leos']]);
+});

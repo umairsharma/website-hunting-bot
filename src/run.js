@@ -202,9 +202,11 @@ async function checkBusiness(biz, ctx) {
 
   const mapsSite = maps?.website ? classifyUrl(maps.website) : null;
   const phone = maps?.phone || biz.phone || null;
+  const generic = biz.profile?.tokenSets?.length === 0;
   const socials = [...biz.socials, mapsSite?.kind === 'social' ? mapsSite.url : null,
-    ...(found ? findSocials(found.results, biz).map((p) => p.url) : [])];
-  if (found && cfg.findSocials) {
+    ...(found && !generic ? findSocials(found.results, biz).map((p) => p.url) : [])];
+  // A name that's only the place and the trade ("Atlanta car detailing") matches anyone's Instagram.
+  if (found && cfg.findSocials && biz.profile?.tokenSets?.length !== 0) {
     const extra = await findSocialPages(biz, socials, maps?.address || biz.address, ctx);
     socials.push(...extra.urls);
     allResults.push(...extra.results);
