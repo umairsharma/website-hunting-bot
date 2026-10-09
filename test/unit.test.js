@@ -518,6 +518,7 @@ test('Send to WhatsApp: each card shares the full lead, within Discord limits', 
     '🔥 *Snowflake (Donuts) & Co* (Bakery / sweets)',
     '⭐ 4.8 (358 reviews)',
     '📞 (713) 827-2808',
+    '💬 https://wa.me/17138272808',
     '🏠 1234 Westheimer Rd, Houston, TX 77006',
     '📍 https://maps.google.com/?cid=1841144998116252209',
     '🔎 https://www.google.com/search?q=Snowflake%20%28Donuts%29%20%26%20Co%20Houston%20TX',
@@ -544,7 +545,6 @@ test('Send to WhatsApp: each card shares the full lead, within Discord limits', 
   const all = leadsText([lead, { name: 'B', phone: '1' }], 'Houston, United States');
   assert.ok(all.startsWith('🎯 2 website leads · Houston, United States\n\n1. 🔥 *Snowflake (Donuts) & Co*'));
   assert.ok(all.includes('📝 Their Google listing is unclaimed') && all.includes('2. *B*\n📞 1'));
-  assert.ok(!all.includes('wa.me')); // the shared text never links to WhatsApp itself
   assert.equal(leadText({ name: 'C', city: 'Memphis' }), '*C*\n🔎 https://www.google.com/search?q=C%20Memphis');
 });
 

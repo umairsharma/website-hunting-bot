@@ -49,6 +49,7 @@ export function leadText(lead, { n = null, level = 0 } = {}) {
   const lines = [`${n ? `${n}. ` : ''}${hot}*${lead.name}*${lead.categoryLabel ? ` (${lead.categoryLabel})` : ''}`];
   if (lead.rating != null) lines.push(`⭐ ${lead.rating}${lead.reviews ? ` (${Number(lead.reviews).toLocaleString('en-US')} reviews)` : ''}`);
   if (lead.phone) lines.push(`📞 ${lead.phone}`);
+  if (lead.whatsapp) lines.push(`💬 ${lead.whatsapp}`); // chat with the business on WhatsApp
 
   if (lead.address) lines.push(`🏠 ${level >= 5 && lead.address.length > 70 ? `${lead.address.slice(0, 69)}…` : lead.address}`);
   if (lead.mapsUrl) lines.push(`📍 ${lead.mapsUrl}`);
