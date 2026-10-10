@@ -593,7 +593,7 @@ test('AI (Gemini): picks the Maps listing under another name, reads listing page
     });
     const logText = logs.join('\n');
     assert.equal(result.error, null, logText);
-    assert.ok(server.requests.gemini.length > 0 && server.requests.gemini.every((r) => r.key === 'test-key' && r.model === 'gemini-2.5-flash'));
+    assert.ok(server.requests.gemini.length > 0 && server.requests.gemini.every((r) => r.key === 'test-key' && r.model === 'gemini-3.1-flash-lite'));
     // Maps: the AI picked the listing, and its website button counts
     assert.match(logText, /AI: it's on Google Maps as "Dr\. Ahmed Family Dental Care"/);
     assert.match(logText, /Has a website: ahmeddental\.example \(found by Google Maps\)/);
@@ -623,8 +623,8 @@ test('AI (Gemini): daily limit reached → the run carries on without it and say
     });
     const logText = logs.join('\n');
     assert.equal(result.error, null, logText);
-    assert.equal(server.requests.gemini.length, 1); // asked once, then left alone
-    assert.ok(result.warnings.some((w) => /AI \(Gemini\): Gemini's free daily limit was reached/.test(w)), result.warnings.join(' | '));
+    assert.ok(server.requests.gemini.length <= 2, String(server.requests.gemini.length)); // asked once or twice, then left alone
+    assert.ok(result.warnings.some((w) => /AI \(Gemini\): .*(free Google searches through Gemini are used up|free daily limit was reached)/.test(w)), result.warnings.join(' | '));
     assert.ok(result.leads.some((l) => l.name === 'Mike Pipe Fix'));
   });
 });
@@ -643,5 +643,24 @@ test('Google through Gemini: only pages on sites Google returned count; a made-u
     assert.ok(!/made-up-site/.test(logText));
     assert.ok(result.leads.some((l) => l.name === 'Mike Pipe Fix'), logText);
     assert.match(result.leads[0].checks, /Google \(via Gemini\) ✓ · AI ✓/);
+  });
+});
+
+test('Google through Gemini not in the free plan: searches use the other engines, the AI still checks the rest', { timeout: 180000 }, async () => {
+  const geminiSearchStatus = { status: 429, text: JSON.stringify({ error: { code: 429, message: 'You exceeded your current quota. Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 0' } }) };
+  await withServer({ geminiSearchStatus, bingWorks: true }, async (server) => {
+    const logs = [];
+    const result = await run({
+      config: { ...CONFIG, categories: ['plumber'], mapsDiscovery: true, ai: true, aiMinIntervalMs: 0 },
+      dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m),
+    });
+    const logText = logs.join('\n');
+    assert.equal(result.error, null, logText);
+    // Each model tried once for searches, then searches are left alone for the run
+    const searches = server.requests.gemini.filter((r) => r.search);
+    assert.deepEqual(searches.map((r) => r.model), ['gemini-3.1-flash-lite', 'gemini-3.6-flash', 'gemini-2.5-flash']);
+    assert.ok(result.warnings.some((w) => /Google searches through Gemini aren't included in this key's free plan/.test(w)), result.warnings.join(' | '));
+    assert.ok(!result.warnings.some((w) => /daily limit/.test(w))); // the AI itself stays on for its other checks
+    assert.ok(result.leads.some((l) => l.name === 'Mike Pipe Fix'), logText);
   });
 });

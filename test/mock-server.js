@@ -330,6 +330,7 @@ export async function startMockServer(scenario = {}) {
       const search = Boolean(json.tools?.some((t) => t.google_search));
       requests.gemini.push({ model: ai[1], prompt, search, key: req.headers['x-goog-api-key'] });
       if (scenario.geminiStatus) return send(scenario.geminiStatus.status, 'application/json', scenario.geminiStatus.text || '{}');
+      if (search && scenario.geminiSearchStatus) return send(scenario.geminiSearchStatus.status, 'application/json', scenario.geminiSearchStatus.text || '{}');
       // "Search Google for: …": answer with the same results the search engines give, and their sites as sources.
       const googled = prompt.match(/^Search Google for: (.*)$/m);
       if (googled && !(scenario.gemini || []).some((r) => r.match.every((w) => prompt.includes(w)))) {
