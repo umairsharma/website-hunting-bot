@@ -240,6 +240,7 @@ function readBody(req) {
 export async function startMockServer(scenario = {}) {
   const requests = { overpass: [], maps: [], google: [], brave: [], braveApi: [], startpage: [], bing: [], ddg: [], discord: [], sites: [], gemini: [], geminiSearches: [] };
   let discordCalls = 0;
+  let searchCount = 0;
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://mock');
     const body = await readBody(req);
@@ -249,6 +250,10 @@ export async function startMockServer(scenario = {}) {
     };
     const html = (text, status = 200) => send(status, 'text/html; charset=utf-8', text);
     const p = url.pathname;
+    // scenario.searchDownAfter: every search engine starts blocking after this many searches in all
+    const isSearch = ['/google/search', '/brave/search', '/startpage/sp/search', '/bing/search', '/ddg/html/'].includes(p);
+    if (isSearch) searchCount += 1;
+    const down = () => scenario.searchDown || (scenario.searchDownAfter != null && searchCount > scenario.searchDownAfter);
 
     if (p === '/nominatim/search') return send(200, 'application/json', JSON.stringify(NOMINATIM));
     if (p === '/overpass/interpreter' && req.method === 'POST') {
@@ -272,7 +277,7 @@ export async function startMockServer(scenario = {}) {
     if (p === '/google/search') {
       const q = url.searchParams.get('q');
       requests.google.push(q);
-      if (scenario.searchDown || (scenario.googleBlockOn && q.includes(scenario.googleBlockOn))) {
+      if (down() || (scenario.googleBlockOn && q.includes(scenario.googleBlockOn))) {
         return send(302, 'text/plain', '', { Location: '/google/sorry/index?continue=search' });
       }
       return html(googleHtml(resultsFor(q, scenario)));
@@ -283,7 +288,7 @@ export async function startMockServer(scenario = {}) {
     if (p === '/brave/search') {
       const q = url.searchParams.get('q');
       requests.brave.push(q);
-      if (scenario.braveWebBlocked || scenario.searchDown || requests.brave.length <= (scenario.braveBlockFirst || 0)) {
+      if (scenario.braveWebBlocked || down() || requests.brave.length <= (scenario.braveBlockFirst || 0)) {
         return html(page('<p>Too many requests</p>'), 429);
       }
       return html(braveHtml(resultsFor(q, scenario)));
@@ -305,14 +310,14 @@ export async function startMockServer(scenario = {}) {
     if (p === '/bing/search') {
       const q = url.searchParams.get('q');
       requests.bing.push(q);
-      if (scenario.searchDown) return html(page('<div id="b_captcha">Verify you are human</div>'));
+      if (down()) return html(page('<div id="b_captcha">Verify you are human</div>'));
       if (scenario.bingEmptyFirst && requests.bing.length === 1) return html(bingHtml([]));
       return html(bingHtml(scenario.bingWorks ? resultsFor(q, scenario) : []));
     }
     if (p === '/ddg/html/') {
       const q = url.searchParams.get('q');
       requests.ddg.push(q);
-      if (scenario.searchDown) return html(page('<p>Unfortunately, bots use DuckDuckGo too.</p>'));
+      if (down()) return html(page('<p>Unfortunately, bots use DuckDuckGo too.</p>'));
       return html(ddgHtml(resultsFor(q, scenario)));
     }
     if (p === '/site') {

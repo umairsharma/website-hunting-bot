@@ -150,6 +150,7 @@ async function checkBusiness(biz, ctx) {
   const { cfg, ep, mapsPage, searcher, delay, warnings } = ctx;
   const notes = [];
   const aiCallsBefore = ctx.ai?.state.calls || 0;
+  const missed = []; // checks that couldn't run because every search engine was blocked at the time
   let maps = null;
   if (INSTITUTION_NAME.test(biz.name)) return { status: 'excluded', reason: 'part of a larger organisation (university, hospital, council…)' };
 
@@ -222,6 +223,7 @@ async function checkBusiness(biz, ctx) {
     if (!site && ctx.searchOn) {
       await sleep(delay());
       const byPhone = await searcher.find(`"${maps?.phone || biz.phone || phoneForCheck}"`);
+      if (!byPhone) missed.push('phone number search');
       if (byPhone) {
         allResults.push(...byPhone);
         site = await confirmByPhone(siteOrigins(byPhone), phoneForCheck);
@@ -278,6 +280,7 @@ async function checkBusiness(biz, ctx) {
   if (!facts.emails.length && found && cfg.findEmail && ctx.searchOn && !generic) {
     await sleep(delay());
     const results = await searcher.find([biz.searchName, town, 'email'].filter(Boolean).join(' '));
+    if (!results) missed.push('email search');
     if (results) {
       allResults.push(...results);
       addFacts({ emails: [emailFrom(results, biz)].filter(Boolean) });
@@ -312,6 +315,7 @@ async function checkBusiness(biz, ctx) {
       if (site || !ctx.searchOn) break;
       await sleep(delay());
       const results = await searcher.find(`"${other}"`);
+      if (!results) missed.push(`search for their other number ${other}`);
       if (results) {
         allResults.push(...results);
         site = await confirmNew(siteOrigins(results));
@@ -323,6 +327,7 @@ async function checkBusiness(biz, ctx) {
       await sleep(delay());
       const query = [...facts.emails.slice(0, 2).map((e) => `"${e}"`), ...streets.map((st) => `"${st}" ${town}`)].join(' OR ');
       const results = await searcher.find(query);
+      if (!results) missed.push('email/address search');
       if (results) {
         allResults.push(...results);
         site = await confirmNew(siteOrigins(results));
@@ -373,6 +378,7 @@ async function checkBusiness(biz, ctx) {
       if (a.confident) notes.push(`Check first: the AI thinks ${site.host} is their website${a.reason ? ` (${a.reason})` : ''}`);
     }
   }
+  if (missed.length) notes.unshift(`⚠️ Double-check: the search engines blocked the bot before the ${missed.join(', ')} could run`);
   const since = sinceFrom(allResults, biz);
   return {
     status: 'lead',
