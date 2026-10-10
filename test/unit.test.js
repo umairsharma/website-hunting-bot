@@ -799,3 +799,9 @@ test('Confirming a site: any of the numbers, emails or addresses the business is
   assert.deepEqual(await confirmSite(['https://b.example'], { streets: ['9 Old Jail Rd'], nameKeys: ['deltarooter'] }, fetchFn), { origin: 'https://b.example', by: 'their address and name are on it' });
   assert.equal(await confirmSite(['https://a.example'], { phones: ['0300 1111111'] }, fetchFn), null);
 });
+
+test('Menu and online-ordering pages are not the restaurant\'s own website', () => {
+  assert.equal(classifyUrl('https://places.singleplatform.com/johns-cafe/menu').kind, 'delivery');
+  assert.equal(classifyUrl('https://www.toasttab.com/johns-cafe-dallas').kind, 'delivery');
+  assert.equal(classifyUrl('https://johnscafedallas.com/').kind, 'website');
+});

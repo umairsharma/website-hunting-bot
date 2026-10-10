@@ -165,6 +165,8 @@ const DELIVERY = brandPattern([
   'foodpanda', 'ubereats', 'doordash', 'grubhub', 'deliveroo', 'talabat', 'zomato', 'swiggy', 'justeat', 'just-eat',
   'menulog', 'careem', 'cheetay', 'glovoapp', 'glovo', 'wolt', 'rappi', 'postmates', 'seamless', 'skipthedishes',
   'hungerstation', 'jahez', 'lieferando', 'thuisbezorgd', 'pedidosya', 'ifood', 'foodora', 'grab',
+  // Menu and online-ordering services: a menu page there, not the restaurant's own site
+  'singleplatform', 'toasttab', 'chownow', 'menufy', 'slicelife', 'beyondmenu', 'orderonline', 'clover',
 ]);
 const BOOKING = brandPattern([
   'booking', 'agoda', 'expedia', 'hotels', 'trivago', 'airbnb', 'kayak', 'makemytrip', 'goibibo', 'bookme',

@@ -664,3 +664,17 @@ test('Google through Gemini not in the free plan: searches use the other engines
     assert.ok(result.leads.some((l) => l.name === 'Mike Pipe Fix'), logText);
   });
 });
+
+test('Search engines blocked partway through a business: the lead says which checks could not run', { timeout: 180000 }, async () => {
+  await withServer({ searchDownAfter: 2 }, async (server) => {
+    const logs = [];
+    const result = await run({
+      config: { ...CONFIG, categories: ['plumber'], mapsDiscovery: true, phoneCheck: true, requireWebSearch: false },
+      dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m),
+    });
+    const logText = logs.join('\n');
+    assert.equal(result.error, null, logText);
+    const flagged = result.leads.filter((l) => l.notes.some((n) => /^⚠️ Double-check: the search engines blocked the bot before the .*phone number search/.test(n)));
+    assert.ok(flagged.length >= 1, `${logText}\n${JSON.stringify(result.leads.map((l) => [l.name, l.notes]))}`);
+  });
+});

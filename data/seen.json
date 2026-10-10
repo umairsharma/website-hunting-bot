@@ -1558,8 +1558,6 @@
   "gmaps/1236341056259808177": {"status":"lead","name":"Family Barbershop","checked":"2026-10-10","sameAs":"node/1961227794"},
   "node/10160953075": {"status":"lead","name":"Pretty Dolls Beauty Bar","checked":"2026-10-10"},
   "gmaps/14316353162345476487": {"status":"lead","name":"Pretty Dolls Beauty Bar","checked":"2026-10-10","sameAs":"node/10160953075"},
-  "node/10770039540": {"status":"has_website","name":"John's Cafe","checked":"2026-10-10","website":"places.singleplatform.com","layer":2},
-  "gmaps/8218913669154505056": {"status":"has_website","name":"John's Cafe","checked":"2026-10-10","website":"places.singleplatform.com","layer":2,"sameAs":"node/10770039540"},
   "node/13302281001": {"status":"has_website","name":"Starbucks","checked":"2026-10-10","website":"starbucks.com","layer":3},
   "gmaps/5103640559221627339": {"status":"has_website","name":"Starbucks","checked":"2026-10-10","website":"starbucks.com","layer":3,"sameAs":"node/13302281001"},
   "node/6883903285": {"status":"lead","name":"JC Junior Tire Shop","checked":"2026-10-10"},
