@@ -1,32 +1,34 @@
 {
-  "startedAt": "2026-10-10T10:07:59.544Z",
-  "finishedAt": "2026-10-10T10:25:42.071Z",
-  "minutes": 17.7,
-  "place": "Houston, United States",
-  "area": "Houston, Harris County, Texas, United States",
-  "candidates": 0,
-  "discovered": 19,
-  "mapsListed": 121,
+  "startedAt": "2026-10-10T10:46:55.340Z",
+  "finishedAt": "2026-10-10T11:28:26.646Z",
+  "minutes": 41.5,
+  "place": "Dallas, United States",
+  "area": "Dallas, Dallas County, Texas, United States",
+  "candidates": 965,
+  "discovered": 0,
+  "mapsListed": 0,
   "checked": 19,
-  "leads": 11,
-  "hasWebsite": 8,
+  "leads": 14,
+  "hasWebsite": 4,
   "closed": 0,
   "unverified": 0,
-  "pending": 0,
+  "pending": 929,
   "ai": {
-    "calls": 28,
-    "searches": 11,
+    "calls": 36,
+    "searches": 16,
     "off": null
   },
   "searchEngines": {
+    "gemini": "broken",
     "google": "broken",
     "brave": "blocked",
     "startpage": "blocked",
     "bing": "ok",
-    "duckduckgo": "untested"
+    "duckduckgo": "blocked"
   },
   "warnings": [
-    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
+    "Hit the time limit. The rest will be checked next run.",
+    "Web search: Google (via Gemini) didn't work, Google didn't work, Brave blocked the bot, Startpage blocked the bot, DuckDuckGo blocked the bot, so it used Bing."
   ],
   "error": null
 }
