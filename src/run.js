@@ -353,6 +353,12 @@ async function checkBusiness(biz, ctx) {
       const verdict = await aiSiteBelongs(ctx.ai, who, url, visibleText(html));
       return verdict?.belongs ? { how: `the AI read it: ${verdict.reason}` } : null;
     };
+    // The website a directory listing gives for them, when it doesn't show their phone, email or address:
+    // the AI reads it.
+    for (const url of facts.websites.slice(0, 2)) {
+      const v = await judge(url);
+      if (v?.how) return { status: 'has_website', layer: 3, website: hostOf(url), how: `their directory listing links to it; ${v.how}` };
+    }
     // Sites from the searches that mention their name (others can't be theirs, so aren't worth asking about).
     let asked = 0;
     for (const origin of found && !generic ? siteOrigins(allResults, 8) : []) {
@@ -378,6 +384,7 @@ async function checkBusiness(biz, ctx) {
       if (a.confident) notes.push(`Check first: the AI thinks ${site.host} is their website${a.reason ? ` (${a.reason})` : ''}`);
     }
   }
+  for (const url of facts.websites.slice(0, 2)) notes.push(`Check first: a directory listing gives ${hostOf(url)} as their website`);
   if (missed.length) notes.unshift(`⚠️ Double-check: the search engines blocked the bot before the ${missed.join(', ')} could run`);
   const since = sinceFrom(allResults, biz);
   return {
