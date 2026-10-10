@@ -7176,5 +7176,8 @@
    {"type":"way","id":1485128582,"center":{"lat":36.0834077,"lon":-95.8868253},"tags":{"addr:city":"Tulsa","addr:country":"US","addr:housenumber":"5620","addr:postcode":"74145","addr:state":"OK","addr:street":"South Memorial Drive East","amenity":"dentist","building":"retail","healthcare":"dentist","name":"Eddie Smith Family Dentistry"}},
    {"type":"way","id":1486907152,"center":{"lat":36.3058895,"lon":-96.4672506},"tags":{"amenity":"dentist","building":"yes","check_date":"2023-05-07","healthcare":"dentist","name":"Cleveland Dentistry"}},
    {"type":"way","id":1487839995,"center":{"lat":35.9585155,"lon":-95.3941052},"tags":{"addr:city":"Wagoner","addr:housenumber":"302","addr:postcode":"74467","addr:street":"South Hayes Avenue","amenity":"dentist","building":"retail","description":"Dr. Brandon Thorpe; Dr. Ariel Espinoza Thorpe; and Greater Oklahoma Orthodontics, Dr. Brittany Ellis, DMD, Orthodontics.","name":"Wagoner Family Dental","phone":"+1 918 485 3371"}}
+ ]},
+ "Atlanta|United States|0||no-chains|craft=roofer": {"fetched": "2026-10-10T06:52:29.685Z", "elements": [
+   {"type":"node","id":13547393565,"lat":33.8109852,"lon":-84.3581977,"tags":{"check_date":"2026-02-12","craft":"roofer","name":"Kelco Roofing"}}
  ]}
 }
