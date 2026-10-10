@@ -1,7 +1,7 @@
 // Extra details for a lead card, read from the search results the bot already has: where else the
 // business is listed, how long it's been around, and how active its social pages are.
 
-import { businessProfile, classifyUrl, compact, prettySite, siteMatchesBusiness } from './matching.js';
+import { businessProfile, classifyUrl, compact, namesMatch, prettySite, siteMatchesBusiness } from './matching.js';
 import { socialProfile } from './socials.js';
 
 // Names for the directories people know, so the card says "Yelp", not "yelp.com".
@@ -181,4 +181,51 @@ export function emailFromPage(html, biz, pageUrl) {
     || words.some((w) => compact(e).includes(w)));
   if (named) return named;
   return mailtos.length === 1 ? mailtos[0] : null;
+}
+
+/**
+ * What a directory listing page says about the business: { emails, phones, streets, websites }.
+ * Read from the page's structured data (schema.org JSON-LD, which Yelp, Yellow Pages, BBB and most others
+ * include) for the entry named like the business, plus its email as emailFromPage finds it. A listing can
+ * hold a different phone number or address than Google Maps (an old one, a mobile): each is one more
+ * way to find their website.
+ */
+export function factsFromPage(html, biz, pageUrl) {
+  const out = { emails: [], phones: [], streets: [], websites: [] };
+  const add = (list, v) => {
+    const value = String(v || '').trim();
+    if (value && !list.includes(value)) list.push(value);
+  };
+  const pageHost = classifyUrl(pageUrl)?.host || '';
+  const names = biz.names || [biz.name];
+  const entries = [];
+  const walk = (node) => {
+    if (Array.isArray(node)) return node.forEach(walk);
+    if (!node || typeof node !== 'object') return;
+    if (typeof node.name === 'string' && namesMatch(node.name, names)) entries.push(node);
+    for (const key of ['@graph', 'itemListElement', 'item', 'mainEntity']) if (node[key]) walk(node[key]);
+  };
+  for (const m of String(html).matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
+    try {
+      walk(JSON.parse(m[1]));
+    } catch {
+      // broken JSON on someone's page: skip it
+    }
+  }
+  for (const e of entries) {
+    for (const t of [e.telephone].flat()) if (String(t || '').replace(/\D/g, '').length >= 7) add(out.phones, t);
+    for (const em of [e.email].flat()) {
+      const email = String(em || '').toLowerCase().replace(/^mailto:/, '');
+      if (/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,12}$/.test(email) && !NOT_THEIR_EMAIL.test(email) && !email.endsWith(`@${pageHost}`)
+        && ['website', undefined].includes(classifyUrl(`https://${email.split('@')[1]}/`)?.kind)) add(out.emails, email);
+    }
+    for (const a of [e.address].flat()) add(out.streets, typeof a === 'string' ? a.split(',')[0] : a?.streetAddress);
+    for (const u of [e.url, e.sameAs].flat()) {
+      const site = u && classifyUrl(String(u));
+      if (site?.kind === 'website' && site.host !== pageHost && !pageHost.endsWith(`.${site.host}`)) add(out.websites, site.url);
+    }
+  }
+  const email = emailFromPage(html, biz, pageUrl);
+  if (email) add(out.emails, email);
+  return out;
 }

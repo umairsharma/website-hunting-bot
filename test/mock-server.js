@@ -140,7 +140,7 @@ const LISTING_RESULTS = [
 SITES['https://www.yellowpages.com.pk/delta-rooter'] = `<h1>Delta Rooter</h1><a class="email-business" href="mailto:DeltaRooter.Lhr@gmail.com?subject=Hi">Email Business</a>
   <p>Contact us: help@yellowpages.com.pk</p><div class="similar">Ace Drain: <a href="mailto:ace@acedrainco.example">email</a></div>`;
 const resultsFor = (q, scenario = {}) => {
-  const lists = [...(scenario.phoneSites ? PHONE_RESULTS : []), ...(scenario.addressSites ? ADDRESS_RESULTS : []), ...(scenario.listingEmail ? LISTING_RESULTS : []), ...RESULTS];
+  const lists = [...(scenario.results || []), ...(scenario.phoneSites ? PHONE_RESULTS : []), ...(scenario.addressSites ? ADDRESS_RESULTS : []), ...(scenario.listingEmail ? LISTING_RESULTS : []), ...RESULTS];
   return (lists.find((r) => q.includes(r.match)) || { results: [] }).results;
 };
 
@@ -238,7 +238,7 @@ function readBody(req) {
  *   bingEmptyFirst?: boolean (Bing's first page has no results), mapsSearchBlocked?: boolean }
  */
 export async function startMockServer(scenario = {}) {
-  const requests = { overpass: [], maps: [], google: [], brave: [], braveApi: [], startpage: [], bing: [], ddg: [], discord: [], sites: [] };
+  const requests = { overpass: [], maps: [], google: [], brave: [], braveApi: [], startpage: [], bing: [], ddg: [], discord: [], sites: [], gemini: [] };
   let discordCalls = 0;
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://mock');
@@ -254,16 +254,17 @@ export async function startMockServer(scenario = {}) {
     if (p === '/overpass/interpreter' && req.method === 'POST') {
       requests.overpass.push(new URLSearchParams(body).get('data'));
       if (scenario.overpassDown) return send(504, 'text/plain', 'Gateway Timeout');
-      return send(200, 'application/json', JSON.stringify({ elements: ELEMENTS }));
+      return send(200, 'application/json', JSON.stringify({ elements: [...ELEMENTS, ...(scenario.extraElements || [])] }));
     }
     if (p.startsWith('/maps/search/')) {
       const q = decodeURIComponent(p.slice('/maps/search/'.length).split('/@')[0]);
       requests.maps.push(q);
-      return html(mapsSearch(q, scenario));
+      const list = Object.entries(scenario.mapsLists || {}).find(([query]) => q.includes(query));
+      return html(list ? listPage(q, list[1]) : mapsSearch(q, scenario));
     }
     if (p.startsWith('/maps/place/')) {
       const slug = p.slice('/maps/place/'.length).split('/')[0];
-      let place = PLACES[slug] || PLACES_EXTRA[slug];
+      let place = PLACES[slug] || PLACES_EXTRA[slug] || scenario.places?.[slug];
       // scenario.bookingLinks: { slug: url } — a "booking link" on the listing instead of a Website button
       if (place && scenario.bookingLinks?.[slug]) place = { ...place, bookingLink: scenario.bookingLinks[slug] };
       return html(place ? renderLater(placeHtml(place)) : page('Not found'), place ? 200 : 404);
@@ -317,7 +318,24 @@ export async function startMockServer(scenario = {}) {
     if (p === '/site') {
       const target = url.searchParams.get('url');
       requests.sites.push(target);
-      return SITES[target] ? html(page(SITES[target])) : send(404, 'text/plain', 'not found');
+      const site = scenario.sites?.[target] ?? SITES[target];
+      return site ? html(page(site)) : send(404, 'text/plain', 'not found');
+    }
+    // Gemini: scenario.gemini is a list of { match: [words the question contains], reply: {…} }; the first
+    // that fits answers. scenario.geminiStatus: { status, text } answers every question with an error.
+    const ai = p.match(/^\/gemini\/v1beta\/models\/([^/:]+):generateContent$/);
+    if (ai && req.method === 'POST') {
+      const json = JSON.parse(body);
+      const prompt = json.contents[0].parts.map((x) => x.text).join('');
+      const search = Boolean(json.tools?.some((t) => t.google_search));
+      requests.gemini.push({ model: ai[1], prompt, search, key: req.headers['x-goog-api-key'] });
+      if (scenario.geminiStatus) return send(scenario.geminiStatus.status, 'application/json', scenario.geminiStatus.text || '{}');
+      const rule = (scenario.gemini || []).find((r) => r.match.every((w) => prompt.includes(w)));
+      const reply = rule ? rule.reply : search
+        ? { hasWebsite: false, url: null, confidence: 'high', reason: 'nothing of theirs on Google' }
+        : { match: null, belongs: false, confidence: 'low', reason: 'not sure' };
+      const text = `Here you go:\n\`\`\`json\n${JSON.stringify(reply)}\n\`\`\``;
+      return send(200, 'application/json', JSON.stringify({ candidates: [{ content: { parts: [{ text }] } }] }));
     }
     if (p === '/discord/webhook' && req.method === 'POST') {
       discordCalls += 1;

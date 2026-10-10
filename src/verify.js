@@ -112,24 +112,26 @@ const squash = (s) => String(s || '').toLowerCase().replace(/&amp;/g, '&').repla
 /**
  * The first of these sites that is clearly the business's: its homepage or contact page shows their phone
  * number or email, or their street address together with their name. Returns { origin, by } or null.
- * facts: { phone, email, street, nameKeys } (nameKeys: the name squashed, e.g. "leoshandcarwash").
+ * facts: { phone, email, street, nameKeys } (nameKeys: the name squashed, e.g. "leoshandcarwash"), plus
+ * phones, emails and streets: other numbers and addresses the business is listed with.
  */
 export async function confirmSite(origins, facts, fetchFn = fetchPage) {
-  const pattern = phonePattern(facts.phone);
-  const email = facts.email ? facts.email.toLowerCase() : null;
-  const street = facts.street ? squash(facts.street) : null;
+  const patterns = [facts.phone, ...(facts.phones || [])].map(phonePattern).filter(Boolean);
+  const emails = [...new Set([facts.email, ...(facts.emails || [])].filter(Boolean).map((e) => e.toLowerCase()))];
+  const streets = [...new Set([facts.street, ...(facts.streets || [])].map(squash).filter((x) => x.length >= 6))];
   const names = (facts.nameKeys || []).filter((k) => k.length >= 6);
-  if (!pattern && !email && !(street && names.length)) return null;
+  if (!patterns.length && !emails.length && !(streets.length && names.length)) return null;
   for (const origin of origins) {
     for (const path of ['/', '/contact', '/contact-us']) {
       const html = await fetchFn(`${origin}${path}`);
       if (html === null && path === '/') break; // site down or not a web page
       if (!html) continue;
-      if (pattern && pattern.test(html)) return { origin, by: 'their phone number is on it' };
-      if (email && html.toLowerCase().includes(email)) return { origin, by: 'their email is on it' };
-      if (street && names.length) {
+      if (patterns.some((p) => p.test(html))) return { origin, by: 'their phone number is on it' };
+      const lower = html.toLowerCase();
+      if (emails.some((e) => lower.includes(e))) return { origin, by: 'their email is on it' };
+      if (streets.length && names.length) {
         const text = squash(html);
-        if (text.includes(street) && names.some((k) => text.includes(k))) return { origin, by: 'their address and name are on it' };
+        if (streets.some((st) => text.includes(st)) && names.some((k) => text.includes(k))) return { origin, by: 'their address and name are on it' };
       }
     }
   }

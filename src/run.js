@@ -6,14 +6,15 @@ import { launchBrowser } from './browser.js';
 import { checkMaps, mapsSelfTest } from './maps.js';
 import { discoverOnMaps, toCandidate } from './discover.js';
 import { createSearcher, engineLabel, ENGINE_NAMES } from './search.js';
-import { analyzeResults, classifyUrl, compact, hostOf, prettySite, toWhatsApp } from './matching.js';
+import { analyzeResults, classifyUrl, compact, hostOf, prettySite, siteMatchesBusiness, toWhatsApp } from './matching.js';
 import { buildMessages, sendMessages } from './discord.js';
 import { appendLead, loadState, saveState, writeLastRun, writeRunLeads } from './storage.js';
 import { leadsText } from './share.js';
 import { findSocials, orderSocials, socialProfile } from './socials.js';
 import { FREE_MAIL, confirmByPhone, confirmSite, fetchPage, phonePattern, siteOrigins, streetOf } from './verify.js';
 import { loadRecheck, recheckCandidate, saveRecheck } from './recheck.js';
-import { emailFrom, emailFromPage, listingsFrom, sinceFrom, socialActivityFrom } from './details.js';
+import { emailFrom, factsFromPage, listingsFrom, sinceFrom, socialActivityFrom } from './details.js';
+import { aiFindWebsite, aiPickListing, aiSiteBelongs, createAi, visibleText } from './ai.js';
 import { endpoints, randomDelayMs, sleep, today } from './util.js';
 
 const KNOWN_ENGINES = ENGINE_NAMES; // google, brave, startpage, bing, duckduckgo
@@ -35,6 +36,9 @@ const DEFAULTS = {
   recheck: false, // recheck earlier leads (data/recheck.json) instead of finding new ones
   phoneCheck: true, // a site with the business's phone number on it is theirs, whatever its name
   findEmail: true, // look for each lead's email (one more search when the others didn't show it)
+  ai: true, // Gemini double-checks Maps listings and websites (needs GEMINI_API_KEY; skipped without it)
+  aiMaxCalls: 100, // AI questions per run at most (the free tier allows about 250 a day)
+  aiMinIntervalMs: 6500, // the free tier allows 10 questions a minute
   mapsSearch: [], // extra Google Maps searches, e.g. ['roofers'] (the Run workflow form's "any business type" box)
   delaySeconds: [4, 9],
   postSummaryWhenEmpty: true,
@@ -61,6 +65,7 @@ export function normalizeConfig(raw = {}) {
   cfg.findSocials = cfg.findSocials !== false;
   cfg.phoneCheck = cfg.phoneCheck !== false;
   cfg.findEmail = cfg.findEmail !== false;
+  cfg.ai = cfg.ai !== false;
   cfg.recheck = cfg.recheck === true;
   if (cfg.recheck) {
     // Earlier leads come from many cities; each keeps its own city and country.
@@ -122,9 +127,29 @@ async function findSocialPages(biz, known, address, ctx) {
 // Only clear signs: "County Line BBQ" or "State of Grace" are real small businesses.
 export const INSTITUTION_NAME = /\b(university|school of|school district|isd|hospital|health system|department of|dept\.? of|city of|police department|fire department|public library|embassy|consulate)\b/i;
 
+/**
+ * Google Maps showed other names for the search (a longer name, the owner's name…): the AI says which, if
+ * any, is this business, and that listing is read instead.
+ */
+async function aiMatchListing(biz, maps, ctx) {
+  const options = maps.shown
+    ? [{ label: maps.shown.title, detail: [maps.shown.category, maps.shown.address].filter(Boolean).join(', ') }]
+    : (maps.candidates || []).map((c) => ({ label: c.label }));
+  if (!options.length) return maps;
+  const who = { name: biz.name, category: biz.categoryLabel, address: biz.address, city: biz.city || ctx.cfg.city, country: ctx.cfg.country, phones: biz.phone ? [biz.phone] : [] };
+  const i = await aiPickListing(ctx.ai, who, options);
+  if (i === null) return maps;
+  ctx.log(`   🤖 AI: it's on Google Maps as "${options[i].label}"`);
+  if (maps.shown) return { status: 'found', ...maps.shown };
+  const again = await checkMaps(ctx.mapsPage, { ...biz, placeUrl: maps.candidates[i].href, names: [...(biz.names || [biz.name]), options[i].label] }, { mapsBase: ctx.ep.maps });
+  await sleep(ctx.delay());
+  return again.status === 'found' ? again : maps;
+}
+
 async function checkBusiness(biz, ctx) {
   const { cfg, ep, mapsPage, searcher, delay, warnings } = ctx;
   const notes = [];
+  const aiCallsBefore = ctx.ai?.state.calls || 0;
   let maps = null;
   if (INSTITUTION_NAME.test(biz.name)) return { status: 'excluded', reason: 'part of a larger organisation (university, hospital, council…)' };
 
@@ -143,6 +168,7 @@ async function checkBusiness(biz, ctx) {
       return { status: 'unverified', reason: `Google Maps: ${maps.reason}` };
     } else {
       await sleep(delay());
+      if (maps.status === 'not_found' && ctx.ai?.enabled) maps = await aiMatchListing(biz, maps, ctx);
     }
   }
 
@@ -217,57 +243,135 @@ async function checkBusiness(biz, ctx) {
     socials.push(...extra.urls);
     allResults.push(...extra.results);
   }
-  // Their email: from what the searches so far turned up, then their listing pages on directories
-  // (opening a page isn't a search, so it doesn't use up the search engines), else one search for it.
-  let email = biz.email || emailFrom(allResults, biz);
-  if (!email && found && cfg.findEmail && !generic) {
-    for (const listing of listingsFrom(allResults, biz).slice(0, 4)) {
-      const html = await fetchPage(listing.url, { timeoutMs: 8000 });
-      email = html ? emailFromPage(html, biz, listing.url) : null;
-      if (email) {
-        ctx.log(`   ✉️ Email on their ${listing.name} listing`);
-        break;
+  // ── What their listings say: every phone number, email and street address they go by ──
+  // Directory pages (Yelp, Yellow Pages, BBB…) can list another number or address than Google Maps, and
+  // often their email. Opening a page isn't a search, so it doesn't use up the search engines.
+  const town = townOf(biz, maps?.address || biz.address);
+  const facts = { phones: [], emails: [], streets: [], websites: [] };
+  const digitsOf = (p) => String(p).replace(/\D/g, '').slice(-10);
+  const addFacts = (f, from) => {
+    const added = [];
+    for (const k of Object.keys(facts)) {
+      for (const v of f[k] || []) {
+        const dup = k === 'phones' ? facts.phones.some((x) => digitsOf(x) === digitsOf(v)) : facts[k].some((x) => x.toLowerCase() === v.toLowerCase());
+        if (v && !dup) {
+          facts[k].push(v);
+          added.push(k);
+        }
       }
     }
-  }
-  if (!email && found && cfg.findEmail && ctx.searchOn && !generic) {
+    if (from && added.length) ctx.log(`   📇 Their ${from} listing: ${[...new Set(added)].map((k) => ({ phones: 'phone', emails: 'email', streets: 'address', websites: 'website' }[k])).join(', ')}`);
+  };
+  addFacts({
+    phones: [maps?.phone || maps?.phoneTel, biz.phone].filter(Boolean),
+    emails: [biz.email, emailFrom(allResults, biz)].filter(Boolean),
+    streets: [streetOf(maps?.address), streetOf(biz.address)].filter(Boolean),
+  });
+  const readListings = async (results, max) => {
+    for (const listing of listingsFrom(results, biz).slice(0, max)) {
+      const html = await fetchPage(listing.url, { timeoutMs: 8000 });
+      if (html) addFacts(factsFromPage(html, biz, listing.url), listing.name);
+    }
+  };
+  if (found && (cfg.findEmail || cfg.phoneCheck) && !generic) await readListings(allResults, 4);
+  // No email yet: one search for it (and the listing pages that brings up).
+  if (!facts.emails.length && found && cfg.findEmail && ctx.searchOn && !generic) {
     await sleep(delay());
-    const results = await searcher.find([biz.searchName, townOf(biz, maps?.address || biz.address), 'email'].filter(Boolean).join(' '));
+    const results = await searcher.find([biz.searchName, town, 'email'].filter(Boolean).join(' '));
     if (results) {
       allResults.push(...results);
-      email = emailFrom(results, biz);
-      // …and the listing pages that search brought up
-      for (const listing of email ? [] : listingsFrom(results, biz).slice(0, 3)) {
-        const html = await fetchPage(listing.url, { timeoutMs: 8000 });
-        email = html ? emailFromPage(html, biz, listing.url) : null;
-        if (email) break;
-      }
+      addFacts({ emails: [emailFrom(results, biz)].filter(Boolean) });
+      if (!facts.emails.length) await readListings(results, 3);
     }
   }
+  const email = cfg.findEmail ? facts.emails[0] || null : biz.email || null;
   if (email && !biz.email) ctx.log(`   ✉️ Email: ${email}`);
+  const otherPhones = facts.phones.filter((p) => digitsOf(p) !== digitsOf(phoneForCheck || ''));
+  if (otherPhones.length) notes.push(`Also listed with phone ${otherPhones.slice(0, 2).join(', ')}`);
 
-  // Last check before calling it a lead: a website found through their email or street address.
-  //  - info@joesplumbing.com: joesplumbing.com is likely their site, so open it.
-  //  - search for the email and the street address; a site showing their phone, email, or address and
-  //    name is theirs (same rule as the phone check, so a directory or someone else's site never counts).
-  const street = streetOf(maps?.address || biz.address);
-  if (found && cfg.phoneCheck && (email || street)) {
-    const facts = { phone: phoneForCheck, email, street, nameKeys: biz.profile?.keys || [] };
-    const domain = email && !FREE_MAIL.test(email) ? email.split('@')[1] : null;
-    let site = null;
-    if (domain && classifyUrl(`https://${domain}/`)?.kind === 'website') {
-      site = await confirmSite([`https://${domain}`], { ...facts, nameKeys: [...facts.nameKeys, ...(biz.profile?.tokenSets || []).map((t) => t.join(''))] });
-    }
-    if (!site && ctx.searchOn) {
+  // Last checks before calling it a lead: a website found through any of their phone numbers, emails or
+  // street addresses. A site counts when it shows one of their numbers or emails, or their address and
+  // name (same rule as the phone check, so a directory or someone else's site never counts).
+  const allFacts = {
+    phone: phoneForCheck, phones: facts.phones, emails: facts.emails, streets: facts.streets, nameKeys: biz.profile?.keys || [],
+  };
+  const tried = new Set();
+  const confirmNew = async (origins, more = {}) => {
+    const fresh = origins.filter((o) => !tried.has(o));
+    fresh.forEach((o) => tried.add(o));
+    return fresh.length ? confirmSite(fresh, { ...allFacts, ...more }) : null;
+  };
+  if (found && cfg.phoneCheck) {
+    // The website their listing links to, and info@joesplumbing.com → joesplumbing.com.
+    const named = { nameKeys: [...allFacts.nameKeys, ...(biz.profile?.tokenSets || []).map((t) => t.join(''))] };
+    const domains = facts.emails.filter((e) => !FREE_MAIL.test(e)).map((e) => `https://${e.split('@')[1]}/`)
+      .filter((u) => classifyUrl(u)?.kind === 'website');
+    let site = await confirmNew([...facts.websites, ...domains].map((u) => new URL(u).origin), named);
+    // Each other phone number they're listed with gets its own search…
+    for (const other of otherPhones.slice(0, 2)) {
+      if (site || !ctx.searchOn) break;
       await sleep(delay());
-      const query = [email && `"${email}"`, street && `"${street}" ${townOf(biz, maps?.address || biz.address)}`].filter(Boolean).join(' OR ');
+      const results = await searcher.find(`"${other}"`);
+      if (results) {
+        allResults.push(...results);
+        site = await confirmNew(siteOrigins(results));
+      }
+    }
+    // …and their emails and street addresses one more.
+    const streets = facts.streets.slice(0, 2);
+    if (!site && ctx.searchOn && (facts.emails.length || streets.length)) {
+      await sleep(delay());
+      const query = [...facts.emails.slice(0, 2).map((e) => `"${e}"`), ...streets.map((st) => `"${st}" ${town}`)].join(' OR ');
       const results = await searcher.find(query);
       if (results) {
         allResults.push(...results);
-        site = await confirmSite(siteOrigins(results), facts);
+        site = await confirmNew(siteOrigins(results));
       }
     }
     if (site) return { status: 'has_website', layer: 3, website: hostOf(site.origin), how: site.by };
+  }
+
+  // ── AI (Gemini): does any site that came up belong to them? Then it searches Google itself. ──
+  if (ctx.ai?.enabled) {
+    const who = {
+      name: biz.name, category: maps?.category || biz.categoryLabel, address: maps?.address || biz.address,
+      city: town, country: cfg.country, phones: facts.phones, emails: facts.emails,
+    };
+    const words = [...(biz.profile?.tokenSets || []).flat(), ...(biz.profile?.keys || [])].filter((w) => w.length >= 4);
+    // Is the site at this address theirs? { how } yes, { unreachable } couldn't open it, null no.
+    const judge = async (url) => {
+      const origin = new URL(url).origin;
+      const html = await fetchPage(url, { timeoutMs: 10000 }) || (url !== `${origin}/` ? await fetchPage(origin, { timeoutMs: 10000 }) : null);
+      if (!html) return { unreachable: true };
+      const byFacts = await confirmSite([origin], allFacts);
+      if (byFacts) return { how: byFacts.by };
+      const verdict = await aiSiteBelongs(ctx.ai, who, url, visibleText(html));
+      return verdict?.belongs ? { how: `the AI read it: ${verdict.reason}` } : null;
+    };
+    // Sites from the searches that mention their name (others can't be theirs, so aren't worth asking about).
+    let asked = 0;
+    for (const origin of found && !generic ? siteOrigins(allResults, 8) : []) {
+      if (asked >= 3 || !ctx.ai.enabled) break;
+      const html = await fetchPage(origin, { timeoutMs: 8000 });
+      const text = html ? visibleText(html, 30000) : '';
+      const squashed = compact(text);
+      if (!words.some((w) => squashed.includes(w))) continue;
+      asked += 1;
+      const verdict = await aiSiteBelongs(ctx.ai, who, origin, text);
+      if (verdict?.belongs) return { status: 'has_website', layer: 3, website: hostOf(origin), how: `the AI read it: ${verdict.reason}` };
+    }
+    const a = await aiFindWebsite(ctx.ai, who);
+    if (a) ctx.log(`   🤖 AI on Google: ${a.hasWebsite ? `website ${a.url || '(no link given)'}` : 'no website'}${a.reason ? ` · ${a.reason}` : ''}`);
+    const site = a?.hasWebsite && a.url ? classifyUrl(a.url) : null;
+    if (site?.kind === 'website') {
+      const v = await judge(site.url);
+      if (v?.how) return { status: 'has_website', layer: 3, website: site.host, how: `the AI found it on Google; ${v.how}` };
+      // A site that won't open (down, or blocking bots), named after them, that the AI is sure about.
+      if (v?.unreachable && a.high && siteMatchesBusiness(site.siteKey, biz.profile, '')) {
+        return { status: 'has_website', layer: 3, website: site.host, how: 'the AI found it on Google (named after them)' };
+      }
+      if (a.confident) notes.push(`Check first: the AI thinks ${site.host} is their website${a.reason ? ` (${a.reason})` : ''}`);
+    }
   }
   const since = sinceFrom(allResults, biz);
   return {
@@ -292,7 +396,7 @@ async function checkBusiness(biz, ctx) {
       category: maps?.category || null, // Google's category, e.g. "Hair salon"
       hours: maps?.hours || (biz.openingHours ? { status: null, days: [], text: biz.openingHours } : null),
       notes,
-      checks: `Checked: OpenStreetMap ✓ · Google Maps ${maps ? '✓' : '✗'} · ${found ? `${engineLabel(found.engine)} ✓` : 'web search ✗'}`,
+      checks: `Checked: OpenStreetMap ✓ · Google Maps ${maps ? '✓' : '✗'} · ${found ? `${engineLabel(found.engine)} ✓` : 'web search ✗'}${ctx.ai ? ` · AI ${ctx.ai.state.calls > aiCallsBefore ? '✓' : '✗'}` : ''}`,
       city: biz.city || cfg.city,
       osmUrl: biz.osmUrl,
       foundOn: today(),
@@ -404,7 +508,11 @@ async function checkQueue(ctx) {
     searcher = createSearcher({
       page: searchPage, order: cfg.searchEngines, ep, delay, log, deadline, cooldownMs: cfg.searchCooldownMinutes * 60000,
     });
-    const session = { ...ctx, mapsPage, searcher, delay, mapsOn: true, searchOn: true };
+    const ai = cfg.ai ? createAi({ log, maxCalls: cfg.aiMaxCalls, minIntervalMs: cfg.aiMinIntervalMs }) : null;
+    if (ai && !ai.enabled) warnings.push('GEMINI_API_KEY is not set, so the AI checks were skipped this run.');
+    else if (ai) log('🤖 AI checks on (Gemini)');
+    const session = { ...ctx, mapsPage, searcher, delay, mapsOn: true, searchOn: true, ai: ai?.enabled ? ai : null };
+    if (ai) ctx.stats.ai = ai.state; // questions asked, and why the AI stopped (if it did)
 
     if (cfg.selfTest) {
       log('🔧 Google Maps self-test…');
@@ -581,6 +689,8 @@ export async function run({ config, dataDir, dryRun = false, webhookUrl = proces
   }
 
   if (searcher) warnings.push(...engineWarnings(searcher.state));
+  const aiState = stats.ai;
+  if (aiState?.off && aiState.calls) warnings.push(`AI (Gemini): ${aiState.off}, so the rest were checked without it.`);
   const finishedAt = new Date();
   const summary = {
     startedAt: startedAt.toISOString(),
