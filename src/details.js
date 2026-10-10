@@ -156,3 +156,29 @@ export function emailFrom(results, biz) {
   const own = found.find((e) => siteMatchesBusiness(classifyUrl(`https://${e.split('@')[1]}/`)?.siteKey, profile));
   return own || found[0];
 }
+
+/**
+ * The business's email on one of its directory listing pages (Yellow Pages' "Email Business" link, Manta,
+ * Chamber of Commerce…). A listing page also shows other businesses and the directory's own address, so an
+ * email counts only if it's on a domain named after the business, has a word of their name in it, or is
+ * the page's only email link that isn't the directory's.
+ */
+export function emailFromPage(html, biz, pageUrl) {
+  const profile = biz.profile || businessProfile(biz.names || [biz.name], biz.city);
+  const pageHost = classifyUrl(pageUrl)?.host || '';
+  const clean = (raw) => decodeURIComponent(raw).toLowerCase().replace(/^mailto:/, '').split('?')[0].replace(/[.]+$/, '');
+  const ok = (email) => {
+    if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,12}$/.test(email) || NOT_THEIR_EMAIL.test(email)) return false;
+    const domain = email.split('@')[1];
+    if (pageHost && (domain === pageHost || pageHost.endsWith(`.${domain}`) || domain.endsWith(`.${pageHost}`))) return false;
+    const site = classifyUrl(`https://${domain}/`);
+    return !site || site.kind === 'website';
+  };
+  const mailtos = [...new Set([...String(html).matchAll(/href=["']mailto:([^"'>\s]+)/gi)].map((m) => clean(m[1])).filter(ok))];
+  const all = [...new Set([...mailtos, ...(String(html).match(EMAIL) || []).map(clean).filter(ok)])];
+  const words = [...profile.keys, ...profile.tokenSets.flat()].filter((w) => w.length >= 4);
+  const named = all.find((e) => siteMatchesBusiness(classifyUrl(`https://${e.split('@')[1]}/`)?.siteKey, profile)
+    || words.some((w) => compact(e).includes(w)));
+  if (named) return named;
+  return mailtos.length === 1 ? mailtos[0] : null;
+}

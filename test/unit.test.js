@@ -16,7 +16,7 @@ import { shortMapsUrl } from '../src/maps.js';
 import { MAX_LINK, hoursText, leadShareLink, leadText, leadsText, shareText } from '../src/share.js';
 import { findSocials, orderSocials, socialLabel, socialProfile } from '../src/socials.js';
 import { FREE_MAIL, confirmByPhone, confirmSite, fetchPage, phonePattern, siteOrigins, streetOf } from '../src/verify.js';
-import { activityFor, emailFrom, listingsFrom, sinceFrom, socialActivityFrom } from '../src/details.js';
+import { activityFor, emailFrom, emailFromPage, listingsFrom, sinceFrom, socialActivityFrom } from '../src/details.js';
 import { buildRecheckList, recheckCandidate } from '../src/recheck.js';
 import { INSTITUTION_NAME, normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
@@ -736,4 +736,15 @@ test('Confirming a site by email or address: only with their phone, email, or ad
   assert.deepEqual(await confirmSite(['https://b.example', 'https://a.example'], facts, fetchFn), { origin: 'https://a.example', by: 'their address and name are on it' });
   assert.deepEqual(await confirmSite(['https://c.example'], facts, fetchFn), { origin: 'https://c.example', by: 'their email is on it' });
   assert.equal(await confirmSite(['https://b.example'], facts, fetchFn), null);
+});
+
+test('Email on a listing page: theirs by name or as the only email link; never the directory\'s', () => {
+  const joe = { name: "Joe's Plumbing", names: ["Joe's Plumbing"], city: 'Tulsa' };
+  const yp = 'https://www.yellowpages.com/tulsa-ok/mip/joes-plumbing-123';
+  assert.equal(emailFromPage('<a href="mailto:office@joesplumbingtulsa.com">Email</a> <a href="mailto:bob@bobsroofing.com">x</a>', joe, yp), 'office@joesplumbingtulsa.com');
+  assert.equal(emailFromPage('<a href="mailto:tulsaplumb88@gmail.com">Email Business</a> help@yellowpages.com', joe, yp), 'tulsaplumb88@gmail.com');
+  // Two unrelated email links: can't tell which is theirs
+  assert.equal(emailFromPage('<a href="mailto:a1@gmail.com">x</a><a href="mailto:b2@gmail.com">y</a>', joe, yp), null);
+  // Only the directory's own address
+  assert.equal(emailFromPage('<a href="mailto:support@yellowpages.com">Help</a> info@yellowpages.com', joe, yp), null);
 });

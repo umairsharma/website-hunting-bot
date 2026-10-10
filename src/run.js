@@ -11,9 +11,9 @@ import { buildMessages, sendMessages } from './discord.js';
 import { appendLead, loadState, saveState, writeLastRun, writeRunLeads } from './storage.js';
 import { leadsText } from './share.js';
 import { findSocials, orderSocials, socialProfile } from './socials.js';
-import { FREE_MAIL, confirmByPhone, confirmSite, phonePattern, siteOrigins, streetOf } from './verify.js';
+import { FREE_MAIL, confirmByPhone, confirmSite, fetchPage, phonePattern, siteOrigins, streetOf } from './verify.js';
 import { loadRecheck, recheckCandidate, saveRecheck } from './recheck.js';
-import { emailFrom, listingsFrom, sinceFrom, socialActivityFrom } from './details.js';
+import { emailFrom, emailFromPage, listingsFrom, sinceFrom, socialActivityFrom } from './details.js';
 import { endpoints, randomDelayMs, sleep, today } from './util.js';
 
 const KNOWN_ENGINES = ENGINE_NAMES; // google, brave, startpage, bing, duckduckgo
@@ -217,14 +217,31 @@ async function checkBusiness(biz, ctx) {
     socials.push(...extra.urls);
     allResults.push(...extra.results);
   }
-  // Their email: from what the searches so far turned up, else one search for it.
+  // Their email: from what the searches so far turned up, then their listing pages on directories
+  // (opening a page isn't a search, so it doesn't use up the search engines), else one search for it.
   let email = biz.email || emailFrom(allResults, biz);
+  if (!email && found && cfg.findEmail && !generic) {
+    for (const listing of listingsFrom(allResults, biz).slice(0, 4)) {
+      const html = await fetchPage(listing.url, { timeoutMs: 8000 });
+      email = html ? emailFromPage(html, biz, listing.url) : null;
+      if (email) {
+        ctx.log(`   ✉️ Email on their ${listing.name} listing`);
+        break;
+      }
+    }
+  }
   if (!email && found && cfg.findEmail && ctx.searchOn && !generic) {
     await sleep(delay());
     const results = await searcher.find([biz.searchName, townOf(biz, maps?.address || biz.address), 'email'].filter(Boolean).join(' '));
     if (results) {
       allResults.push(...results);
       email = emailFrom(results, biz);
+      // …and the listing pages that search brought up
+      for (const listing of email ? [] : listingsFrom(results, biz).slice(0, 3)) {
+        const html = await fetchPage(listing.url, { timeoutMs: 8000 });
+        email = html ? emailFromPage(html, biz, listing.url) : null;
+        if (email) break;
+      }
     }
   }
   if (email && !biz.email) ctx.log(`   ✉️ Email: ${email}`);
