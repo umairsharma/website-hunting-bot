@@ -5,9 +5,9 @@
 
 import { sleep } from './util.js';
 
-const DEFAULT_MODEL = 'gemini-2.5-flash'; // free tier includes Google Search grounding on this model
-// Tried in turn if Google retires the one before (HTTP 404).
-const FALLBACK_MODELS = ['gemini-3.1-flash-lite', 'gemini-3.6-flash'];
+const DEFAULT_MODEL = 'gemini-3.1-flash-lite'; // gemini-2.5-flash is no longer available on the API
+// Tried in turn if Google retires the one before (HTTP 404), or a key's free plan doesn't include it.
+const FALLBACK_MODELS = ['gemini-3.6-flash', 'gemini-2.5-flash'];
 
 /** The first JSON object in a model reply (which may wrap it in ```json fences or a sentence). */
 export function parseJson(text) {
@@ -32,10 +32,11 @@ export function createAi({
   apiKey = process.env.GEMINI_API_KEY, base = process.env.GEMINI_BASE_URL || 'https://generativelanguage.googleapis.com',
   model = DEFAULT_MODEL, maxCalls = 100, log = () => {}, timeoutMs = 60000, retryWaitMs = 20000, minIntervalMs = 6500,
 } = {}) {
-  const state = { calls: 0, searches: 0, off: apiKey ? null : 'no GEMINI_API_KEY' };
+  const state = { calls: 0, searches: 0, off: apiKey ? null : 'no GEMINI_API_KEY', searchOff: null };
   let last = 0; // the free tier allows 10 questions a minute: keep them at least minIntervalMs apart
 
   const models = [...new Set([model, ...FALLBACK_MODELS])];
+  const searchModels = [...models]; // Google searches have their own quota, which can differ by model
   let failures = 0;
   const failed = (why) => {
     // Say why an answer didn't come (the first few times), so a broken setup shows in the log.
@@ -50,7 +51,7 @@ export function createAi({
       generationConfig: { temperature: 0, ...(search ? {} : { responseMimeType: 'application/json' }) },
       ...(search ? { tools: [{ google_search: {} }] } : {}),
     };
-    const res = await fetch(`${base}/v1beta/models/${models[0]}:generateContent`, {
+    const res = await fetch(`${base}/v1beta/models/${search ? searchModels[0] : models[0]}:generateContent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
       body: JSON.stringify(body),
@@ -62,7 +63,7 @@ export function createAi({
 
   /** { text, sources } of the model's reply (sources: the Google results it used), or null. */
   async function askText(prompt, { search = false } = {}) {
-    if (state.off) return null;
+    if (state.off || (search && state.searchOff)) return null;
     if (state.calls >= maxCalls) {
       state.off = `the per-run limit of ${maxCalls} AI questions was reached`;
       return null;
@@ -77,20 +78,48 @@ export function createAi({
         last = Date.now();
         r = await request(prompt, search);
         // A model Google has retired (or not on this key): the next one.
-        if (r.status === 404 && models.length > 1) {
-          log(`   🤖 Gemini model ${models[0]} isn't available, using ${models[1]}`);
-          models.shift();
+        const list = search ? searchModels : models;
+        if (r.status === 404 && list.length > 1) {
+          log(`   🤖 Gemini model ${list[0]} isn't available, using ${list[1]}`);
+          const gone = list.shift();
+          if (!search && searchModels[0] === gone && searchModels.length > 1) searchModels.shift();
           attempt -= 1;
           continue;
         }
-        if (r.status !== 429 && r.status < 500) break;
-        // The daily quota is used up: no point asking again today.
-        if (r.status === 429 && /per ?day/i.test(r.text)) {
-          state.off = "Gemini's free daily limit was reached";
-          log(`   🤖 ${state.off}; carrying on without the AI`);
-          return null;
+        if (r.status === 429) {
+          const noFreeQuota = /limit:\s*0\b/.test(r.text); // not in this key's free plan at all
+          const daily = /per ?day/i.test(r.text);
+          const detail = r.text.replace(/\s+/g, ' ').match(/"message":\s*"([^"]{0,300})/)?.[1] || r.text.slice(0, 300);
+          // Google searches have their own quota: when it's gone, the AI still answers everything else.
+          if (search && noFreeQuota && searchModels.length > 1) {
+            log(`   🤖 Google searches through ${searchModels[0]} aren't in this key's free plan, trying ${searchModels[1]}`);
+            searchModels.shift();
+            attempt -= 1;
+            continue;
+          }
+          if (search && (noFreeQuota || daily || attempt >= 1)) {
+            state.searchOff = noFreeQuota ? "Google searches through Gemini aren't included in this key's free plan"
+              : daily ? "today's free Google searches through Gemini are used up" : 'Gemini kept refusing Google searches (over its quota)';
+            log(`   🤖 ${state.searchOff}; searching with the other engines instead. Gemini said: ${detail}`);
+            return null;
+          }
+          if (noFreeQuota && models.length > 1) {
+            log(`   🤖 Gemini model ${models[0]} has no free quota on this key, using ${models[1]}`);
+            models.shift();
+            attempt -= 1;
+            continue;
+          }
+          if (daily || noFreeQuota) {
+            state.off = "Gemini's free daily limit was reached";
+            log(`   🤖 ${state.off}; carrying on without the AI. Gemini said: ${detail}`);
+            return null;
+          }
+        } else if (r.status < 500) {
+          break;
         }
-        if (attempt < 2) await sleep(retryWaitMs); // per-minute limit or a busy server: wait, then ask again
+        // Per-minute limit or a busy server: wait as long as Gemini asks (or 20 s), then ask again.
+        const asked = Number(r.text.match(/"retryDelay":\s*"(\d+)/)?.[1]);
+        if (attempt < 2) await sleep(asked > 0 && asked <= 60 ? asked * 1000 + 500 : retryWaitMs);
       }
       if (r.status === 400 || r.status === 401 || r.status === 403) {
         state.off = `Gemini refused the request (HTTP ${r.status}: ${r.text.slice(0, 160).replace(/\s+/g, ' ')}). Check the GEMINI_API_KEY secret`;
@@ -204,13 +233,13 @@ Reply with JSON only: {"hasWebsite": true|false, "url": "<their website, or null
  * { error, fatal? }. Only pages on sites Google actually returned are kept, so a made-up address never counts.
  */
 export async function aiGoogleSearch(ai, query) {
-  if (!ai?.enabled) return { error: ai?.state.off || 'the AI is off', fatal: true };
+  if (!ai?.enabled || ai.state.searchOff) return { error: ai?.state.searchOff || ai?.state.off || 'the AI is off', fatal: true };
   const r = await ai.askText(`Search Google for: ${query}
 
 List the results Google shows for this search (up to 10), in order: each page's full address, its title,
 and the text shown under it. Only list pages the search actually returned; never make an address up.
 Reply with JSON only: {"results": [{"url": "https://…", "title": "…", "snippet": "…"}]}`, { search: true });
-  if (!r) return ai.enabled ? { error: 'Gemini gave no answer' } : { error: ai.state.off, fatal: true };
+  if (!r) return ai.enabled && !ai.state.searchOff ? { error: 'Gemini gave no answer' } : { error: ai.state.searchOff || ai.state.off, fatal: true };
   const bare = (h) => String(h || '').toLowerCase().replace(/^www\./, '');
   // The sites Google returned (Gemini names each source by its domain).
   const hosts = [...new Set(r.sources.map((s) => bare(s.title)).filter((h) => /^[a-z0-9.-]+\.[a-z]{2,}$/.test(h)))];

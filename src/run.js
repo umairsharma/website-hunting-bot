@@ -692,6 +692,7 @@ export async function run({ config, dataDir, dryRun = false, webhookUrl = proces
   if (searcher) warnings.push(...engineWarnings(searcher.state));
   const aiState = stats.ai;
   if (aiState?.off && aiState.calls) warnings.push(`AI (Gemini): ${aiState.off}, so the rest were checked without it.`);
+  if (aiState?.searchOff && !aiState.off) warnings.push(`AI (Gemini): ${aiState.searchOff}, so web searches used the other engines. The AI still checked Maps listings and websites.`);
   const finishedAt = new Date();
   const summary = {
     startedAt: startedAt.toISOString(),
