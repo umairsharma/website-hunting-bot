@@ -169,7 +169,10 @@ export async function checkMaps(page, biz, { mapsBase, timeoutMs = 20000 }) {
         links.map((a) => ({ href: a.href, label: a.getAttribute('aria-label') || a.textContent || '' })));
       if (!items.length) return { status: 'error', reason: 'the results list did not load' };
       const hit = items.slice(0, 10).find((item) => namesMatch(item.label, biz.names));
-      if (!hit) return { status: 'not_found', searchUrl };
+      // No name matches: hand back what Maps showed, so the AI can tell whether one of them is this business
+      // under a longer or different name.
+      const candidates = items.slice(0, 8).map((i) => ({ href: i.href, label: i.label.trim() })).filter((i) => i.label);
+      if (!hit) return { status: 'not_found', searchUrl, candidates };
       await gotoPage(page, withEnglish(hit.href));
       if (await isBlocked(page)) return { status: 'blocked' };
       view = await waitForView(page, timeoutMs);
@@ -191,7 +194,7 @@ export async function checkMaps(page, biz, { mapsBase, timeoutMs = 20000 }) {
     }).catch(() => false);
     if (opened) await page.waitForTimeout(800);
     const info = await readPlace(page);
-    if (!namesMatch(info.title, biz.names)) return { status: 'not_found', searchUrl, shownInstead: info.title };
+    if (!namesMatch(info.title, biz.names)) return { status: 'not_found', searchUrl, shownInstead: info.title, shown: { ...info, mapsUrl: shortMapsUrl(page.url()) } };
     // When a search opens a listing directly, Maps swaps the address bar from /search/ to the listing's
     // own /place/ link a moment later. Wait for it, so the lead links to the listing, not the search.
     if (!/\/maps\/place\//.test(page.url())) await page.waitForURL(/\/maps\/place\//, { timeout: 5000 }).catch(() => {});

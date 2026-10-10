@@ -16,7 +16,8 @@ import { shortMapsUrl } from '../src/maps.js';
 import { MAX_LINK, hoursText, leadShareLink, leadText, leadsText, shareText } from '../src/share.js';
 import { findSocials, orderSocials, socialLabel, socialProfile } from '../src/socials.js';
 import { FREE_MAIL, confirmByPhone, confirmSite, fetchPage, phonePattern, siteOrigins, streetOf } from '../src/verify.js';
-import { activityFor, emailFrom, emailFromPage, listingsFrom, sinceFrom, socialActivityFrom } from '../src/details.js';
+import { activityFor, emailFrom, emailFromPage, factsFromPage, listingsFrom, sinceFrom, socialActivityFrom } from '../src/details.js';
+import { aiFindWebsite, aiPickListing, aiSiteBelongs, createAi, parseJson, visibleText } from '../src/ai.js';
 import { buildRecheckList, recheckCandidate } from '../src/recheck.js';
 import { INSTITUTION_NAME, normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
@@ -747,4 +748,48 @@ test('Email on a listing page: theirs by name or as the only email link; never t
   assert.equal(emailFromPage('<a href="mailto:a1@gmail.com">x</a><a href="mailto:b2@gmail.com">y</a>', joe, yp), null);
   // Only the directory's own address
   assert.equal(emailFromPage('<a href="mailto:support@yellowpages.com">Help</a> info@yellowpages.com', joe, yp), null);
+});
+
+test('AI replies: JSON read from fenced or chatty text; unsure answers count as no answer', async () => {
+  assert.deepEqual(parseJson('Sure!\n```json\n{"match": 1, "confidence": "high"}\n```'), { match: 1, confidence: 'high' });
+  assert.equal(parseJson('no idea'), null);
+  const fake = (reply) => ({ enabled: true, ask: async () => reply });
+  const b = { name: 'Noor Clinic', city: 'Lahore' };
+  const options = [{ label: 'Dr. Ahmed Dental' }, { label: 'City Pharmacy' }];
+  assert.equal(await aiPickListing(fake({ match: 0, confidence: 'high' }), b, options), 0);
+  assert.equal(await aiPickListing(fake({ match: 0, confidence: 'low' }), b, options), null);
+  assert.equal(await aiPickListing(fake({ match: 5, confidence: 'high' }), b, options), null); // not on the list
+  assert.equal(await aiPickListing({ enabled: false }, b, options), null);
+  assert.deepEqual(await aiSiteBelongs(fake({ belongs: true, confidence: 'low', reason: 'maybe' }), b, 'https://x.example', 'text'), { belongs: false, reason: 'maybe' });
+  const found = await aiFindWebsite(fake({ hasWebsite: true, url: 'noorclinic.pk', confidence: 'high' }), b);
+  assert.equal(found.url, 'https://noorclinic.pk');
+  assert.ok(found.high && found.confident);
+  assert.equal((await aiFindWebsite(fake({ hasWebsite: false, url: 'null' }), b)).url, null);
+  assert.equal(createAi({ apiKey: '' }).enabled, false);
+});
+
+test('Page text for the AI: no scripts, styles or tags', () => {
+  assert.equal(visibleText('<style>p{}</style><h1>Joe&amp;Sons</h1><script>var x=1</script><p>Call   us</p>'), 'Joe&Sons Call us');
+});
+
+test('Listing page facts: the business\'s own phone, address, email and website from its structured data', () => {
+  const b = biz('Delta Rooter');
+  const html = `<script type="application/ld+json">${JSON.stringify({ '@graph': [
+    { '@type': 'Plumber', name: 'Delta Rooter', telephone: '0300 7654321', email: 'mailto:delta@deltarooter.pk',
+      address: { streetAddress: '9 Old Jail Rd' }, url: 'https://www.yellowpages.com.pk/delta-rooter', sameAs: ['https://deltarooter.pk/', 'https://facebook.com/delta'] },
+    { '@type': 'Plumber', name: 'Ace Drain Co', telephone: '0300 1234500', email: 'ace@acedrain.pk' },
+  ] })}</script><script type="application/ld+json">{broken</script>`;
+  const facts = factsFromPage(html, b, 'https://www.yellowpages.com.pk/delta-rooter');
+  assert.deepEqual(facts.phones, ['0300 7654321']);
+  assert.deepEqual(facts.streets, ['9 Old Jail Rd']);
+  assert.deepEqual(facts.emails, ['delta@deltarooter.pk']);
+  assert.deepEqual(facts.websites, ['https://deltarooter.pk/']); // not the directory page itself, not Facebook
+});
+
+test('Confirming a site: any of the numbers, emails or addresses the business is listed with', async () => {
+  const pages = { 'https://a.example/': '<p>Call 0300-765-4321</p>', 'https://b.example/': '<p>9 Old Jail Rd · Delta Rooter</p>' };
+  const fetchFn = async (url) => pages[url] ?? null;
+  assert.deepEqual(await confirmSite(['https://a.example'], { phone: '042 35550000', phones: ['0300 7654321'] }, fetchFn), { origin: 'https://a.example', by: 'their phone number is on it' });
+  assert.deepEqual(await confirmSite(['https://b.example'], { streets: ['9 Old Jail Rd'], nameKeys: ['deltarooter'] }, fetchFn), { origin: 'https://b.example', by: 'their address and name are on it' });
+  assert.equal(await confirmSite(['https://a.example'], { phones: ['0300 1111111'] }, fetchFn), null);
 });

@@ -7,8 +7,10 @@ Finds local businesses that **don't have a website** and sends them to your Disc
 A business only becomes a lead if it has **no website at all three checks**:
 
 1. **OpenStreetMap:** finds businesses in your city with no website listed. If it doesn't have enough (common for plumbers, roofers and other trades in the US), the bot also **searches Google Maps** for them, e.g. "plumbers in Jackson, Mississippi".
-2. **Google Maps:** opens each business's listing and looks for a "Website" button.
+2. **Google Maps:** opens each business's listing and looks for a "Website" button. When Maps shows other names (the business listed under a longer name or the owner's name), the AI says which one, if any, is the same business.
 3. **Web search:** searches "*business name + city*" to catch websites Maps doesn't show. If Google blocks the bot, it switches to Brave, then Startpage (Google's results without the blocking), then Bing, then DuckDuckGo.
+4. **Their details, from where they're listed:** the bot opens their directory listings (Yelp, Yellow Pages, BBB…) and collects every phone number, email and street address they're listed with. Each different one gets its own search for a website. A site counts as theirs if it shows one of their numbers or emails, or their address and name.
+5. **AI (Gemini):** reads the sites that came up and mentions their name, and says whether each is theirs. Then it searches Google itself for their website, by name, phone and address; a site it finds is opened and checked before it counts. Only a business that passes all of this comes to you as a lead.
 
 Facebook pages, Instagram, Foodpanda and booking sites (Marham, Oladoc…) **don't count** as a website, so a business that only has one of those is still a lead.
 
@@ -49,6 +51,12 @@ Google, Brave and Startpage all sometimes block bots running on GitHub. Brave's 
    - Secret: paste the key → **Add secret**
 
 That's it. The Discord summary will say *Brave (API)* when it's being used. Without a key, the bot tries Brave's normal website instead.
+
+**5. Optional: a Gemini API key (AI checks, free, no card)**
+1. Go to **https://aistudio.google.com/apikey**, sign in with a Google account and tap **Create API key**.
+2. Add it as a repository secret named `GEMINI_API_KEY` (same steps as above).
+
+The free tier allows about 10 AI questions a minute and a few hundred a day; the bot asks at most 100 per run and spaces them out. If the day's limit runs out, the run carries on without the AI and the Discord summary says so. Each lead card's "Checked" line shows *AI ✓* when the AI looked at it. Turn off with `ai: false` in `config.js`.
 
 ## What you get
 

@@ -24,6 +24,7 @@ const CONFIG = {
   mapsDiscovery: false, // tested on its own below
   findSocials: false, // tested on its own below
   phoneCheck: false, // tested on its own below
+  ai: false, // tested on its own below
 };
 
 async function withServer(scenario, fn) {
@@ -39,6 +40,8 @@ async function withServer(scenario, fn) {
     STARTPAGE_BASE_URL: `${server.base}/startpage`,
     DDG_BASE_URL: `${server.base}/ddg`,
     SITE_FETCH_BASE: server.base,
+    GEMINI_BASE_URL: `${server.base}/gemini`,
+    GEMINI_API_KEY: 'test-key',
   };
   const saved = {};
   for (const [k, v] of Object.entries(env)) {
@@ -549,8 +552,75 @@ test('Email from a directory listing page: the business\'s own, not the director
     assert.equal(result.error, null, logText);
     const delta = result.leads.find((l) => l.name === 'Delta Rooter');
     assert.equal(delta.email, 'deltarooter.lhr@gmail.com', logText);
-    assert.match(logText, /Email on their Yellow Pages listing/);
+    assert.match(logText, /Their Yellow Pages listing: email/);
     assert.ok(server.requests.sites.includes('https://www.yellowpages.com.pk/delta-rooter'));
     assert.ok(!server.requests.google.some((q) => q === 'Delta Rooter Lahore email')); // found without another search
+  });
+});
+
+test('AI (Gemini): picks the Maps listing under another name, reads listing pages for other numbers, judges sites', { timeout: 240000 }, async () => {
+  const scenario = {
+    // Noor Clinic is on Google Maps under the dentist's name; Maps shows a list without "Noor Clinic" in it.
+    extraElements: [{ type: 'node', id: 11, lat: 31.53, lon: 74.36, tags: { name: 'Noor Clinic', amenity: 'dentist' } }],
+    mapsLists: { 'Noor Clinic': [['Dr. Ahmed Family Dental Care', 'noor-dental'], ['City Pharmacy', 'city-pharmacy']] },
+    places: { 'noor-dental': { title: 'Dr. Ahmed Family Dental Care', website: 'https://ahmeddental.example/', address: '5 Canal Bank Rd, Lahore' } },
+    // Delta Rooter's Yellow Pages listing has another phone number; a site shows that one.
+    results: [
+      { match: 'Delta Rooter Lahore', results: [{ url: 'https://www.yellowpages.com.pk/delta-rooter', title: 'Delta Rooter - Plumbers in Lahore' }] },
+      { match: '"0300 7654321"', results: [{ url: 'https://lahore-drains.example/', title: 'Home' }] },
+    ],
+    sites: {
+      'https://www.yellowpages.com.pk/delta-rooter': `<h1>Delta Rooter</h1><script type="application/ld+json">${JSON.stringify({
+        '@context': 'https://schema.org', '@graph': [
+          { '@type': 'Plumber', name: 'Delta Rooter', telephone: '0300 7654321', address: { '@type': 'PostalAddress', streetAddress: '9 Old Jail Rd' } },
+          { '@type': 'Plumber', name: 'Ace Drain Co', telephone: '0300 1234500' },
+        ] })}</script>`,
+      'https://lahore-drains.example/': '<h1>Lahore Drains</h1><p>Call 0300-765-4321</p>',
+      // Mike Pipe Fix's site: no phone number on it, only the AI can tell it's theirs.
+      'https://mikefix-pk.example/': "<h1>Mike's Fixes</h1><p>Mike fixes pipes all over Lahore since 2008.</p>",
+    },
+    gemini: [
+      { match: ['Noor Clinic', 'Dr. Ahmed Family Dental Care'], reply: { match: 0, confidence: 'high', reason: 'Noor Clinic is run by Dr. Ahmed' } },
+      { match: ['Search Google', 'Mike Pipe Fix'], reply: { hasWebsite: true, url: 'mikefix-pk.example', confidence: 'medium', reason: 'found their site' } },
+      { match: ['Does this website belong', 'mikefix-pk.example'], reply: { belongs: true, confidence: 'high', reason: 'same owner, same town' } },
+    ],
+  };
+  await withServer(scenario, async (server) => {
+    const logs = [];
+    const result = await run({
+      config: { ...CONFIG, categories: ['plumber', 'dentist'], mapsDiscovery: true, phoneCheck: true, ai: true, aiMinIntervalMs: 0 },
+      dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m),
+    });
+    const logText = logs.join('\n');
+    assert.equal(result.error, null, logText);
+    assert.ok(server.requests.gemini.length > 0 && server.requests.gemini.every((r) => r.key === 'test-key' && r.model === 'gemini-2.5-flash'));
+    // Maps: the AI picked the listing, and its website button counts
+    assert.match(logText, /AI: it's on Google Maps as "Dr\. Ahmed Family Dental Care"/);
+    assert.match(logText, /Has a website: ahmeddental\.example \(found by Google Maps\)/);
+    // Listing page: another phone number, searched on its own, finds their site
+    assert.match(logText, /Their Yellow Pages listing: phone, address/);
+    assert.ok(server.requests.google.includes('"0300 7654321"'), server.requests.google.join(' | '));
+    assert.match(logText, /Has a website: lahore-drains\.example \(found by web search, their phone number is on it\)/);
+    // The AI's Google search found a site; it read the page and said it's theirs
+    assert.ok(server.requests.gemini.some((r) => r.search && r.prompt.includes('Mike Pipe Fix')));
+    assert.match(logText, /Has a website: mikefix-pk\.example \(found by web search, the AI found it on Google; the AI read it: same owner, same town\)/);
+    assert.ok(!result.leads.some((l) => ['Mike Pipe Fix', 'Delta Rooter', 'Noor Clinic'].includes(l.name)), logText);
+    for (const lead of result.leads) assert.match(lead.checks, /AI ✓/);
+  });
+});
+
+test('AI (Gemini): daily limit reached → the run carries on without it and says so', { timeout: 180000 }, async () => {
+  const geminiStatus = { status: 429, text: '{"error":{"code":429,"details":[{"violations":[{"quotaId":"GenerateRequestsPerDayPerProjectPerModel-FreeTier"}]}]}}' };
+  await withServer({ geminiStatus }, async (server) => {
+    const logs = [];
+    const result = await run({
+      config: { ...CONFIG, categories: ['plumber'], mapsDiscovery: true, ai: true, aiMinIntervalMs: 0 },
+      dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m),
+    });
+    const logText = logs.join('\n');
+    assert.equal(result.error, null, logText);
+    assert.equal(server.requests.gemini.length, 1); // asked once, then left alone
+    assert.ok(result.warnings.some((w) => /AI \(Gemini\): Gemini's free daily limit was reached/.test(w)), result.warnings.join(' | '));
+    assert.ok(result.leads.some((l) => l.name === 'Mike Pipe Fix'));
   });
 });
