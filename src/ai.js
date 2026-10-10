@@ -6,6 +6,8 @@
 import { sleep } from './util.js';
 
 const DEFAULT_MODEL = 'gemini-2.5-flash'; // free tier includes Google Search grounding on this model
+// Tried in turn if Google retires the one before (HTTP 404).
+const FALLBACK_MODELS = ['gemini-3.1-flash-lite', 'gemini-3.6-flash'];
 
 /** The first JSON object in a model reply (which may wrap it in ```json fences or a sentence). */
 export function parseJson(text) {
@@ -33,13 +35,22 @@ export function createAi({
   const state = { calls: 0, searches: 0, off: apiKey ? null : 'no GEMINI_API_KEY' };
   let last = 0; // the free tier allows 10 questions a minute: keep them at least minIntervalMs apart
 
+  const models = [...new Set([model, ...FALLBACK_MODELS])];
+  let failures = 0;
+  const failed = (why) => {
+    // Say why an answer didn't come (the first few times), so a broken setup shows in the log.
+    failures += 1;
+    if (failures <= 3) log(`   🤖 AI gave no answer: ${why}`);
+    return null;
+  };
+
   async function request(prompt, search) {
     const body = {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: { temperature: 0, ...(search ? {} : { responseMimeType: 'application/json' }) },
       ...(search ? { tools: [{ google_search: {} }] } : {}),
     };
-    const res = await fetch(`${base}/v1beta/models/${model}:generateContent`, {
+    const res = await fetch(`${base}/v1beta/models/${models[0]}:generateContent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
       body: JSON.stringify(body),
@@ -49,7 +60,8 @@ export function createAi({
     return { status: res.status, text };
   }
 
-  async function ask(prompt, { search = false } = {}) {
+  /** { text, sources } of the model's reply (sources: the Google results it used), or null. */
+  async function askText(prompt, { search = false } = {}) {
     if (state.off) return null;
     if (state.calls >= maxCalls) {
       state.off = `the per-run limit of ${maxCalls} AI questions was reached`;
@@ -64,6 +76,13 @@ export function createAi({
         if (wait > 0) await sleep(wait);
         last = Date.now();
         r = await request(prompt, search);
+        // A model Google has retired (or not on this key): the next one.
+        if (r.status === 404 && models.length > 1) {
+          log(`   🤖 Gemini model ${models[0]} isn't available, using ${models[1]}`);
+          models.shift();
+          attempt -= 1;
+          continue;
+        }
         if (r.status !== 429 && r.status < 500) break;
         // The daily quota is used up: no point asking again today.
         if (r.status === 429 && /per ?day/i.test(r.text)) {
@@ -74,20 +93,31 @@ export function createAi({
         if (attempt < 2) await sleep(retryWaitMs); // per-minute limit or a busy server: wait, then ask again
       }
       if (r.status === 400 || r.status === 401 || r.status === 403) {
-        state.off = `Gemini refused the request (HTTP ${r.status}: ${r.text.slice(0, 120).replace(/\s+/g, ' ')}). Check the GEMINI_API_KEY secret`;
+        state.off = `Gemini refused the request (HTTP ${r.status}: ${r.text.slice(0, 160).replace(/\s+/g, ' ')}). Check the GEMINI_API_KEY secret`;
         log(`   🤖 ${state.off}`);
         return null;
       }
-      if (r.status !== 200) return null;
+      if (r.status !== 200) return failed(`HTTP ${r.status} ${r.text.slice(0, 160).replace(/\s+/g, ' ')}`);
       const json = JSON.parse(r.text);
-      const reply = (json.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('');
-      return parseJson(reply);
-    } catch {
-      return null; // network hiccup or timeout: this one question goes unanswered
+      const cand = json.candidates?.[0];
+      const text = (cand?.content?.parts || []).filter((p) => !p.thought).map((p) => p.text || '').join('');
+      if (!text) return failed(`empty reply (${cand?.finishReason || json.promptFeedback?.blockReason || 'no reason given'})`);
+      const sources = (cand.groundingMetadata?.groundingChunks || [])
+        .map((c) => ({ uri: c.web?.uri || '', title: c.web?.title || '' })).filter((c) => c.uri || c.title);
+      return { text, sources };
+    } catch (err) {
+      return failed(String(err?.message || err).split('\n')[0]); // network hiccup or timeout
     }
   }
 
-  return { get enabled() { return !state.off; }, ask, state };
+  /** The JSON object in the reply, or null. */
+  async function ask(prompt, opts) {
+    const r = await askText(prompt, opts);
+    if (!r) return null;
+    return parseJson(r.text) || failed(`unreadable reply: ${r.text.slice(0, 120).replace(/\s+/g, ' ')}`);
+  }
+
+  return { get enabled() { return !state.off; }, ask, askText, state };
 }
 
 /** A web page's readable text (no scripts, styles or tags), for the AI to read. */
@@ -167,4 +197,40 @@ Reply with JSON only: {"hasWebsite": true|false, "url": "<their website, or null
   if (typeof a.url === 'string' && /(^|[/.])(google|googleusercontent|vertexaisearch\.cloud\.google)\.[a-z.]+(\/|$)/i.test(a.url)) a.url = null;
   const url = typeof a.url === 'string' && /^https?:\/\//i.test(a.url) ? a.url : (typeof a.url === 'string' && /^[a-z0-9.-]+\.[a-z]{2,}/i.test(a.url) ? `https://${a.url}` : null);
   return { hasWebsite: a.hasWebsite === true, url, confident: sure(a.confidence), high: /^high$/i.test(String(a.confidence)), reason: String(a.reason || '').slice(0, 200) };
+}
+
+/**
+ * A Google search, done by Gemini (Google Search grounding): { results: [{ url, title, snippet }] }, or
+ * { error, fatal? }. Only pages on sites Google actually returned are kept, so a made-up address never counts.
+ */
+export async function aiGoogleSearch(ai, query) {
+  if (!ai?.enabled) return { error: ai?.state.off || 'the AI is off', fatal: true };
+  const r = await ai.askText(`Search Google for: ${query}
+
+List the results Google shows for this search (up to 10), in order: each page's full address, its title,
+and the text shown under it. Only list pages the search actually returned; never make an address up.
+Reply with JSON only: {"results": [{"url": "https://…", "title": "…", "snippet": "…"}]}`, { search: true });
+  if (!r) return ai.enabled ? { error: 'Gemini gave no answer' } : { error: ai.state.off, fatal: true };
+  const bare = (h) => String(h || '').toLowerCase().replace(/^www\./, '');
+  // The sites Google returned (Gemini names each source by its domain).
+  const hosts = [...new Set(r.sources.map((s) => bare(s.title)).filter((h) => /^[a-z0-9.-]+\.[a-z]{2,}$/.test(h)))];
+  const onHost = (host) => hosts.find((h) => host === h || host.endsWith(`.${h}`) || h.endsWith(`.${host}`));
+  const results = [];
+  const covered = new Set();
+  for (const item of parseJson(r.text)?.results || []) {
+    let url;
+    try {
+      url = new URL(String(item?.url || ''));
+    } catch {
+      continue;
+    }
+    const host = bare(url.hostname);
+    if (!/^https?:$/.test(url.protocol) || /(^|\.)(google|googleusercontent|vertexaisearch\.cloud\.google)\./.test(host)) continue;
+    const source = onHost(host);
+    if (!source) continue;
+    covered.add(source);
+    results.push({ url: url.href, title: String(item.title || host).slice(0, 200), snippet: String(item.snippet || '').slice(0, 600) });
+  }
+  for (const h of hosts) if (!covered.has(h)) results.push({ url: `https://${h}/`, title: h, snippet: '' });
+  return { results };
 }

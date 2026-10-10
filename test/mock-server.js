@@ -238,7 +238,7 @@ function readBody(req) {
  *   bingEmptyFirst?: boolean (Bing's first page has no results), mapsSearchBlocked?: boolean }
  */
 export async function startMockServer(scenario = {}) {
-  const requests = { overpass: [], maps: [], google: [], brave: [], braveApi: [], startpage: [], bing: [], ddg: [], discord: [], sites: [], gemini: [] };
+  const requests = { overpass: [], maps: [], google: [], brave: [], braveApi: [], startpage: [], bing: [], ddg: [], discord: [], sites: [], gemini: [], geminiSearches: [] };
   let discordCalls = 0;
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://mock');
@@ -330,6 +330,19 @@ export async function startMockServer(scenario = {}) {
       const search = Boolean(json.tools?.some((t) => t.google_search));
       requests.gemini.push({ model: ai[1], prompt, search, key: req.headers['x-goog-api-key'] });
       if (scenario.geminiStatus) return send(scenario.geminiStatus.status, 'application/json', scenario.geminiStatus.text || '{}');
+      // "Search Google for: …": answer with the same results the search engines give, and their sites as sources.
+      const googled = prompt.match(/^Search Google for: (.*)$/m);
+      if (googled && !(scenario.gemini || []).some((r) => r.match.every((w) => prompt.includes(w)))) {
+        requests.geminiSearches.push(googled[1]);
+        const found = resultsFor(googled[1], scenario);
+        const chunks = [...new Set(found.map((r) => new URL(r.url).hostname.replace(/^www\./, '')))]
+          .map((h) => ({ web: { uri: `https://vertexaisearch.cloud.google.com/grounding-api-redirect/${h}`, title: h } }));
+        const listed = found.map((r) => ({ url: r.url, title: r.title, snippet: r.snippet || '' }));
+        if (scenario.geminiMadeUp) listed.push({ url: 'https://made-up-site.example/', title: 'Not a real result' });
+        return send(200, 'application/json', JSON.stringify({ candidates: [{
+          content: { parts: [{ text: JSON.stringify({ results: listed }) }] }, groundingMetadata: { groundingChunks: chunks },
+        }] }));
+      }
       const rule = (scenario.gemini || []).find((r) => r.match.every((w) => prompt.includes(w)));
       const reply = rule ? rule.reply : search
         ? { hasWebsite: false, url: null, confidence: 'high', reason: 'nothing of theirs on Google' }
