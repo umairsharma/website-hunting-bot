@@ -11,6 +11,7 @@ import { socialIcon, socialLabel } from './socials.js';
 const MAX_EMBEDS_PER_MESSAGE = 10; // Discord limit
 const MAX_CHARS_PER_MESSAGE = 5800; // Discord limit is 6000 across all embeds
 const HOT_REVIEWS = 50; // busy places with no website = best leads
+const NOT_FOUND = '❌ Not found'; // phone, address or email the bot looked for and couldn't find
 
 const clip = (value, max) => {
   const s = String(value ?? '');
@@ -37,15 +38,17 @@ export function leadEmbed(lead) {
   if (lead.phone) {
     const wa = lead.whatsapp ? `\n[Open in WhatsApp](${safeUrl(lead.whatsapp)})` : '';
     fields.push({ name: 'Phone', value: clip(`${lead.phone}${wa}`, 1024), inline: true });
+  } else {
+    fields.push({ name: 'Phone', value: NOT_FOUND, inline: true });
   }
   if (lead.rating != null) {
     const count = lead.reviews ? ` (${lead.reviews.toLocaleString('en-US')} reviews)` : '';
     fields.push({ name: 'Google rating', value: `⭐ ${lead.rating}${count}`, inline: true });
   }
-  if (lead.address) fields.push({ name: 'Address', value: clip(lead.address, 1024) });
+  fields.push({ name: 'Address', value: lead.address ? clip(lead.address, 1024) : NOT_FOUND });
   const maps = mapsField(lead);
   if (maps) fields.push(maps);
-  if (lead.email) fields.push({ name: 'Email', value: clip(lead.email, 1024) });
+  fields.push({ name: 'Email', value: lead.email ? clip(lead.email, 1024) : NOT_FOUND });
   const hours = lead.hours?.days?.length > 1
     ? lead.hours.days.map(([d, t]) => `${d}: ${t}`).join('\n')
     : hoursText(lead.hours);

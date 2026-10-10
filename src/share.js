@@ -48,13 +48,14 @@ export function leadText(lead, { n = null, level = 0 } = {}) {
   const hot = (lead.reviews || 0) >= 50 ? '🔥 ' : '';
   const lines = [`${n ? `${n}. ` : ''}${hot}*${lead.name}*${lead.categoryLabel ? ` (${lead.categoryLabel})` : ''}`];
   if (lead.rating != null) lines.push(`⭐ ${lead.rating}${lead.reviews ? ` (${Number(lead.reviews).toLocaleString('en-US')} reviews)` : ''}`);
-  if (lead.phone) lines.push(`📞 ${lead.phone}`);
+  lines.push(`📞 ${lead.phone || 'Phone: ❌ not found'}`);
   if (lead.whatsapp) lines.push(`💬 ${lead.whatsapp}`); // chat with the business on WhatsApp
 
+  if (!lead.address) lines.push('🏠 Address: ❌ not found');
   if (lead.address) lines.push(`🏠 ${level >= 5 && lead.address.length > 70 ? `${lead.address.slice(0, 69)}…` : lead.address}`);
   if (lead.mapsUrl) lines.push(`📍 ${lead.mapsUrl}`);
   lines.push(`🔎 ${googleSearchUrl(lead)}`); // a Google search for them, to check by hand
-  if (lead.email) lines.push(`✉️ ${lead.email}`);
+  lines.push(`✉️ ${lead.email || 'Email: ❌ not found'}`);
   if (lead.category && level < 4) lines.push(`🏷️ ${lead.category}`);
   const hours = hoursText(lead.hours, { short: level >= 2 });
   if (hours) lines.push(`🕒 ${hours}`);
@@ -82,11 +83,11 @@ const SOCIAL_PAGE = {
  */
 export function shareText(lead, { maxSocials = 4 } = {}) {
   const lines = [`*${lead.name}*`];
-  if (lead.address) lines.push(`🏠 Address: ${lead.address}`);
+  lines.push(`🏠 Address: ${lead.address || '❌ not found'}`);
   lines.push(`🔎 Google search for them: ${googleSearchUrl(lead)}`);
   if (lead.mapsUrl) lines.push(`📍 ${lead.onMaps === false ? 'Their location on Google Maps' : 'Their Google Maps listing'}: ${lead.mapsUrl}`);
-  if (lead.email) lines.push(`✉️ Email: ${lead.email}`);
-  if (lead.phone) lines.push(`📞 Phone: ${lead.phone}`);
+  lines.push(`✉️ Email: ${lead.email || '❌ not found'}`);
+  lines.push(`📞 Phone: ${lead.phone || '❌ not found'}`);
   for (const url of (lead.socials || []).slice(0, maxSocials)) {
     const p = socialProfile(url);
     const what = p ? `${SOCIAL_PAGE[p.network] || `${p.label} page`}${p.display.startsWith('@') ? ` (${p.display})` : ''}` : `${prettySite(hostOf(url))} page`;
