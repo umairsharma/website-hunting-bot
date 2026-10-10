@@ -520,3 +520,20 @@ test('Recheck: earlier leads go through the latest checks; ones with a website a
     assert.ok(!fs.existsSync(path.join(dataDir, 'recheck.json')));
   });
 });
+
+test('Address and email check: a site found by their street address, with their name on it, is theirs', { timeout: 180000 }, async () => {
+  await withServer({ addressSites: true }, async (server) => {
+    const logs = [];
+    const result = await run({
+      config: { ...CONFIG, categories: ['plumber'], mapsDiscovery: true, phoneCheck: true },
+      dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m),
+    });
+    const logText = logs.join('\n');
+    assert.equal(result.error, null, logText);
+    // Mike Pipe Fix: email found (gmail, so no site from it), then "email" OR "street" searched
+    assert.ok(server.requests.google.some((q) => q.includes('"mikepipefix@gmail.com" OR "3 Ferozepur Rd"')), server.requests.google.join(' | '));
+    assert.match(logText, /Has a website: lahorepipeworks\.example \(found by web search, their address and name are on it\)/);
+    assert.ok(!result.leads.some((l) => l.name === 'Mike Pipe Fix'));
+    assert.ok(result.leads.some((l) => l.name === 'Delta Rooter')); // its address search finds nothing of theirs
+  });
+});

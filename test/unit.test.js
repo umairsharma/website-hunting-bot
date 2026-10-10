@@ -15,7 +15,7 @@ import { buildMessages, googleSearchUrl, leadEmbed, sendMessages } from '../src/
 import { shortMapsUrl } from '../src/maps.js';
 import { MAX_LINK, hoursText, leadShareLink, leadText, leadsText, shareText } from '../src/share.js';
 import { findSocials, orderSocials, socialLabel, socialProfile } from '../src/socials.js';
-import { confirmByPhone, fetchPage, phonePattern, siteOrigins } from '../src/verify.js';
+import { FREE_MAIL, confirmByPhone, confirmSite, fetchPage, phonePattern, siteOrigins, streetOf } from '../src/verify.js';
 import { activityFor, emailFrom, listingsFrom, sinceFrom, socialActivityFrom } from '../src/details.js';
 import { buildRecheckList, recheckCandidate } from '../src/recheck.js';
 import { INSTITUTION_NAME, normalizeConfig } from '../src/run.js';
@@ -720,4 +720,20 @@ test('Email: read from results about the business, never a directory\'s own or a
   assert.equal(emailFrom([{ url: 'https://x.example/', title: "Joe's Plumbing", snippet: 'name@example.com logo@2x.png noreply@joes.com' }], joe), null);
   // An address on their own domain wins over a free one
   assert.equal(emailFrom([{ url: 'https://x.example/', title: "Joe's Plumbing Tulsa", snippet: 'joe123@yahoo.com or office@joesplumbing.com' }], joe), 'office@joesplumbing.com');
+});
+
+test('Confirming a site by email or address: only with their phone, email, or address and name on it', async () => {
+  assert.equal(streetOf('1566 Memorial Dr SE, Atlanta, GA 30317, United States'), '1566 Memorial Dr SE');
+  assert.equal(streetOf('Atlanta, GA 30318'), null);
+  assert.ok(FREE_MAIL.test('joe@gmail.com') && FREE_MAIL.test('a@yahoo.co.uk') && !FREE_MAIL.test('info@joesplumbing.com'));
+  const pages = {
+    'https://a.example/': '<p>Leo\'s Hand Car Wash, 1566 Memorial Dr. SE, Atlanta</p>',
+    'https://b.example/': '<p>Car washes on 1566 Memorial Dr SE</p>', // the street, but not their name
+    'https://c.example/contact': '<a href="mailto:Leo@LeosWash.com">Email us</a>',
+  };
+  const fetchFn = async (url) => pages[url] ?? (url.endsWith('/') ? '<p>home</p>' : null);
+  const facts = { street: '1566 Memorial Dr SE', email: 'leo@leoswash.com', nameKeys: ['leoshandcarwash'] };
+  assert.deepEqual(await confirmSite(['https://b.example', 'https://a.example'], facts, fetchFn), { origin: 'https://a.example', by: 'their address and name are on it' });
+  assert.deepEqual(await confirmSite(['https://c.example'], facts, fetchFn), { origin: 'https://c.example', by: 'their email is on it' });
+  assert.equal(await confirmSite(['https://b.example'], facts, fetchFn), null);
 });

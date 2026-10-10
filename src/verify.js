@@ -94,14 +94,43 @@ export function fetchPage(url, { timeoutMs = 10000, maxBytes = 2_000_000, redire
 }
 
 /** The first of these sites that shows the business's phone number (homepage, then /contact), or null. */
-export async function confirmByPhone(origins, phone, fetchFn = fetchPage) {
-  const pattern = phonePattern(phone);
-  if (!pattern) return null;
+export function confirmByPhone(origins, phone, fetchFn = fetchPage) {
+  return confirmSite(origins, { phone }, fetchFn).then((r) => r?.origin || null);
+}
+
+// Free email services: an address there says nothing about a website.
+export const FREE_MAIL = /@(gmail|googlemail|yahoo|ymail|rocketmail|hotmail|outlook|live|msn|icloud|me|mac|aol|comcast|att|sbcglobal|bellsouth|verizon|cox|charter|earthlink|juno|protonmail|proton|gmx|mail|zoho|yandex|frontier|windstream|centurylink|q|optonline|roadrunner|rr)\.[a-z.]+$/i;
+
+/** "1566 Memorial Dr SE" from "1566 Memorial Dr SE, Atlanta, GA 30317", or null if it has no house number. */
+export function streetOf(address) {
+  const first = String(address || '').split(',')[0].trim();
+  return /^\d+[a-z]?\s+\S+/i.test(first) && first.length <= 60 ? first : null;
+}
+
+const squash = (s) => String(s || '').toLowerCase().replace(/&amp;/g, '&').replace(/[^a-z0-9]+/g, '');
+
+/**
+ * The first of these sites that is clearly the business's: its homepage or contact page shows their phone
+ * number or email, or their street address together with their name. Returns { origin, by } or null.
+ * facts: { phone, email, street, nameKeys } (nameKeys: the name squashed, e.g. "leoshandcarwash").
+ */
+export async function confirmSite(origins, facts, fetchFn = fetchPage) {
+  const pattern = phonePattern(facts.phone);
+  const email = facts.email ? facts.email.toLowerCase() : null;
+  const street = facts.street ? squash(facts.street) : null;
+  const names = (facts.nameKeys || []).filter((k) => k.length >= 6);
+  if (!pattern && !email && !(street && names.length)) return null;
   for (const origin of origins) {
     for (const path of ['/', '/contact', '/contact-us']) {
       const html = await fetchFn(`${origin}${path}`);
-      if (html && pattern.test(html)) return origin;
       if (html === null && path === '/') break; // site down or not a web page
+      if (!html) continue;
+      if (pattern && pattern.test(html)) return { origin, by: 'their phone number is on it' };
+      if (email && html.toLowerCase().includes(email)) return { origin, by: 'their email is on it' };
+      if (street && names.length) {
+        const text = squash(html);
+        if (text.includes(street) && names.some((k) => text.includes(k))) return { origin, by: 'their address and name are on it' };
+      }
     }
   }
   return null;
