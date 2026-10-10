@@ -7320,5 +7320,8 @@
    {"type":"way","id":469579467,"center":{"lat":32.9942285,"lon":-96.7991388},"tags":{"addr:housenumber":"17732","building":"yes","name":"William Davis Realty","office":"estate_agent","roof:shape":"mansard"}},
    {"type":"way","id":469579491,"center":{"lat":32.9940182,"lon":-96.7989238},"tags":{"addr:housenumber":"17734","building":"yes","name":"Better Homes and Gardens Real Estate Winans","office":"estate_agent","roof:shape":"mansard"}},
    {"type":"way","id":471980703,"center":{"lat":32.7717192,"lon":-96.7966815},"tags":{"addr:city":"Dallas","addr:housenumber":"1075","addr:postcode":"75215","addr:state":"TX","addr:street":"Griffin Street West","building":"office","name":"Zeno & Associates","office":"estate_agent"}}
+ ]},
+ "Dallas|United States|0||no-chains|craft=plumber": {"fetched": "2026-10-10T15:35:00.933Z", "elements": [
+
  ]}
 }
