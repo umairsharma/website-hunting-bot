@@ -695,7 +695,9 @@ export async function run({ config, dataDir, dryRun = false, webhookUrl = proces
           ? 'Every business found has already been checked. Add categories or change the area to find new ones.'
           : 'No businesses without a website were found here for these categories. Try more categories, a bigger radius or another city.');
       }
-      stats.pending = pickQueue(candidates, state, Infinity, cfg.maxAttempts).pending;
+      stats.pending = pickQueue(candidates, state, Infinity, cfg.maxAttempts).pending
+        // businesses found on Google Maps this run but not reached (the next run's Maps search finds them again)
+        + queue.filter((b) => !b.osmUrl && !state.places[b.key]).length;
     }
   } catch (err) {
     fatal = err;
