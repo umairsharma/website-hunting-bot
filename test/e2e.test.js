@@ -678,3 +678,30 @@ test('Search engines blocked partway through a business: the lead says which che
     assert.ok(flagged.length >= 1, `${logText}\n${JSON.stringify(result.leads.map((l) => [l.name, l.notes]))}`);
   });
 });
+
+test('Website given on a directory listing: the AI reads it; unconfirmed, the card says to check it', { timeout: 240000 }, async () => {
+  const scenario = (gemini) => ({
+    results: [{ match: 'Delta Rooter Lahore', results: [{ url: 'https://www.yellowpages.com.pk/delta-rooter', title: 'Delta Rooter - Plumbers in Lahore' }] }],
+    sites: {
+      'https://www.yellowpages.com.pk/delta-rooter': `<h1>Delta Rooter</h1><script type="application/ld+json">${JSON.stringify({ '@type': 'Plumber', name: 'Delta Rooter', url: 'https://drn-services.example/' })}</script>`,
+      'https://drn-services.example/': '<h1>DRN Services</h1><p>Drains and pipes, Lahore.</p>',
+    },
+    gemini,
+  });
+  await withServer(scenario([{ match: ['Does this website belong', 'drn-services.example'], reply: { belongs: true, confidence: 'high', reason: 'their drain business' } }]), async (server) => {
+    const logs = [];
+    await run({
+      config: { ...CONFIG, categories: ['plumber'], mapsDiscovery: true, phoneCheck: true, ai: true, aiMinIntervalMs: 0 },
+      dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m),
+    });
+    assert.match(logs.join('\n'), /Has a website: drn-services\.example \(found by web search, their directory listing links to it; the AI read it: their drain business\)/);
+  });
+  await withServer(scenario([]), async (server) => {
+    const result = await run({
+      config: { ...CONFIG, categories: ['plumber'], mapsDiscovery: true, phoneCheck: true },
+      dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: () => {},
+    });
+    const delta = result.leads.find((l) => l.name === 'Delta Rooter');
+    assert.ok(delta.notes.includes('Check first: a directory listing gives drn-services.example as their website'), delta.notes.join(' | '));
+  });
+});
