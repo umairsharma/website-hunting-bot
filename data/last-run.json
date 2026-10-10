@@ -1,28 +1,32 @@
 {
-  "startedAt": "2026-10-10T06:52:20.395Z",
-  "finishedAt": "2026-10-10T07:07:34.129Z",
-  "minutes": 15.2,
-  "place": "Atlanta, United States",
-  "area": "Atlanta, Fulton County, Georgia, United States",
-  "candidates": 1,
-  "discovered": 14,
-  "mapsListed": 110,
-  "checked": 13,
-  "leads": 12,
-  "hasWebsite": 1,
+  "startedAt": "2026-10-10T10:07:59.544Z",
+  "finishedAt": "2026-10-10T10:25:42.071Z",
+  "minutes": 17.7,
+  "place": "Houston, United States",
+  "area": "Houston, Harris County, Texas, United States",
+  "candidates": 0,
+  "discovered": 19,
+  "mapsListed": 121,
+  "checked": 19,
+  "leads": 11,
+  "hasWebsite": 8,
   "closed": 0,
   "unverified": 0,
   "pending": 0,
+  "ai": {
+    "calls": 28,
+    "searches": 11,
+    "off": null
+  },
   "searchEngines": {
     "google": "broken",
     "brave": "blocked",
     "startpage": "blocked",
-    "bing": "broken",
-    "duckduckgo": "blocked"
+    "bing": "ok",
+    "duckduckgo": "untested"
   },
   "warnings": [
-    "Every search engine blocked the bot, so it stopped early. The rest will be checked next run.",
-    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, Bing didn't work, DuckDuckGo blocked the bot."
+    "Web search: Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing."
   ],
   "error": null
 }
