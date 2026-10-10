@@ -13,10 +13,10 @@ import { placeIdOf } from '../src/discover.js';
 import { applyRunInputs, callingCodeFor, DEFAULT_NICHE } from '../src/inputs.js';
 import { buildMessages, googleSearchUrl, leadEmbed, sendMessages } from '../src/discord.js';
 import { shortMapsUrl } from '../src/maps.js';
-import { MAX_LINK, hoursText, leadShareLink, leadText, leadsText } from '../src/share.js';
+import { MAX_LINK, hoursText, leadShareLink, leadText, leadsText, shareText } from '../src/share.js';
 import { findSocials, orderSocials, socialLabel, socialProfile } from '../src/socials.js';
 import { confirmByPhone, fetchPage, phonePattern, siteOrigins } from '../src/verify.js';
-import { activityFor, listingsFrom, sinceFrom, socialActivityFrom } from '../src/details.js';
+import { activityFor, emailFrom, listingsFrom, sinceFrom, socialActivityFrom } from '../src/details.js';
 import { buildRecheckList, recheckCandidate } from '../src/recheck.js';
 import { INSTITUTION_NAME, normalizeConfig } from '../src/run.js';
 import { appendLead, loadState, saveState } from '../src/storage.js';
@@ -486,7 +486,7 @@ test('Google Maps link on every lead card: their listing, or the location when n
   assert.ok(value.includes('query=Crusty%20Cottage%20Bakery%2C%201%20High%20St'));
 });
 
-test('Send to WhatsApp: each card shares the full lead, within Discord limits', () => {
+test('Send to WhatsApp: the short version, each link saying where it leads', () => {
   const lead = {
     name: 'Snowflake (Donuts) & Co', categoryLabel: 'Bakery / sweets', rating: 4.8, reviews: 358,
     phone: '(713) 827-2808', whatsapp: 'https://wa.me/17138272808', email: 'hello@snowflake.example',
@@ -515,30 +515,24 @@ test('Send to WhatsApp: each card shares the full lead, within Discord limits', 
   const url = card.description.match(/^📲 \*\*\[Send this lead to WhatsApp\]\((https:\/\/wa\.me\/\?text=[^)\s]+)\)\*\*\n/)[1]; // brackets in the name don't break it
   const text = new URL(url).searchParams.get('text');
   assert.equal(text, [
-    '🔥 *Snowflake (Donuts) & Co* (Bakery / sweets)',
-    '⭐ 4.8 (358 reviews)',
-    '📞 (713) 827-2808',
-    '💬 https://wa.me/17138272808',
-    '🏠 1234 Westheimer Rd, Houston, TX 77006',
-    '📍 https://maps.google.com/?cid=1841144998116252209',
-    '🔎 https://www.google.com/search?q=Snowflake%20%28Donuts%29%20%26%20Co%20Houston%20TX',
-    '✉️ hello@snowflake.example',
-    '🏷️ Donut shop',
-    '🕒 Mon 6 AM–2 PM, Tue 6 AM–2 PM, Sun Closed',
-    '📅 Open since 1998 (BBB)',
-    '🔗 Facebook snowflakedonuts (3.1K likes): https://www.facebook.com/snowflakedonuts',
-    '📸 Instagram @snowflakedonuts (12.4K followers · 830 posts): https://www.instagram.com/snowflakedonuts/',
-    '📋 Also listed on: Yelp https://www.yelp.com/biz/snowflake-donuts-houston · BBB https://www.bbb.org/x',
-    '📝 Their Google Maps "website" is just a Facebook page',
-    '📝 Their Google listing is unclaimed',
+    '*Snowflake (Donuts) & Co*',
+    '🏠 Address: 1234 Westheimer Rd, Houston, TX 77006',
+    '🔎 Google search for them: https://www.google.com/search?q=Snowflake%20%28Donuts%29%20%26%20Co%20Houston%20TX',
+    '📍 Their Google Maps listing: https://maps.google.com/?cid=1841144998116252209',
+    '✉️ Email: hello@snowflake.example',
+    '📞 Phone: (713) 827-2808',
+    '🔗 Facebook page: https://www.facebook.com/snowflakedonuts',
+    '📸 Instagram profile (@snowflakedonuts): https://www.instagram.com/snowflakedonuts/',
   ].join('\n'));
+  // Not on Google Maps: the link is only their location
+  assert.match(shareText({ name: 'X', city: 'Lahore', onMaps: false, mapsUrl: 'https://www.google.com/maps/search/?api=1&query=1,2' }),
+    /📍 Their location on Google Maps: /);
 
-  // Too much for one link: notes go first, then extra social pages; the essentials always stay.
-  const huge = { ...lead, notes: Array(8).fill('n'.repeat(300)), socials: Array(4).fill(`https://www.facebook.com/${'p'.repeat(300)}`) };
+  // Too long for one link: social pages go first; name, address, phone and Maps link always stay.
+  const huge = { ...lead, socials: Array(4).fill(`https://www.facebook.com/${'p'.repeat(600)}`) };
   const hugeText = new URL(leadShareLink(huge)).searchParams.get('text');
   assert.ok(leadShareLink(huge).length <= MAX_LINK);
   for (const must of ['*Snowflake', '(713) 827-2808', 'Westheimer', 'maps.google.com/?cid=']) assert.ok(hugeText.includes(must), must);
-  assert.ok(!hugeText.includes('📝'));
   assert.ok(leadShareLink({ name: 'x'.repeat(3000), phone: '1' }).length <= MAX_LINK);
 
   // run-leads.txt: every lead, numbered, every detail.
@@ -712,4 +706,18 @@ test('A name made only of the city and the trade has nothing to match an Instagr
   assert.deepEqual(findSocials([{ url: 'https://www.instagram.com/blackposhmobilewash/', title: 'Black Posh Mobile Wash (@blackposhmobilewash)' }],
     { name: 'Atlanta car detailing', names: ['Atlanta car detailing'], city: 'Atlanta', profile: generic }), []);
   assert.deepEqual(businessProfile(["Leo's Hand Car Wash & Auto Detailing"], 'Atlanta').tokenSets, [['leos']]);
+});
+
+test('Email: read from results about the business, never a directory\'s own or a placeholder', () => {
+  const joe = { name: "Joe's Plumbing", names: ["Joe's Plumbing"], city: 'Tulsa' };
+  assert.equal(emailFrom([
+    { url: 'https://www.yelp.com/biz/joes-plumbing-tulsa', title: "Joe's Plumbing - Tulsa - Yelp", snippet: 'Contact feedback@yelp.com' },
+    { url: 'https://www.facebook.com/joesplumbingtulsa/', title: "Joe's Plumbing | Tulsa", snippet: "Joe's Plumbing, Tulsa. Email: JoesPlumbingTulsa@Gmail.com. 120 likes" },
+  ], joe), 'joesplumbingtulsa@gmail.com');
+  // Another business's email doesn't count
+  assert.equal(emailFrom([{ url: 'https://x.example/', title: 'Best plumbers in Tulsa', snippet: 'Call Bob: bob@bobsplumbing.com' }], joe), null);
+  // Placeholders and image names aren't emails
+  assert.equal(emailFrom([{ url: 'https://x.example/', title: "Joe's Plumbing", snippet: 'name@example.com logo@2x.png noreply@joes.com' }], joe), null);
+  // An address on their own domain wins over a free one
+  assert.equal(emailFrom([{ url: 'https://x.example/', title: "Joe's Plumbing Tulsa", snippet: 'joe123@yahoo.com or office@joesplumbing.com' }], joe), 'office@joesplumbing.com');
 });

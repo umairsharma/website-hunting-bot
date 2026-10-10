@@ -84,7 +84,7 @@ const RESULTS = [
   ] },
 
   { match: 'Mike Pipe Fix Lahore', results: [
-    { url: 'https://www.yellowpages.com.pk/mike-pipe-fix', title: 'Mike Pipe Fix - Plumbers in Lahore', snippet: 'Mike Pipe Fix, established in 2008, offers plumbing repairs.' },
+    { url: 'https://www.yellowpages.com.pk/mike-pipe-fix', title: 'Mike Pipe Fix - Plumbers in Lahore', snippet: 'Mike Pipe Fix, established in 2008, offers plumbing repairs. Email: MikePipeFix@gmail.com' },
   ] },
   { match: 'Delta Rooter Lahore instagram', results: [
     { url: 'https://www.instagram.com/deltafaucet/', title: 'Delta Faucet (@deltafaucet) • Instagram' },

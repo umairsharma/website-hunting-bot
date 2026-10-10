@@ -1,7 +1,7 @@
 // Extra details for a lead card, read from the search results the bot already has: where else the
 // business is listed, how long it's been around, and how active its social pages are.
 
-import { businessProfile, classifyUrl, compact, prettySite } from './matching.js';
+import { businessProfile, classifyUrl, compact, prettySite, siteMatchesBusiness } from './matching.js';
 import { socialProfile } from './socials.js';
 
 // Names for the directories people know, so the card says "Yelp", not "yelp.com".
@@ -127,4 +127,32 @@ export function activityFor(url, activity = {}) {
   if (!num) return null;
   const hit = Object.entries(activity).find(([k]) => k.startsWith(`${p.network}/`) && k.endsWith(num));
   return hit ? hit[1] : null;
+}
+
+// Addresses that are never the business's own: placeholders, automated senders, platforms' own mail.
+const NOT_THEIR_EMAIL = /^(no-?reply|noreply|donotreply|do-not-reply|privacy|abuse|postmaster|webmaster|example|test|user|name|email|your\.?name|someone|support|feedback|press|legal|dmca|ads|advertising|careers|jobs)@|@(example\.(com|org)|domain\.com|email\.com|sentry\.io|wixpress\.com|godaddy\.com|squarespace\.com|mysite\.com|yoursite\.com)$/i;
+const EMAIL = /[a-z0-9][a-z0-9._%+-]{0,63}@[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,12}/gi;
+
+/**
+ * The business's email, from the text of search results about it (directory snippets, their Facebook or
+ * Instagram page: "Email: joesplumbing@gmail.com"). A directory's or social site's own address never
+ * counts, and only results that name the business are read. Null if none.
+ */
+export function emailFrom(results, biz) {
+  const profile = biz.profile || businessProfile(biz.names || [biz.name], biz.city);
+  const found = [];
+  for (const r of results) {
+    if (!aboutBusiness(r, profile)) continue;
+    for (const raw of `${r.title || ''} ${r.snippet || ''}`.match(EMAIL) || []) {
+      const email = raw.toLowerCase().replace(/[.]+$/, '');
+      if (NOT_THEIR_EMAIL.test(email) || /\.(png|jpe?g|gif|webp|svg)$/.test(email)) continue;
+      const site = classifyUrl(`https://${email.split('@')[1]}/`);
+      if (site && site.kind !== 'website') continue; // @yelp.com, @facebook.com, @bookings site …
+      found.push(email);
+    }
+  }
+  if (!found.length) return null;
+  // An address on a domain named after the business first, then the rest (gmail etc.) in the order found.
+  const own = found.find((e) => siteMatchesBusiness(classifyUrl(`https://${e.split('@')[1]}/`)?.siteKey, profile));
+  return own || found[0];
 }
