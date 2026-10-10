@@ -11,7 +11,7 @@ import { buildMessages, sendMessages } from './discord.js';
 import { appendLead, loadState, saveState, writeLastRun, writeRunLeads } from './storage.js';
 import { leadsText } from './share.js';
 import { findSocials, orderSocials, socialProfile } from './socials.js';
-import { confirmByPhone, phonePattern, siteOrigins } from './verify.js';
+import { FREE_MAIL, confirmByPhone, confirmSite, phonePattern, siteOrigins, streetOf } from './verify.js';
 import { loadRecheck, recheckCandidate, saveRecheck } from './recheck.js';
 import { emailFrom, listingsFrom, sinceFrom, socialActivityFrom } from './details.js';
 import { endpoints, randomDelayMs, sleep, today } from './util.js';
@@ -228,6 +228,30 @@ async function checkBusiness(biz, ctx) {
     }
   }
   if (email && !biz.email) ctx.log(`   ✉️ Email: ${email}`);
+
+  // Last check before calling it a lead: a website found through their email or street address.
+  //  - info@joesplumbing.com: joesplumbing.com is likely their site, so open it.
+  //  - search for the email and the street address; a site showing their phone, email, or address and
+  //    name is theirs (same rule as the phone check, so a directory or someone else's site never counts).
+  const street = streetOf(maps?.address || biz.address);
+  if (found && cfg.phoneCheck && (email || street)) {
+    const facts = { phone: phoneForCheck, email, street, nameKeys: biz.profile?.keys || [] };
+    const domain = email && !FREE_MAIL.test(email) ? email.split('@')[1] : null;
+    let site = null;
+    if (domain && classifyUrl(`https://${domain}/`)?.kind === 'website') {
+      site = await confirmSite([`https://${domain}`], { ...facts, nameKeys: [...facts.nameKeys, ...(biz.profile?.tokenSets || []).map((t) => t.join(''))] });
+    }
+    if (!site && ctx.searchOn) {
+      await sleep(delay());
+      const query = [email && `"${email}"`, street && `"${street}" ${townOf(biz, maps?.address || biz.address)}`].filter(Boolean).join(' OR ');
+      const results = await searcher.find(query);
+      if (results) {
+        allResults.push(...results);
+        site = await confirmSite(siteOrigins(results), facts);
+      }
+    }
+    if (site) return { status: 'has_website', layer: 3, website: hostOf(site.origin), how: site.by };
+  }
   const since = sinceFrom(allResults, biz);
   return {
     status: 'lead',

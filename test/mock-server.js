@@ -125,8 +125,16 @@ export const SITES = {
   'https://mpf-services.example/': '<h1>MPF Services</h1><p>Plumbing and repairs</p>',
   'https://mpf-services.example/contact': '<p>WhatsApp <a href="tel:+923211234567">+92 321 1234567</a></p>',
 };
+// A site named nothing like the business, found by its street address, with the address and name on it.
+const ADDRESS_RESULTS = [
+  { match: '"3 Ferozepur Rd"', results: [
+    { url: 'https://www.zameen.com/Property/x', title: 'Shops on Ferozepur Road' },
+    { url: 'https://lahorepipeworks.example/about', title: 'About us' },
+  ] },
+];
+SITES['https://lahorepipeworks.example/'] = '<h1>Lahore Pipe Works</h1><p>Mike Pipe Fix &amp; sons, 3 Ferozepur Rd., Lahore</p>';
 const resultsFor = (q, scenario = {}) => {
-  const lists = scenario.phoneSites ? [...PHONE_RESULTS, ...RESULTS] : RESULTS;
+  const lists = [...(scenario.phoneSites ? PHONE_RESULTS : []), ...(scenario.addressSites ? ADDRESS_RESULTS : []), ...RESULTS];
   return (lists.find((r) => q.includes(r.match)) || { results: [] }).results;
 };
 
