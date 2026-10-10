@@ -133,8 +133,14 @@ const ADDRESS_RESULTS = [
   ] },
 ];
 SITES['https://lahorepipeworks.example/'] = '<h1>Lahore Pipe Works</h1><p>Mike Pipe Fix &amp; sons, 3 Ferozepur Rd., Lahore</p>';
+// A directory listing page that shows the business's email (and other businesses' and its own).
+const LISTING_RESULTS = [
+  { match: 'Delta Rooter Lahore', results: [{ url: 'https://www.yellowpages.com.pk/delta-rooter', title: 'Delta Rooter - Plumbers in Lahore' }] },
+];
+SITES['https://www.yellowpages.com.pk/delta-rooter'] = `<h1>Delta Rooter</h1><a class="email-business" href="mailto:DeltaRooter.Lhr@gmail.com?subject=Hi">Email Business</a>
+  <p>Contact us: help@yellowpages.com.pk</p><div class="similar">Ace Drain: <a href="mailto:ace@acedrainco.example">email</a></div>`;
 const resultsFor = (q, scenario = {}) => {
-  const lists = [...(scenario.phoneSites ? PHONE_RESULTS : []), ...(scenario.addressSites ? ADDRESS_RESULTS : []), ...RESULTS];
+  const lists = [...(scenario.phoneSites ? PHONE_RESULTS : []), ...(scenario.addressSites ? ADDRESS_RESULTS : []), ...(scenario.listingEmail ? LISTING_RESULTS : []), ...RESULTS];
   return (lists.find((r) => q.includes(r.match)) || { results: [] }).results;
 };
 

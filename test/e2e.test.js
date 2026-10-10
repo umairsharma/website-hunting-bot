@@ -537,3 +537,20 @@ test('Address and email check: a site found by their street address, with their 
     assert.ok(result.leads.some((l) => l.name === 'Delta Rooter')); // its address search finds nothing of theirs
   });
 });
+
+test('Email from a directory listing page: the business\'s own, not the directory\'s or a neighbour\'s', { timeout: 180000 }, async () => {
+  await withServer({ listingEmail: true }, async (server) => {
+    const logs = [];
+    const result = await run({
+      config: { ...CONFIG, categories: ['plumber'], mapsDiscovery: true },
+      dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m),
+    });
+    const logText = logs.join('\n');
+    assert.equal(result.error, null, logText);
+    const delta = result.leads.find((l) => l.name === 'Delta Rooter');
+    assert.equal(delta.email, 'deltarooter.lhr@gmail.com', logText);
+    assert.match(logText, /Email on their Yellow Pages listing/);
+    assert.ok(server.requests.sites.includes('https://www.yellowpages.com.pk/delta-rooter'));
+    assert.ok(!server.requests.google.some((q) => q === 'Delta Rooter Lahore email')); // found without another search
+  });
+});
