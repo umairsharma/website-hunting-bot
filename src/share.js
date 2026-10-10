@@ -2,7 +2,7 @@
 // of that lead typed in (the same details the card shows). The user picks the chat.
 
 import { hostOf, prettySite } from './matching.js';
-import { socialIcon, socialLabel } from './socials.js';
+import { socialIcon, socialLabel, socialProfile } from './socials.js';
 import { activityFor } from './details.js';
 
 /** A Google search for the business by name and town, for checking it by hand ("do they have a website?"). */
@@ -70,15 +70,40 @@ export function leadText(lead, { n = null, level = 0 } = {}) {
   return lines.join('\n');
 }
 
-/** wa.me link for one lead, with as many details as fit in a Discord field. */
+// What each social link opens, said plainly.
+const SOCIAL_PAGE = {
+  instagram: 'Instagram profile', facebook: 'Facebook page', tiktok: 'TikTok profile', x: 'X (Twitter) profile',
+  youtube: 'YouTube channel', linkedin: 'LinkedIn page',
+};
+
+/**
+ * The short version for sharing on WhatsApp: name, address, a Google search, the Google Maps listing,
+ * email, phone and social pages, each saying where it leads.
+ */
+export function shareText(lead, { maxSocials = 4 } = {}) {
+  const lines = [`*${lead.name}*`];
+  if (lead.address) lines.push(`🏠 Address: ${lead.address}`);
+  lines.push(`🔎 Google search for them: ${googleSearchUrl(lead)}`);
+  if (lead.mapsUrl) lines.push(`📍 ${lead.onMaps === false ? 'Their location on Google Maps' : 'Their Google Maps listing'}: ${lead.mapsUrl}`);
+  if (lead.email) lines.push(`✉️ Email: ${lead.email}`);
+  if (lead.phone) lines.push(`📞 Phone: ${lead.phone}`);
+  for (const url of (lead.socials || []).slice(0, maxSocials)) {
+    const p = socialProfile(url);
+    const what = p ? `${SOCIAL_PAGE[p.network] || `${p.label} page`}${p.display.startsWith('@') ? ` (${p.display})` : ''}` : `${prettySite(hostOf(url))} page`;
+    lines.push(`${socialIcon(url)} ${what}: ${url}`);
+  }
+  return lines.join('\n');
+}
+
+/** wa.me link for one lead (the short version above), kept to a length Discord and WhatsApp open reliably. */
 export function leadShareLink(lead) {
-  for (let level = 0; level <= 5; level += 1) {
-    const link = waLink(leadText(lead, { level }));
+  for (const maxSocials of [4, 2, 0]) {
+    const link = waLink(shareText(lead, { maxSocials }));
     if (link.length <= MAX_LINK) return link;
   }
-  // Very long name or address: name, phone and Maps link only, shortening the name until it fits.
-  for (let len = 80; len > 0; len -= 10) {
-    const link = waLink(leadText({ name: String(lead.name).slice(0, len), phone: lead.phone, mapsUrl: lead.mapsUrl }));
+  // Very long name or address: shorten them until it fits.
+  for (let len = 120; len > 0; len -= 20) {
+    const link = waLink(shareText({ ...lead, name: String(lead.name).slice(0, len), address: lead.address && String(lead.address).slice(0, len), socials: [] }));
     if (link.length <= MAX_LINK) return link;
   }
   return waLink(String(lead.name).slice(0, 40));

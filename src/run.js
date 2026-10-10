@@ -13,7 +13,7 @@ import { leadsText } from './share.js';
 import { findSocials, orderSocials, socialProfile } from './socials.js';
 import { confirmByPhone, phonePattern, siteOrigins } from './verify.js';
 import { loadRecheck, recheckCandidate, saveRecheck } from './recheck.js';
-import { listingsFrom, sinceFrom, socialActivityFrom } from './details.js';
+import { emailFrom, listingsFrom, sinceFrom, socialActivityFrom } from './details.js';
 import { endpoints, randomDelayMs, sleep, today } from './util.js';
 
 const KNOWN_ENGINES = ENGINE_NAMES; // google, brave, startpage, bing, duckduckgo
@@ -34,6 +34,7 @@ const DEFAULTS = {
   findSocials: true, // search for each lead's Instagram (and Facebook) page
   recheck: false, // recheck earlier leads (data/recheck.json) instead of finding new ones
   phoneCheck: true, // a site with the business's phone number on it is theirs, whatever its name
+  findEmail: true, // look for each lead's email (one more search when the others didn't show it)
   mapsSearch: [], // extra Google Maps searches, e.g. ['roofers'] (the Run workflow form's "any business type" box)
   delaySeconds: [4, 9],
   postSummaryWhenEmpty: true,
@@ -59,6 +60,7 @@ export function normalizeConfig(raw = {}) {
   cfg.mapsDiscovery = cfg.mapsDiscovery !== false;
   cfg.findSocials = cfg.findSocials !== false;
   cfg.phoneCheck = cfg.phoneCheck !== false;
+  cfg.findEmail = cfg.findEmail !== false;
   cfg.recheck = cfg.recheck === true;
   if (cfg.recheck) {
     // Earlier leads come from many cities; each keeps its own city and country.
@@ -89,13 +91,17 @@ function websiteNote(site) {
  * A lead's Instagram (and Facebook, when it comes up too): one more search, e.g.
  * "Roy's Plumbing Abbeville instagram". Only profiles that are clearly this business are kept.
  */
+/** For a run over a whole state, the business's own town from its address ("…, Abbeville, MS 38601"). */
+function townOf(biz, address) {
+  const parts = String(address || '').split(',').map((x) => x.trim()).filter(Boolean);
+  const inCity = compact(address).includes(compact(biz.city));
+  return (!inCity && parts.length >= 3 && !/\d/.test(parts.at(-2)) ? parts.at(-2) : null) || biz.city;
+}
+
 // Returns { urls: the new profiles, results: all search results looked at }.
 async function findSocialPages(biz, known, address, ctx) {
   const has = (network) => known.some((url) => socialProfile(url)?.network === network);
-  // For a run over a whole state, the business's own town from its address ("…, Abbeville, MS 38601").
-  const parts = String(address || '').split(',').map((x) => x.trim()).filter(Boolean);
-  const inCity = compact(address).includes(compact(biz.city));
-  const town = (!inCity && parts.length >= 3 && !/\d/.test(parts.at(-2)) ? parts.at(-2) : null) || biz.city;
+  const town = townOf(biz, address);
   const found = [];
   const seen = []; // every result, for the card's extra details (followers, other listings)
   // One search, for Instagram: free search engines block the bot after a few dozen searches, so each one
@@ -211,6 +217,17 @@ async function checkBusiness(biz, ctx) {
     socials.push(...extra.urls);
     allResults.push(...extra.results);
   }
+  // Their email: from what the searches so far turned up, else one search for it.
+  let email = biz.email || emailFrom(allResults, biz);
+  if (!email && found && cfg.findEmail && ctx.searchOn && !generic) {
+    await sleep(delay());
+    const results = await searcher.find([biz.searchName, townOf(biz, maps?.address || biz.address), 'email'].filter(Boolean).join(' '));
+    if (results) {
+      allResults.push(...results);
+      email = emailFrom(results, biz);
+    }
+  }
+  if (email && !biz.email) ctx.log(`   ✉️ Email: ${email}`);
   const since = sinceFrom(allResults, biz);
   return {
     status: 'lead',
@@ -221,7 +238,7 @@ async function checkBusiness(biz, ctx) {
       categoryLabel: biz.categoryLabel,
       phone,
       whatsapp: toWhatsApp(maps?.phoneTel || phone, biz.phoneCountryCode ?? cfg.phoneCountryCode),
-      email: biz.email,
+      email,
       address: maps?.address || biz.address,
       rating: maps?.rating ?? null,
       reviews: maps?.reviews ?? null,
