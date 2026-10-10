@@ -540,7 +540,13 @@ test('Send to WhatsApp: the short version, each link saying where it leads', () 
   const all = leadsText([lead, { name: 'B', phone: '1' }], 'Houston, United States');
   assert.ok(all.startsWith('🎯 2 website leads · Houston, United States\n\n1. 🔥 *Snowflake (Donuts) & Co*'));
   assert.ok(all.includes('📝 Their Google listing is unclaimed') && all.includes('2. *B*\n📞 1'));
-  assert.equal(leadText({ name: 'C', city: 'Memphis' }), '*C*\n🔎 https://www.google.com/search?q=C%20Memphis');
+  // Phone, address or email not found: said plainly, on the card and in the WhatsApp text
+  assert.equal(leadText({ name: 'C', city: 'Memphis' }),
+    '*C*\n📞 Phone: ❌ not found\n🏠 Address: ❌ not found\n🔎 https://www.google.com/search?q=C%20Memphis\n✉️ Email: ❌ not found');
+  const bare = { name: 'D', city: 'Memphis' };
+  assert.equal(shareText(bare), '*D*\n🏠 Address: ❌ not found\n🔎 Google search for them: https://www.google.com/search?q=D%20Memphis\n✉️ Email: ❌ not found\n📞 Phone: ❌ not found');
+  const bareCard = leadEmbed(bare);
+  for (const name of ['Phone', 'Address', 'Email']) assert.equal(bareCard.fields.find((f) => f.name === name).value, '❌ Not found');
 });
 
 test('Google Maps search phrases: every category has one; place IDs read from listing links', () => {
