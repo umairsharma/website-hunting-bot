@@ -1,20 +1,20 @@
 {
-  "startedAt": "2026-10-10T12:10:30.152Z",
-  "finishedAt": "2026-10-10T12:30:58.947Z",
-  "minutes": 20.5,
+  "startedAt": "2026-10-10T12:45:14.399Z",
+  "finishedAt": "2026-10-10T13:06:17.353Z",
+  "minutes": 21,
   "place": "Dallas, United States",
   "area": "Dallas, Dallas County, Texas, United States",
   "candidates": 965,
   "discovered": 0,
   "mapsListed": 0,
-  "checked": 25,
-  "leads": 10,
-  "hasWebsite": 15,
+  "checked": 30,
+  "leads": 12,
+  "hasWebsite": 18,
   "closed": 0,
   "unverified": 0,
-  "pending": 904,
+  "pending": 875,
   "ai": {
-    "calls": 14,
+    "calls": 30,
     "searches": 1,
     "off": null,
     "searchOff": "Gemini kept refusing Google searches (over its quota)"
@@ -23,13 +23,12 @@
     "gemini": "broken",
     "google": "broken",
     "brave": "blocked",
-    "startpage": "blocked",
-    "bing": "broken",
-    "duckduckgo": "blocked"
+    "startpage": "ok",
+    "bing": "ok",
+    "duckduckgo": "untested"
   },
   "warnings": [
-    "Every search engine blocked the bot, so it stopped early. The rest will be checked next run.",
-    "Web search: Google (via Gemini) didn't work, Google didn't work, Brave blocked the bot, Startpage blocked the bot, Bing didn't work, DuckDuckGo blocked the bot.",
+    "Web search: Google (via Gemini) didn't work, Google didn't work, Brave blocked the bot, so it used Startpage + Bing.",
     "AI (Gemini): Gemini kept refusing Google searches (over its quota), so web searches used the other engines. The AI still checked Maps listings and websites."
   ],
   "error": null
