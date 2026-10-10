@@ -1,10 +1,12 @@
 // Layer 3 — web search for "<business name> <city>" to catch websites that Google Maps doesn't link.
+// With a Gemini key, Gemini searches Google itself first (never blocked, until the day's free quota runs out).
 // Google blocks bots often, so Brave, Startpage, Bing and DuckDuckGo are automatic fallbacks.
 // Brave uses its official Search API when a BRAVE_API_KEY is set (never blocked), otherwise its website.
 
 import { gotoPage, isBlocked } from './browser.js';
 import { hostOf, unwrapRedirect } from './matching.js';
 import { sleep } from './util.js';
+import { aiGoogleSearch } from './ai.js';
 
 // A search that must return the official site. If it doesn't, that engine is blocked or broken this run.
 export const SEARCH_CANARY = { query: 'Eiffel Tower official website', expectHost: 'toureiffel.paris' };
@@ -73,7 +75,10 @@ const ENGINES = {
 
 export const ENGINE_NAMES = Object.keys(ENGINES);
 
-export const engineLabel = (name) => (name === 'brave' && process.env.BRAVE_API_KEY ? 'Brave (API)' : ENGINES[name]?.label || name);
+export const engineLabel = (name) => {
+  if (name === 'gemini') return 'Google (via Gemini)';
+  return name === 'brave' && process.env.BRAVE_API_KEY ? 'Brave (API)' : ENGINES[name]?.label || name;
+};
 
 /** Brave Search API: JSON over HTTPS, no browser, made for bots. */
 async function runBraveApi(query, ep, key) {
@@ -103,7 +108,8 @@ async function runBraveApi(query, ep, key) {
   }
 }
 
-async function runEngine(page, name, query, ep) {
+async function runEngine(page, name, query, ep, ai) {
+  if (name === 'gemini') return aiGoogleSearch(ai, query);
   if (name === 'brave' && process.env.BRAVE_API_KEY) return runBraveApi(query, ep, process.env.BRAVE_API_KEY);
   const engine = ENGINES[name];
   try {
@@ -134,14 +140,15 @@ async function runEngine(page, name, query, ep) {
  * and when every engine is resting the search waits for the first one to come back, if the run has time.
  */
 export function createSearcher({
-  page, order, ep, delay = () => 0, log = () => {},
+  page, order, ep, ai = null, delay = () => 0, log = () => {},
   cooldownMs = 5 * 60000, maxBlocks = 2, deadline = Infinity, retryTestMs = 5000,
 }) {
   const state = {};
-  for (const name of order) if (ENGINES[name]) state[name] = { status: 'untested', errors: 0, blocks: 0, blockedAt: 0 };
+  // ai: a Gemini client (ai.js); Google through Gemini then goes first.
+  for (const name of [...(ai?.enabled ? ['gemini'] : []), ...order]) if (ENGINES[name] || name === 'gemini') state[name] = { status: 'untested', errors: 0, blocks: 0, blockedAt: 0 };
 
   async function selfTestOnce(name) {
-    const r = await runEngine(page, name, SEARCH_CANARY.query, ep);
+    const r = await runEngine(page, name, SEARCH_CANARY.query, ep, ai);
     if (r.blocked) return { status: 'blocked' };
     if (r.error) return { status: 'broken', why: r.error };
     if (!r.results.some((x) => hostOf(x.url).endsWith(SEARCH_CANARY.expectHost))) {
@@ -190,7 +197,7 @@ export function createSearcher({
         if (st.status !== 'ok') continue;
         await sleep(delay());
       }
-      const r = await runEngine(page, name, query, ep);
+      const r = await runEngine(page, name, query, ep, ai);
       if (r.blocked) {
         markBlocked(st);
         log(`   ⛔ ${engineLabel(name)} blocked the bot, switching engine${canRetry(st) ? ` (will try it again in ${Math.round(cooldownMs / 60000)} min)` : ''}`);

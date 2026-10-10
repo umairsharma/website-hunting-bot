@@ -37,7 +37,7 @@ const DEFAULTS = {
   phoneCheck: true, // a site with the business's phone number on it is theirs, whatever its name
   findEmail: true, // look for each lead's email (one more search when the others didn't show it)
   ai: true, // Gemini double-checks Maps listings and websites (needs GEMINI_API_KEY; skipped without it)
-  aiMaxCalls: 100, // AI questions per run at most (the free tier allows about 250 a day)
+  aiMaxCalls: 250, // AI questions (Google searches included) per run at most
   aiMinIntervalMs: 6500, // the free tier allows 10 questions a minute
   mapsSearch: [], // extra Google Maps searches, e.g. ['roofers'] (the Run workflow form's "any business type" box)
   delaySeconds: [4, 9],
@@ -505,12 +505,12 @@ async function checkQueue(ctx) {
   try {
     const mapsPage = await context.newPage();
     const searchPage = await context.newPage();
-    searcher = createSearcher({
-      page: searchPage, order: cfg.searchEngines, ep, delay, log, deadline, cooldownMs: cfg.searchCooldownMinutes * 60000,
-    });
     const ai = cfg.ai ? createAi({ log, maxCalls: cfg.aiMaxCalls, minIntervalMs: cfg.aiMinIntervalMs }) : null;
     if (ai && !ai.enabled) warnings.push('GEMINI_API_KEY is not set, so the AI checks were skipped this run.');
-    else if (ai) log('🤖 AI checks on (Gemini)');
+    else if (ai) log('🤖 AI checks on (Gemini), and Gemini searches Google first');
+    searcher = createSearcher({
+      page: searchPage, order: cfg.searchEngines, ep, ai, delay, log, deadline, cooldownMs: cfg.searchCooldownMinutes * 60000,
+    });
     const session = { ...ctx, mapsPage, searcher, delay, mapsOn: true, searchOn: true, ai: ai?.enabled ? ai : null };
     if (ai) ctx.stats.ai = ai.state; // questions asked, and why the AI stopped (if it did)
 
@@ -592,6 +592,7 @@ function summaryText(cfg, stats, warnings, fatal) {
     if (stats.closed) bits.push(`🚫 ${stats.closed} closed`);
     if (stats.unverified) bits.push(`⏳ ${stats.unverified} to retry`);
     if (bits.length) lines.push(bits.join(' · '));
+    if (stats.ai?.calls) lines.push(`🤖 Gemini: ${stats.ai.calls} questions, ${stats.ai.searches} of them Google searches`);
     lines.push(cfg?.recheck
       ? `🔎 ${stats.pending.toLocaleString('en-US')} earlier leads still to recheck${stats.pending ? '' : ' · all done ✅'}`
       : `🔎 Checked ${stats.checked} this run${stats.discovered ? ` (${stats.discovered} found by searching Google Maps)` : ''} · ${stats.pending.toLocaleString('en-US')} still in the queue`);

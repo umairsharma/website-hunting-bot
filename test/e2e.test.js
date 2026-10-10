@@ -581,7 +581,7 @@ test('AI (Gemini): picks the Maps listing under another name, reads listing page
     },
     gemini: [
       { match: ['Noor Clinic', 'Dr. Ahmed Family Dental Care'], reply: { match: 0, confidence: 'high', reason: 'Noor Clinic is run by Dr. Ahmed' } },
-      { match: ['Search Google', 'Mike Pipe Fix'], reply: { hasWebsite: true, url: 'mikefix-pk.example', confidence: 'medium', reason: 'found their site' } },
+      { match: ['Search Google to find out', 'Mike Pipe Fix'], reply: { hasWebsite: true, url: 'mikefix-pk.example', confidence: 'medium', reason: 'found their site' } },
       { match: ['Does this website belong', 'mikefix-pk.example'], reply: { belongs: true, confidence: 'high', reason: 'same owner, same town' } },
     ],
   };
@@ -599,7 +599,11 @@ test('AI (Gemini): picks the Maps listing under another name, reads listing page
     assert.match(logText, /Has a website: ahmeddental\.example \(found by Google Maps\)/);
     // Listing page: another phone number, searched on its own, finds their site
     assert.match(logText, /Their Yellow Pages listing: phone, address/);
-    assert.ok(server.requests.google.includes('"0300 7654321"'), server.requests.google.join(' | '));
+    assert.ok(server.requests.geminiSearches.includes('"0300 7654321"'), server.requests.geminiSearches.join(' | '));
+    // Searches go to Google through Gemini first (an empty answer is double-checked with the next engine)
+    assert.ok(server.requests.geminiSearches.includes('Eiffel Tower official website'));
+    assert.ok(server.requests.geminiSearches.includes('Delta Rooter Lahore'));
+    assert.ok(!server.requests.google.includes('Delta Rooter Lahore'));
     assert.match(logText, /Has a website: lahore-drains\.example \(found by web search, their phone number is on it\)/);
     // The AI's Google search found a site; it read the page and said it's theirs
     assert.ok(server.requests.gemini.some((r) => r.search && r.prompt.includes('Mike Pipe Fix')));
@@ -622,5 +626,22 @@ test('AI (Gemini): daily limit reached → the run carries on without it and say
     assert.equal(server.requests.gemini.length, 1); // asked once, then left alone
     assert.ok(result.warnings.some((w) => /AI \(Gemini\): Gemini's free daily limit was reached/.test(w)), result.warnings.join(' | '));
     assert.ok(result.leads.some((l) => l.name === 'Mike Pipe Fix'));
+  });
+});
+
+test('Google through Gemini: only pages on sites Google returned count; a made-up address is dropped', { timeout: 180000 }, async () => {
+  await withServer({ geminiMadeUp: true }, async (server) => {
+    const logs = [];
+    const result = await run({
+      config: { ...CONFIG, categories: ['plumber'], mapsDiscovery: true, ai: true, aiMinIntervalMs: 0 },
+      dataDir: tempDir(), webhookUrl: `${server.base}/discord/webhook`, log: (m) => logs.push(m),
+    });
+    const logText = logs.join('\n');
+    assert.equal(result.error, null, logText);
+    assert.match(logText, /Google \(via Gemini\) self-test: ok/);
+    assert.equal(result.searchEngines.gemini, 'ok');
+    assert.ok(!/made-up-site/.test(logText));
+    assert.ok(result.leads.some((l) => l.name === 'Mike Pipe Fix'), logText);
+    assert.match(result.leads[0].checks, /Google \(via Gemini\) ✓ · AI ✓/);
   });
 });
