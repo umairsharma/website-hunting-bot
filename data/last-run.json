@@ -1,20 +1,20 @@
 {
-  "startedAt": "2026-10-11T11:15:44.857Z",
-  "finishedAt": "2026-10-11T11:34:34.730Z",
-  "minutes": 18.8,
-  "place": "Nashville, United States",
-  "area": "Nashville, Davidson County, Middle Tennessee, Tennessee, United States",
-  "candidates": 414,
-  "discovered": 0,
-  "mapsListed": 0,
-  "checked": 30,
-  "leads": 7,
-  "hasWebsite": 23,
+  "startedAt": "2026-10-12T09:22:20.099Z",
+  "finishedAt": "2026-10-12T09:38:02.955Z",
+  "minutes": 15.7,
+  "place": "Manchester, United Kingdom",
+  "area": "Manchester, Greater Manchester, England, United Kingdom",
+  "candidates": 0,
+  "discovered": 18,
+  "mapsListed": 80,
+  "checked": 12,
+  "leads": 10,
+  "hasWebsite": 2,
   "closed": 0,
   "unverified": 0,
-  "pending": 265,
+  "pending": 6,
   "ai": {
-    "calls": 19,
+    "calls": 3,
     "searches": 1,
     "off": null,
     "searchOff": "Gemini kept refusing Google searches (over its quota)"
@@ -24,11 +24,12 @@
     "google": "broken",
     "brave": "blocked",
     "startpage": "blocked",
-    "bing": "ok",
-    "duckduckgo": "untested"
+    "bing": "broken",
+    "duckduckgo": "blocked"
   },
   "warnings": [
-    "Web search: Google (via Gemini) didn't work, Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing.",
+    "Every search engine blocked the bot, so it stopped early. The rest will be checked next run.",
+    "Web search: Google (via Gemini) didn't work, Google didn't work, Brave blocked the bot, Startpage blocked the bot, Bing didn't work, DuckDuckGo blocked the bot.",
     "AI (Gemini): Gemini kept refusing Google searches (over its quota), so web searches used the other engines. The AI still checked Maps listings and websites."
   ],
   "error": null
