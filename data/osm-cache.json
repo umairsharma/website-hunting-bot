@@ -7350,5 +7350,8 @@
    {"type":"way","id":1306909793,"center":{"lat":33.4151058,"lon":-112.0043055},"tags":{"addr:city":"Phoenix","addr:housenumber":"3450","addr:postcode":"85040","addr:state":"AZ","addr:street":"South 36th Street","building":"yes","craft":"plumber","name":"Oh No Plumbing & Air Conditioning"}},
    {"type":"way","id":1307144653,"center":{"lat":33.4121316,"lon":-111.9983152},"tags":{"addr:city":"Phoenix","addr:housenumber":"3826","addr:postcode":"85040","addr:state":"AZ","addr:street":"East Illini Street","building":"yes","craft":"plumber","name":"Option One Plumbing"}},
    {"type":"way","id":1544988965,"center":{"lat":33.3967109,"lon":-112.0018095},"tags":{"addr:city":"Phoenix","addr:housenumber":"3655","addr:postcode":"85040","addr:state":"AZ","addr:street":"East La Salle Street","building":"yes","craft":"plumber","name":"The Plumber's Choice"}}
+ ]},
+ "Nashville|USA|0||no-chains|craft=plumber": {"fetched": "2026-10-12T15:01:48.480Z", "elements": [
+
  ]}
 }
