@@ -7326,5 +7326,29 @@
  ]},
  "Manchester|United Kingdom|0||no-chains|craft=plumber": {"fetched": "2026-10-12T09:22:23.062Z", "elements": [
 
+ ]},
+ "Phoenix, Arizona|United States of America|0||no-chains|craft=plumber": {"fetched": "2026-10-12T11:17:51.425Z", "elements": [
+   {"type":"node","id":11050269579,"lat":33.6769927,"lon":-112.0373725,"tags":{"craft":"plumber","name":"Custom Plumbing of Arizona"}},
+   {"type":"node","id":11374661402,"lat":33.4611053,"lon":-112.1738876,"tags":{"craft":"plumber","name":"Anthony's Plumbing"}},
+   {"type":"node","id":11951239139,"lat":33.4041906,"lon":-111.9985766,"tags":{"craft":"plumber","name":"Reece Plumbing"}},
+   {"type":"node","id":11951298186,"lat":33.4046738,"lon":-112.0023063,"tags":{"craft":"plumber","name":"Nu Flow"}},
+   {"type":"node","id":11952737194,"lat":33.4007642,"lon":-111.9962244,"tags":{"craft":"plumber","name":"Wave Supply"}},
+   {"type":"node","id":14055364378,"lat":33.3990201,"lon":-111.9992262,"tags":{"craft":"plumber","name":"Peerless Plumbing & Nudrain Phoenix"}},
+   {"type":"node","id":14055395140,"lat":33.3921574,"lon":-111.9940422,"tags":{"craft":"plumber","name":"Allan J Coleman"}},
+   {"type":"way","id":82162159,"center":{"lat":33.6765717,"lon":-112.0284896},"tags":{"addr:city":"Phoenix","addr:country":"US","addr:housenumber":"2515","addr:postcode":"85050","addr:state":"AZ","addr:street":"East Rose Garden Lane","building":"commercial","craft":"plumber","name":"Brown's Partsmaster Inc","source":"esri_USDOT_Arizona"}},
+   {"type":"way","id":131563690,"center":{"lat":33.4522311,"lon":-112.1656092},"tags":{"addr:city":"Phoenix","addr:housenumber":"505","addr:postcode":"85043","addr:state":"AZ","addr:street":"North 51st Avenue","building":"yes","craft":"plumber","name":"Advanced Drainage Systems, Inc."}},
+   {"type":"way","id":131890986,"center":{"lat":33.4225323,"lon":-112.0629765},"tags":{"addr:city":"Phoenix","addr:housenumber":"813","addr:postcode":"85034","addr:state":"AZ","addr:street":"East University Drive","building":"yes","craft":"plumber","name":"Van Marcke Plumbing Supply","source":"esri/USA_NAD_Addresses"}},
+   {"type":"way","id":210917839,"center":{"lat":33.4235878,"lon":-112.0286761},"tags":{"addr:city":"Phoenix","addr:country":"US","addr:housenumber":"2445","addr:postcode":"85034","addr:state":"AZ","addr:street":"East University Drive","building":"yes","craft":"plumber","name":"Water Treatment Technologies"}},
+   {"type":"way","id":215261642,"center":{"lat":33.4117678,"lon":-112.0011294},"tags":{"addr:city":"Phoenix","addr:housenumber":"3830","addr:postcode":"85040","addr:state":"AZ","addr:street":"South 38th Street","building":"yes","craft":"plumber","name":"George Brazil Plumbing & Electrical"}},
+   {"type":"way","id":503491255,"center":{"lat":33.6783669,"lon":-112.0337005},"tags":{"addr:city":"Phoenix","addr:country":"US","addr:housenumber":"2239","addr:postcode":"85024","addr:state":"AZ","addr:street":"East Rose Garden Loop","building":"commercial","craft":"plumber","name":"Moon Valley Plumbing","source":"esri_USDOT_Arizona"}},
+   {"type":"way","id":503491265,"center":{"lat":33.6775623,"lon":-112.0340163},"tags":{"addr:city":"Phoenix","addr:country":"US","addr:housenumber":"2228","addr:postcode":"85024","addr:state":"AZ","addr:street":"East Rose Garden Loop","building":"commercial","craft":"plumber","name":"Walker Plumbing & HVAC","source":"esri_USDOT_Arizona"}},
+   {"type":"way","id":907575070,"center":{"lat":33.4150181,"lon":-112.0240032},"tags":{"addr:city":"Phoenix","addr:housenumber":"2626","addr:postcode":"85040","addr:state":"AZ","addr:street":"East Elwood Street","building":"yes","craft":"plumber","name":"Alliance Plumbing"}},
+   {"type":"way","id":948289590,"center":{"lat":33.4655333,"lon":-112.0470111},"tags":{"addr:city":"Phoenix","addr:housenumber":"1613","addr:postcode":"85006","addr:state":"AZ","addr:street":"East McDowell Road","building":"retail","craft":"plumber","name":"Phoenix Plumbers & Drain Clean Services","source":"esri_USDOT_Arizona"}},
+   {"type":"way","id":952157203,"center":{"lat":33.3977285,"lon":-111.99759},"tags":{"addr:city":"Phoenix","addr:housenumber":"3831","addr:postcode":"85040","addr:state":"AZ","addr:street":"East Grove Street","building":"yes","craft":"plumber","name":"Backflow Prevention Device Inspections","source":"microsoft/BuildingFootprints;esri/USA_NAD_Addresses"}},
+   {"type":"way","id":1004594322,"center":{"lat":33.4579709,"lon":-112.1705324},"tags":{"addr:city":"Phoenix","addr:housenumber":"5127","addr:postcode":"85043","addr:state":"AZ","addr:street":"West Roosevelt Street","building":"yes","craft":"plumber","name":"JFN Mechanical","source":"microsoft/BuildingFootprints;esri/USA_NAD_Addresses"}},
+   {"type":"way","id":1077123881,"center":{"lat":33.424773,"lon":-112.041655},"tags":{"addr:city":"Phoenix","addr:housenumber":"2424","addr:postcode":"85034","addr:state":"AZ","addr:street":"South 19th Street","building":"yes","craft":"plumber","name":"Southwest Water Solutions","source":"microsoft/BuildingFootprints"}},
+   {"type":"way","id":1306909793,"center":{"lat":33.4151058,"lon":-112.0043055},"tags":{"addr:city":"Phoenix","addr:housenumber":"3450","addr:postcode":"85040","addr:state":"AZ","addr:street":"South 36th Street","building":"yes","craft":"plumber","name":"Oh No Plumbing & Air Conditioning"}},
+   {"type":"way","id":1307144653,"center":{"lat":33.4121316,"lon":-111.9983152},"tags":{"addr:city":"Phoenix","addr:housenumber":"3826","addr:postcode":"85040","addr:state":"AZ","addr:street":"East Illini Street","building":"yes","craft":"plumber","name":"Option One Plumbing"}},
+   {"type":"way","id":1544988965,"center":{"lat":33.3967109,"lon":-112.0018095},"tags":{"addr:city":"Phoenix","addr:housenumber":"3655","addr:postcode":"85040","addr:state":"AZ","addr:street":"East La Salle Street","building":"yes","craft":"plumber","name":"The Plumber's Choice"}}
  ]}
 }

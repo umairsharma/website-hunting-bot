@@ -1,20 +1,20 @@
 {
-  "startedAt": "2026-10-12T09:22:20.099Z",
-  "finishedAt": "2026-10-12T09:38:02.955Z",
-  "minutes": 15.7,
-  "place": "Manchester, United Kingdom",
-  "area": "Manchester, Greater Manchester, England, United Kingdom",
-  "candidates": 0,
-  "discovered": 18,
-  "mapsListed": 80,
-  "checked": 12,
-  "leads": 10,
-  "hasWebsite": 2,
+  "startedAt": "2026-10-12T11:17:10.085Z",
+  "finishedAt": "2026-10-12T11:35:37.767Z",
+  "minutes": 18.5,
+  "place": "Phoenix, Arizona, United States of America",
+  "area": "Phoenix, Maricopa County, Arizona, United States",
+  "candidates": 22,
+  "discovered": 7,
+  "mapsListed": 118,
+  "checked": 29,
+  "leads": 9,
+  "hasWebsite": 20,
   "closed": 0,
   "unverified": 0,
-  "pending": 6,
+  "pending": 0,
   "ai": {
-    "calls": 3,
+    "calls": 22,
     "searches": 1,
     "off": null,
     "searchOff": "Gemini kept refusing Google searches (over its quota)"
@@ -24,12 +24,11 @@
     "google": "broken",
     "brave": "blocked",
     "startpage": "blocked",
-    "bing": "broken",
-    "duckduckgo": "blocked"
+    "bing": "ok",
+    "duckduckgo": "untested"
   },
   "warnings": [
-    "Every search engine blocked the bot, so it stopped early. The rest will be checked next run.",
-    "Web search: Google (via Gemini) didn't work, Google didn't work, Brave blocked the bot, Startpage blocked the bot, Bing didn't work, DuckDuckGo blocked the bot.",
+    "Web search: Google (via Gemini) didn't work, Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing.",
     "AI (Gemini): Gemini kept refusing Google searches (over its quota), so web searches used the other engines. The AI still checked Maps listings and websites."
   ],
   "error": null
