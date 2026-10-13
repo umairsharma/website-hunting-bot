@@ -5731,7 +5731,7 @@
    {"type":"way","id":892847248,"center":{"lat":43.600384,"lon":-116.228956},"tags":{"addr:city":"Boise","addr:housenumber":"3803","addr:postcode":"83705","addr:state":"ID","addr:street":"West Rose Hill Street","building":"yes","name":"Rudy's Auto Repair","shop":"car_repair","source":"microsoft/BuildingFootprints"}},
    {"type":"way","id":1029461649,"center":{"lat":43.595272,"lon":-116.1938945},"tags":{"addr:city":"Boise","addr:housenumber":"1415","addr:postcode":"83706","addr:state":"ID","addr:street":"South Broadway Avenue","building":"yes","name":"Einstein's Oilery","shop":"car_repair","source":"microsoft/BuildingFootprints"}}
  ]},
- "Nashville|United States|0||no-chains|amenity=restaurant": {"fetched": "2026-10-06T11:19:58.702Z", "elements": [
+ "Nashville|United States|0||no-chains|amenity=restaurant": {"fetched": "2026-10-13T18:07:48.931Z", "elements": [
    {"type":"node","id":587895072,"lat":36.0711702,"lon":-86.68495,"tags":{"amenity":"restaurant","cuisine":"lao;thai","name":"King Market"}},
    {"type":"node","id":660520022,"lat":36.0835679,"lon":-86.6887333,"tags":{"amenity":"restaurant","cuisine":"mexican","name":"Las Palmas"}},
    {"type":"node","id":761667243,"lat":36.0410368,"lon":-86.7423825,"tags":{"amenity":"restaurant","name":"Las Palmas Mexican Restaurant"}},
@@ -5839,7 +5839,7 @@
    {"type":"node","id":8522489426,"lat":36.1956589,"lon":-86.7230548,"tags":{"addr:city":"Nashville","addr:housenumber":"1601","addr:postcode":"37216","addr:state":"TN","addr:street":"Riverside Drive","addr:unit":"A","amenity":"restaurant","cuisine":"asian","name":"Babo Korean Bar"}},
    {"type":"node","id":8525087642,"lat":36.1886654,"lon":-86.7467189,"tags":{"amenity":"restaurant","cuisine":"sushi","name":"Nomzilla!"}},
    {"type":"node","id":8677821263,"lat":36.185568,"lon":-86.7680419,"tags":{"addr:city":"Nashville","addr:housenumber":"823","addr:postcode":"37207","addr:state":"TN","addr:street":"Meridian Street","amenity":"restaurant","name":"Folk"}},
-   {"type":"node","id":8710461417,"lat":36.1603359,"lon":-86.7793612,"tags":{"amenity":"restaurant","check_date":"2025-09-04","cuisine":"chicken","indoor_seating":"yes","level":"1","name":"Hattie B’s Hot Chicken","opening_hours":"Mo-Th 11:00-22:00; Fr-Sa 11:00-00:00; Su 11:00-23:00","outdoor_seating":"yes","payment:credit_cards":"yes","payment:debit_cards":"yes","phone":"+1-615-576-8700","wheelchair":"yes"}},
+   {"type":"node","id":8710461417,"lat":36.1603359,"lon":-86.7793612,"tags":{"amenity":"restaurant","check_date":"2026-10-08","cuisine":"chicken","indoor_seating":"yes","level":"1","name":"Hattie B’s Hot Chicken","opening_hours":"Mo-Th 11:00-22:00; Fr-Sa 11:00-00:00; Su 11:00-23:00","outdoor_seating":"yes","payment:credit_cards":"yes","payment:debit_cards":"yes","phone":"+1-615-576-8700","wheelchair":"yes"}},
    {"type":"node","id":9469541947,"lat":36.1377031,"lon":-86.8005733,"tags":{"amenity":"restaurant","cuisine":"steak_house","diet:non-vegetarian":"yes","diet:non_vegan":"yes","name":"E3 Chophouse"}},
    {"type":"node","id":9611132617,"lat":36.1777937,"lon":-86.7519453,"tags":{"amenity":"restaurant","name":"Noble’s Kitchen & Beer Hall"}},
    {"type":"node","id":9664114810,"lat":36.2345966,"lon":-86.7063849,"tags":{"amenity":"restaurant","cuisine":"southern;american","name":"Cock of the Walk"}},
@@ -5954,7 +5954,7 @@
    {"type":"way","id":1355284542,"center":{"lat":36.1296266,"lon":-86.6673787},"tags":{"amenity":"restaurant","building":"yes","name":"Puckett's"}},
    {"type":"way","id":1355284543,"center":{"lat":36.1297603,"lon":-86.6672342},"tags":{"amenity":"restaurant","building":"yes","name":"The Southern Steak & Oyster"}}
  ]},
- "Nashville|United States|0||no-chains|amenity=cafe": {"fetched": "2026-10-06T11:20:45.344Z", "elements": [
+ "Nashville|United States|0||no-chains|amenity=cafe": {"fetched": "2026-10-13T18:08:18.136Z", "elements": [
    {"type":"node","id":823638769,"lat":36.08801,"lon":-86.74259,"tags":{"amenity":"cafe","name":"Zoofari Cafe","source":"survey"}},
    {"type":"node","id":1960587442,"lat":36.1364319,"lon":-86.8007256,"tags":{"addr:city":"Nashville","addr:state":"TN","addr:street":"21st Avenue South","amenity":"cafe","name":"Fido"}},
    {"type":"node","id":2886991164,"lat":36.1053668,"lon":-86.7955353,"tags":{"amenity":"cafe","name":"The Well Coffeehouse"}},
@@ -6026,7 +6026,7 @@
    {"type":"node","id":12676794897,"lat":36.1682142,"lon":-86.6666003,"tags":{"check_date":"2025-03-18","name":"Yeast Nashville","name:en":"2713, Lebanon Pike","payment:credit_cards":"yes","shop":"bakery"}},
    {"type":"way","id":1051383172,"center":{"lat":36.2047632,"lon":-86.6930002},"tags":{"name":"Molly's Cupcakes","shop":"bakery"}}
  ]},
- "Nashville|United States|0||no-chains|shop=hairdresser,shop=beauty": {"fetched": "2026-10-06T11:22:52.242Z", "elements": [
+ "Nashville|United States|0||no-chains|shop=hairdresser,shop=beauty": {"fetched": "2026-10-13T18:14:21.992Z", "elements": [
    {"type":"node","id":1945396428,"lat":36.1503484,"lon":-86.6267508,"tags":{"name":"That Hair Place","shop":"hairdresser"}},
    {"type":"node","id":1961227794,"lat":36.1454162,"lon":-86.8129228,"tags":{"name":"Family Barbershop","shop":"hairdresser"}},
    {"type":"node","id":2499776625,"lat":36.0839359,"lon":-86.6891828,"tags":{"name":"Doyle's Barber Shop","shop":"hairdresser"}},
@@ -6059,7 +6059,7 @@
    {"type":"way","id":1051363201,"center":{"lat":36.2007004,"lon":-86.6918558},"tags":{"beauty":"nails","name":"Nail Trix","shop":"beauty"}},
    {"type":"way","id":1419371256,"center":{"lat":36.0341395,"lon":-86.6470982},"tags":{"beauty":"nails","indoor":"room","level":"0","name":"Noire The Nail Bar","room":"shop","shop":"beauty"}}
  ]},
- "Nashville|United States|0||no-chains|amenity=dentist,healthcare=dentist": {"fetched": "2026-10-06T11:24:06.685Z", "elements": [
+ "Nashville|United States|0||no-chains|amenity=dentist,healthcare=dentist": {"fetched": "2026-10-13T18:15:26.640Z", "elements": [
    {"type":"node","id":6312880885,"lat":36.1368766,"lon":-86.8046757,"tags":{"amenity":"dentist","healthcare":"dentist","name":"Thetford dentistry"}},
    {"type":"node","id":11047067507,"lat":36.2553316,"lon":-86.6524836,"tags":{"addr:city":"Old Hickory","addr:housenumber":"1509","addr:postcode":"37138","addr:state":"TN","addr:street":"Robinson Road","amenity":"dentist","healthcare":"dentist","name":"Kirby Leslie"}},
    {"type":"node","id":13795219401,"lat":36.1541499,"lon":-86.7842492,"tags":{"addr:city":"Nashville","addr:housenumber":"224","addr:postcode":"37203","addr:state":"TN","addr:street":"11th Avenue South","amenity":"dentist","healthcare":"dentist","name":"Gulch Dental Studio","opening_hours":"Mo-Th 07:00-15:00; Fr 07:00-12:00","phone":"+1-615-953-3068"}},
