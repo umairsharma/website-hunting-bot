@@ -1,20 +1,20 @@
 {
-  "startedAt": "2026-10-14T06:36:54.796Z",
-  "finishedAt": "2026-10-14T06:46:01.814Z",
-  "minutes": 9.1,
-  "place": "Sydney, Australia",
-  "area": "Sydney, New South Wales, Australia",
-  "candidates": 3,
-  "discovered": 4,
-  "mapsListed": 122,
-  "checked": 7,
-  "leads": 1,
-  "hasWebsite": 6,
-  "closed": 0,
+  "startedAt": "2026-10-14T15:46:55.069Z",
+  "finishedAt": "2026-10-14T16:19:30.899Z",
+  "minutes": 32.6,
+  "place": "Nashville, United States",
+  "area": "Nashville, Davidson County, Middle Tennessee, Tennessee, United States",
+  "candidates": 414,
+  "discovered": 0,
+  "mapsListed": 0,
+  "checked": 30,
+  "leads": 3,
+  "hasWebsite": 25,
+  "closed": 2,
   "unverified": 0,
-  "pending": 0,
+  "pending": 175,
   "ai": {
-    "calls": 4,
+    "calls": 10,
     "searches": 1,
     "off": null,
     "searchOff": "Gemini kept refusing Google searches (over its quota)"
@@ -23,12 +23,13 @@
     "gemini": "broken",
     "google": "broken",
     "brave": "ok",
-    "startpage": "untested",
-    "bing": "untested",
-    "duckduckgo": "untested"
+    "startpage": "blocked",
+    "bing": "broken",
+    "duckduckgo": "blocked"
   },
   "warnings": [
-    "Web search: Google (via Gemini) didn't work, Google didn't work, so it used Brave.",
+    "OpenStreetMap servers were busy, so older saved data was used for: Real estate agent.",
+    "Web search: Google (via Gemini) didn't work, Google didn't work, Startpage blocked the bot, Bing didn't work, DuckDuckGo blocked the bot, so it used Brave.",
     "AI (Gemini): Gemini kept refusing Google searches (over its quota), so web searches used the other engines. The AI still checked Maps listings and websites."
   ],
   "error": null

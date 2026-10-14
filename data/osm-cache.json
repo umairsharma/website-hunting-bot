@@ -6008,7 +6008,7 @@
    {"type":"way","id":1451897055,"center":{"lat":36.2158358,"lon":-86.587858},"tags":{"amenity":"cafe","building":"yes","cuisine":"coffee_shop","name":"Elevate Coffee"}},
    {"type":"way","id":1533113463,"center":{"lat":36.1952154,"lon":-86.7434096},"tags":{"addr:city":"Nashville","addr:housenumber":"2501","addr:postcode":"37206","addr:state":"TN","addr:street":"Gallatin Avenue","addr:unit":"b","amenity":"cafe","building":"commercial","name":"Doll's Family Cafe"}}
  ]},
- "Nashville|United States|0||no-chains|shop=bakery,shop=confectionery,shop=pastry": {"fetched": "2026-10-06T11:21:50.542Z", "elements": [
+ "Nashville|United States|0||no-chains|shop=bakery,shop=confectionery,shop=pastry": {"fetched": "2026-10-14T15:50:26.151Z", "elements": [
    {"type":"node","id":5511703495,"lat":36.151354,"lon":-86.7965171,"tags":{"name":"Gigi's Cupcakes","shop":"bakery"}},
    {"type":"node","id":6391951286,"lat":36.1259507,"lon":-86.7887484,"tags":{"addr:city":"Nashville","addr:housenumber":"1110","addr:postcode":"37204","addr:state":"TN","addr:street":"Caruthers Avenue","contact:email":"admin@fivedaughtersbakery.com","name":"Five daughters bakery","opening_hours":"Mo-Fr 07:00-22:00, Sa-Su 08:00-22:00","phone":"+1-615-490-6554","shop":"bakery"}},
    {"type":"node","id":6540999686,"lat":36.2192538,"lon":-86.6979516,"tags":{"name":"Sweet City USA","shop":"confectionery"}},
@@ -6067,7 +6067,7 @@
    {"type":"way","id":1102616438,"center":{"lat":36.217569,"lon":-86.5995785},"tags":{"amenity":"dentist","building":"yes","healthcare":"dentist","name":"Hermitage Dental Laboratories","source":"microsoft/BuildingFootprints"}},
    {"type":"way","id":1131960642,"center":{"lat":36.2316582,"lon":-86.7252066},"tags":{"amenity":"dentist","building":"yes","healthcare":"dentist","name":"Rolin Hills Dental Care","source":"microsoft/BuildingFootprints"}}
  ]},
- "Nashville|United States|0||no-chains|amenity=clinic,amenity=doctors,healthcare=clinic,healthcare=doctor": {"fetched": "2026-10-06T11:28:14.972Z", "elements": [
+ "Nashville|United States|0||no-chains|amenity=clinic,amenity=doctors,healthcare=clinic,healthcare=doctor": {"fetched": "2026-10-14T15:52:32.992Z", "elements": [
    {"type":"node","id":356901159,"lat":36.2791823,"lon":-86.7085195,"tags":{"amenity":"doctors","gnis:feature_id":"2453951","name":"Madison Minor Medical Center"}},
    {"type":"node","id":356901163,"lat":36.1668039,"lon":-86.8065112,"tags":{"amenity":"clinic","gnis:feature_id":"2453952","healthcare":"clinic","name":"Meharry Clinics"}},
    {"type":"node","id":368157273,"lat":36.1734208,"lon":-86.6025217,"tags":{"addr:state":"TN","amenity":"doctors","ele":"163","gnis:feature_id":"2453519","healthcare":"doctor","name":"Summit Medical Park","source":"USGS Geonames"}},
@@ -6088,7 +6088,7 @@
  "Mississippi|United States|0||no-chains|craft=plumber": {"fetched": "2026-10-07T10:07:10.067Z", "elements": [
    {"type":"way","id":511335215,"center":{"lat":33.7117999,"lon":-90.7190795},"tags":{"addr:city":"Boyle","addr:country":"US","addr:housenumber":"617","addr:postcode":"38730","addr:state":"MS","addr:street":"North Gaines Highway","building":"yes","craft":"plumber","name":"Timbo's Plumbing"}}
  ]},
- "Nashville|United States|0||no-chains|leisure=fitness_centre": {"fetched": "2026-10-07T11:18:44.606Z", "elements": [
+ "Nashville|United States|0||no-chains|leisure=fitness_centre": {"fetched": "2026-10-14T15:53:03.046Z", "elements": [
    {"type":"node","id":4796284005,"lat":36.1524177,"lon":-86.8536331,"tags":{"leisure":"fitness_centre","name":"Crossfit"}},
    {"type":"node","id":5311163473,"lat":36.1703201,"lon":-86.6847291,"tags":{"leisure":"fitness_centre","name":"Anytime Fitness"}},
    {"type":"node","id":7911563292,"lat":36.1487305,"lon":-86.7703615,"tags":{"leisure":"fitness_centre","name":"Cross Fit Forte"}},
@@ -6104,7 +6104,7 @@
    {"type":"way","id":670330389,"center":{"lat":36.2080299,"lon":-86.7159848},"tags":{"addr:city":"Nashville","addr:housenumber":"1586","addr:postcode":"37216","addr:state":"TN","addr:street":"McGavock Pike","building":"yes","denomination":"baptist","leisure":"fitness_centre","name":"Dalewood Baptist Church - Christian Life Center","sport":"basketball;walking_track;exercise_room;game_room"}},
    {"type":"way","id":745008871,"center":{"lat":36.1715509,"lon":-86.6731142},"tags":{"building":"yes","leisure":"fitness_centre","name":"CrossFit Donelson"}}
  ]},
- "Nashville|United States|0||no-chains|shop=car_repair,shop=tyres": {"fetched": "2026-10-07T11:21:23.909Z", "elements": [
+ "Nashville|United States|0||no-chains|shop=car_repair,shop=tyres": {"fetched": "2026-10-14T15:53:55.238Z", "elements": [
    {"type":"node","id":2045317247,"lat":36.0927171,"lon":-86.7353815,"tags":{"addr:housenumber":"3730","addr:postcode":"37211","addr:street":"Nolensville Pike","name":"Nashville Auto Service","shop":"car_repair"}},
    {"type":"node","id":2065248043,"lat":36.0976262,"lon":-86.7380048,"tags":{"addr:housenumber":"3600","addr:postcode":"37211","addr:street":"Nolensville Pike","name":"Larry's Auto & Tire Inc.","shop":"car_repair"}},
    {"type":"node","id":2065692079,"lat":36.1114673,"lon":-86.7492704,"tags":{"addr:housenumber":"524","addr:postcode":"37211","addr:street":"Thompson Lane","name":"Alva's Quick lube plus","shop":"car_repair"}},
@@ -6125,7 +6125,7 @@
    {"type":"way","id":1102616440,"center":{"lat":36.2175145,"lon":-86.5986555},"tags":{"building":"yes","name":"Gateway Tire & Service Center","shop":"car_repair","source":"microsoft/BuildingFootprints"}},
    {"type":"way","id":1131961347,"center":{"lat":36.2302181,"lon":-86.7246928},"tags":{"building":"yes","name":"Budget Brakes","shop":"car_repair","source":"microsoft/BuildingFootprints"}}
  ]},
- "Nashville|United States|0||no-chains|shop=clothes,shop=boutique,shop=fabric,shop=tailor,craft=tailor": {"fetched": "2026-10-07T11:23:00.209Z", "elements": [
+ "Nashville|United States|0||no-chains|shop=clothes,shop=boutique,shop=fabric,shop=tailor,craft=tailor": {"fetched": "2026-10-14T15:55:41.769Z", "elements": [
    {"type":"node","id":4615517239,"lat":36.1424126,"lon":-86.7918413,"tags":{"addr:city":"Nashville","addr:housenumber":"1200","addr:postcode":"37212","addr:state":"TN","addr:street":"Villa Place","addr:unit":"403","clothes":"fashion","name":"Billy Reid","shop":"clothes"}},
    {"type":"node","id":4796898647,"lat":36.1559981,"lon":-86.8484113,"tags":{"name":"Spell's Dancewear","shop":"clothes"}},
    {"type":"node","id":6541056485,"lat":36.2198069,"lon":-86.6968773,"tags":{"name":"Trail West","shop":"clothes"}},
@@ -6141,7 +6141,7 @@
    {"type":"node","id":10856035657,"lat":36.1602544,"lon":-86.7796218,"tags":{"level":"1","name":"The Normal Brand","shop":"clothes"}},
    {"type":"node","id":10856035662,"lat":36.1607005,"lon":-86.7796205,"tags":{"name":"Molly Green","shop":"clothes"}},
    {"type":"node","id":10856035665,"lat":36.160459,"lon":-86.7793965,"tags":{"level":"1","name":"The Nash Collection","opening_hours":"Mo-Th 10:00-17:00; Fr-Sa 09:00-21:00; Su 09:00-19:00","shop":"clothes"}},
-   {"type":"node","id":10856035668,"lat":36.1609862,"lon":-86.7796873,"tags":{"level":"1","name":"Ariat","shop":"clothes"}},
+   {"type":"node","id":10856035668,"lat":36.1609862,"lon":-86.7796873,"tags":{"check_date":"2026-10-08","level":"1","name":"Ariat","shop":"clothes"}},
    {"type":"node","id":10856035669,"lat":36.1610296,"lon":-86.7795792,"tags":{"level":"1","name":"Hollie Rae","shop":"clothes"}},
    {"type":"node","id":10856035674,"lat":36.1610073,"lon":-86.7791846,"tags":{"level":"1","name":"Tecovas","shop":"clothes"}},
    {"type":"node","id":12051655977,"lat":36.0469607,"lon":-86.6502481,"tags":{"addr:housenumber":"5330","brand":"Rainbow","clothes":"women","name":"Rainbow","shop":"clothes","toilets":"no","wheelchair":"yes"}},
