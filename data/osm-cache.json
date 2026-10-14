@@ -7389,5 +7389,9 @@
    {"type":"way","id":1353295462,"center":{"lat":39.1243685,"lon":-82.5408207},"tags":{"addr:city":"Wellston","addr:housenumber":"7","addr:postcode":"45692","addr:state":"OH","addr:street":"North Wisconsin Avenue","building":"industrial","craft":"plumber","name":"McFadden Plumbing and Heating"}},
    {"type":"way","id":1368019904,"center":{"lat":39.7533299,"lon":-82.6505007},"tags":{"addr:city":"Lancaster","addr:housenumber":"1771","addr:postcode":"43130","addr:state":"OH","addr:street":"Victor Road","building:part":"office","craft":"plumber","name":"Apex Pros"}},
    {"type":"way","id":1432644495,"center":{"lat":39.224204,"lon":-82.2064014},"tags":{"addr:city":"Albany","addr:postcode":"45710","addr:state":"OH","addr:street":"Washington Road","building":"commercial","craft":"plumber","name":"A Team Plumbing and More"}}
+ ]},
+ "Dubai|UAE|0||no-chains|craft=plumber": {"fetched": "2026-10-14T03:55:05.486Z", "elements": [
+   {"type":"node","id":4913802665,"lat":25.1646211,"lon":55.2523778,"tags":{"addr:street":"35d Street","craft":"plumber","name":"Yousuf Kallat Elect & Plumbing","name:en":"Yousuf Kallat Elect & Plumbing","source":"Kaart Ground Survey 2017"}},
+   {"type":"node","id":4927353910,"lat":25.2879628,"lon":55.3906628,"tags":{"addr:street":"17 Street","craft":"plumber","name":"HydroFlex","name:en":"HydroFlex","source":"Kaart Ground Survey 2017"}}
  ]}
 }

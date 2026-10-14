@@ -1,20 +1,20 @@
 {
-  "startedAt": "2026-10-13T18:05:25.229Z",
-  "finishedAt": "2026-10-13T18:33:24.090Z",
-  "minutes": 28,
-  "place": "Nashville, United States",
-  "area": "Nashville, Davidson County, Middle Tennessee, Tennessee, United States",
-  "candidates": 414,
-  "discovered": 0,
-  "mapsListed": 0,
-  "checked": 30,
-  "leads": 4,
-  "hasWebsite": 22,
-  "closed": 3,
+  "startedAt": "2026-10-14T03:54:36.443Z",
+  "finishedAt": "2026-10-14T04:04:41.110Z",
+  "minutes": 10.1,
+  "place": "Dubai, UAE",
+  "area": "Dubai, Dubai Emirate, United Arab Emirates",
+  "candidates": 2,
+  "discovered": 10,
+  "mapsListed": 120,
+  "checked": 3,
+  "leads": 2,
+  "hasWebsite": 1,
+  "closed": 0,
   "unverified": 0,
-  "pending": 205,
+  "pending": 9,
   "ai": {
-    "calls": 9,
+    "calls": 5,
     "searches": 1,
     "off": null,
     "searchOff": "Gemini kept refusing Google searches (over its quota)"
@@ -22,14 +22,14 @@
   "searchEngines": {
     "gemini": "broken",
     "google": "broken",
-    "brave": "ok",
+    "brave": "blocked",
     "startpage": "blocked",
-    "bing": "ok",
-    "duckduckgo": "untested"
+    "bing": "broken",
+    "duckduckgo": "blocked"
   },
   "warnings": [
-    "OpenStreetMap servers were busy, so older saved data was used for: Bakery / sweets, Clinic / doctor.",
-    "Web search: Google (via Gemini) didn't work, Google didn't work, Startpage blocked the bot, so it used Brave + Bing.",
+    "Every search engine blocked the bot, so it stopped early. The rest will be checked next run.",
+    "Web search: Google (via Gemini) didn't work, Google didn't work, Brave blocked the bot, Startpage blocked the bot, Bing didn't work, DuckDuckGo blocked the bot.",
     "AI (Gemini): Gemini kept refusing Google searches (over its quota), so web searches used the other engines. The AI still checked Maps listings and websites."
   ],
   "error": null
