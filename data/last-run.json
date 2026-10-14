@@ -1,20 +1,20 @@
 {
-  "startedAt": "2026-10-14T04:17:40.055Z",
-  "finishedAt": "2026-10-14T04:27:45.924Z",
-  "minutes": 10.1,
-  "place": "Dubai, UAE",
-  "area": "Dubai, Dubai Emirate, United Arab Emirates",
-  "candidates": 2,
-  "discovered": 9,
-  "mapsListed": 120,
-  "checked": 9,
-  "leads": 6,
-  "hasWebsite": 3,
+  "startedAt": "2026-10-14T06:36:54.796Z",
+  "finishedAt": "2026-10-14T06:46:01.814Z",
+  "minutes": 9.1,
+  "place": "Sydney, Australia",
+  "area": "Sydney, New South Wales, Australia",
+  "candidates": 3,
+  "discovered": 4,
+  "mapsListed": 122,
+  "checked": 7,
+  "leads": 1,
+  "hasWebsite": 6,
   "closed": 0,
   "unverified": 0,
   "pending": 0,
   "ai": {
-    "calls": 11,
+    "calls": 4,
     "searches": 1,
     "off": null,
     "searchOff": "Gemini kept refusing Google searches (over its quota)"
@@ -22,13 +22,13 @@
   "searchEngines": {
     "gemini": "broken",
     "google": "broken",
-    "brave": "blocked",
-    "startpage": "blocked",
-    "bing": "ok",
+    "brave": "ok",
+    "startpage": "untested",
+    "bing": "untested",
     "duckduckgo": "untested"
   },
   "warnings": [
-    "Web search: Google (via Gemini) didn't work, Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing.",
+    "Web search: Google (via Gemini) didn't work, Google didn't work, so it used Brave.",
     "AI (Gemini): Gemini kept refusing Google searches (over its quota), so web searches used the other engines. The AI still checked Maps listings and websites."
   ],
   "error": null

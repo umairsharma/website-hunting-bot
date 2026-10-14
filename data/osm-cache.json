@@ -7393,5 +7393,10 @@
  "Dubai|UAE|0||no-chains|craft=plumber": {"fetched": "2026-10-14T03:55:05.486Z", "elements": [
    {"type":"node","id":4913802665,"lat":25.1646211,"lon":55.2523778,"tags":{"addr:street":"35d Street","craft":"plumber","name":"Yousuf Kallat Elect & Plumbing","name:en":"Yousuf Kallat Elect & Plumbing","source":"Kaart Ground Survey 2017"}},
    {"type":"node","id":4927353910,"lat":25.2879628,"lon":55.3906628,"tags":{"addr:street":"17 Street","craft":"plumber","name":"HydroFlex","name:en":"HydroFlex","source":"Kaart Ground Survey 2017"}}
+ ]},
+ "Sydney|Australia|0||no-chains|craft=plumber": {"fetched": "2026-10-14T06:40:02.758Z", "elements": [
+   {"type":"node","id":3162173718,"lat":-33.7005665,"lon":151.1010262,"tags":{"check_date":"2025-09-16","craft":"plumber","name":"Watermatic Irrigation"}},
+   {"type":"node","id":11815981697,"lat":-33.8765905,"lon":151.135913,"tags":{"craft":"plumber","name":"AMF"}},
+   {"type":"way","id":667343241,"center":{"lat":-33.8478448,"lon":151.0897779},"tags":{"addr:housenumber":"325","addr:street":"Concord Road","building":"yes","craft":"plumber","name":"Expert Plumbing Services"}}
  ]}
 }
