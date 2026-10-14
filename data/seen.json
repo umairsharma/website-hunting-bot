@@ -2427,6 +2427,22 @@
   "node/4913802665": {"status":"lead","name":"Yousuf Kallat Elect & Plumbing","checked":"2026-10-14"},
   "node/4927353910": {"status":"has_website","name":"HydroFlex","checked":"2026-10-14","website":"hydroflexuae.ae","layer":3},
   "gmaps/13080573905972679647": {"status":"has_website","name":"HydroFlex","checked":"2026-10-14","website":"hydroflexuae.ae","layer":3,"sameAs":"node/4927353910"},
-  "gmaps/14757592905814115545": {"status":"lead","name":"GLPC Plumber Dubai","checked":"2026-10-14"}
+  "gmaps/14757592905814115545": {"status":"lead","name":"GLPC Plumber Dubai","checked":"2026-10-14"},
+  "gmaps/4391294454566237079": {"status":"has_website","name":"Mservo Technical Services L.L.C","checked":"2026-10-14","website":"mservo.ae","layer":"maps list"},
+  "gmaps/13387672806116007751": {"status":"has_website","name":"Fix It Technical Services","checked":"2026-10-14","website":"fixitserviceuae.com","layer":"maps list"},
+  "gmaps/3707430963221904200": {"status":"has_website","name":"Dar Al Ataa Technical Services LLC | Facility & Property Management Company in Dubai-UAE","checked":"2026-10-14","website":"daralataa.com","layer":"maps list"},
+  "gmaps/4258291996380335309": {"status":"has_website","name":"Best in Town Services LLC","checked":"2026-10-14","website":"bestintownrepairservices.ae","layer":"maps list"},
+  "gmaps/9074116304546325743": {"status":"has_website","name":"Inovix Technical Services in Dubai | Property Management Company | Interior Design | Plumbing |","checked":"2026-10-14","website":"inovixtechnicalservices.com","layer":"maps list"},
+  "gmaps/2452260255900460104": {"status":"has_website","name":"Junaid Sanitary and Electrical Material Trading LLC HEAD OFFICE","checked":"2026-10-14","website":"junaidworld.com","layer":"maps list"},
+  "gmaps/16014443986324979351": {"status":"has_website","name":"Liwa Sun Technical Service LLC","checked":"2026-10-14","website":"liwasun.com","layer":"maps list"},
+  "gmaps/13771403021123562390": {"status":"has_website","name":"FixMasters Dubai - Home Maintenance Services","checked":"2026-10-14","website":"fixmastersuae.com","layer":3},
+  "gmaps/8239399849695811213": {"status":"has_website","name":"Bab Al Safi Technical & Cleaning Services","checked":"2026-10-14","website":"babalbabtechnical.com","layer":3},
+  "gmaps/2989775129844070267": {"status":"has_website","name":"Plumbing Facility","checked":"2026-10-14","website":"plumbingfacility.com","layer":3},
+  "gmaps/2328657509129398755": {"status":"lead","name":"Aquafix plumbing services dubai","checked":"2026-10-14"},
+  "gmaps/5818752530657926424": {"status":"lead","name":"West Coast Maintenance & Renovation","checked":"2026-10-14"},
+  "gmaps/13863283816554117157": {"status":"lead","name":"Electrican and Plumber Work in dubai al quoz","checked":"2026-10-14"},
+  "gmaps/3128375296827309502": {"status":"lead","name":"ANBI Air Condition Trading L.L.C","checked":"2026-10-14"},
+  "gmaps/4955935795295626863": {"status":"lead","name":"Big Elephant","checked":"2026-10-14"},
+  "gmaps/893949078625218104": {"status":"lead","name":"APlus Fixperts","checked":"2026-10-14"}
  }
 }
