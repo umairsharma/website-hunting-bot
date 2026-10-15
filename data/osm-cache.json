@@ -6165,7 +6165,7 @@
    {"type":"way","id":1419371259,"center":{"lat":36.0346145,"lon":-86.6479731},"tags":{"clothes":"sports","indoor":"room","level":"0","name":"Ariat","room":"shop","shop":"clothes"}},
    {"type":"way","id":1419371265,"center":{"lat":36.0351712,"lon":-86.6478472},"tags":{"indoor":"room","level":"0","name":"Mountain High Outfitters","room":"shop","shop":"clothes"}}
  ]},
- "Nashville|United States|0||no-chains|office=estate_agent": {"fetched": "2026-10-07T11:23:34.150Z", "elements": [
+ "Nashville|United States|0||no-chains|office=estate_agent": {"fetched": "2026-10-15T15:34:46.097Z", "elements": [
    {"type":"node","id":5525027866,"lat":36.1510477,"lon":-86.7962545,"tags":{"name":"Crye-Leike Realtors","office":"estate_agent"}},
    {"type":"node","id":7044405328,"lat":36.140062,"lon":-86.7694555,"tags":{"name":"Village Real Estate","office":"estate_agent"}},
    {"type":"way","id":573984091,"center":{"lat":36.1503095,"lon":-86.7948133},"tags":{"building":"yes","name":"CHORD Real Estate","office":"estate_agent"}},
