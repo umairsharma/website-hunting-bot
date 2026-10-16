@@ -32,6 +32,7 @@ const DEFAULTS = {
   requireMapsCheck: true,
   requireWebSearch: true,
   mapsDiscovery: true, // when OpenStreetMap runs short, find more businesses by searching Google Maps
+  maxReviewAgeMonths: 6, // drop businesses whose newest Google review is older than this (dead leads). Unknown = kept.
   findSocials: true, // search for each lead's Instagram (and Facebook) page
   recheck: false, // recheck earlier leads (data/recheck.json) instead of finding new ones
   phoneCheck: true, // a site with the business's phone number on it is theirs, whatever its name
@@ -57,6 +58,7 @@ export function normalizeConfig(raw = {}) {
   if (!cfg.city) throw new Error('config.js: `city` is empty. Set it to the city you want to search.');
   cfg.radiusKm = Math.max(0, Number(cfg.radiusKm) || 0);
   cfg.maxChecksPerRun = Math.min(200, Math.max(1, Math.round(Number(cfg.maxChecksPerRun) || 30)));
+  cfg.maxReviewAgeMonths = Math.max(1, Number(cfg.maxReviewAgeMonths) || 6);
   const delays = Array.isArray(cfg.delaySeconds) ? cfg.delaySeconds : [cfg.delaySeconds, cfg.delaySeconds];
   cfg.delaySeconds = [Number(delays[0]) || 0, Number(delays[1] ?? delays[0]) || 0];
   cfg.phoneCountryCode = String(cfg.phoneCountryCode || '').replace(/\D/g, '');
@@ -141,7 +143,7 @@ async function aiMatchListing(biz, maps, ctx) {
   if (i === null) return maps;
   ctx.log(`   🤖 AI: it's on Google Maps as "${options[i].label}"`);
   if (maps.shown) return { status: 'found', ...maps.shown };
-  const again = await checkMaps(ctx.mapsPage, { ...biz, placeUrl: maps.candidates[i].href, names: [...(biz.names || [biz.name]), options[i].label] }, { mapsBase: ctx.ep.maps });
+  const again = await checkMaps(ctx.mapsPage, { ...biz, placeUrl: maps.candidates[i].href, names: [...(biz.names || [biz.name]), options[i].label] }, { mapsBase: ctx.ep.maps, maxReviewAgeMonths: ctx.cfg.maxReviewAgeMonths });
   await sleep(ctx.delay());
   return again.status === 'found' ? again : maps;
 }
@@ -156,7 +158,7 @@ async function checkBusiness(biz, ctx) {
 
   // ── Layer 2: Google Maps ──
   if (ctx.mapsOn) {
-    maps = await checkMaps(mapsPage, biz, { mapsBase: ep.maps });
+    maps = await checkMaps(mapsPage, biz, { mapsBase: ep.maps, maxReviewAgeMonths: cfg.maxReviewAgeMonths });
     if (maps.status === 'blocked') {
       ctx.mapsOn = false;
       maps = null;
@@ -180,6 +182,8 @@ async function checkBusiness(biz, ctx) {
   else if (maps.status === 'not_found') notes.push('Not on Google Maps. You can also offer to set up their Google Business Profile');
   else {
     if (maps.permanentlyClosed) return { status: 'closed' };
+    // Dead lead: the newest Google review is older than maxReviewAgeMonths (unknown age = kept).
+    if (maps.stale) return { status: 'closed', stale: true, months: maps.newestReviewMonths };
     if (maps.website) {
       const site = classifyUrl(maps.website);
       if (!site || site.kind === 'website') return { status: 'has_website', layer: 2, website: site ? site.host : maps.website };
@@ -439,9 +443,16 @@ function record(outcome, biz, { cfg, state, stats, leads, dataDir, dryRun, log }
       log(`   ⏭️  Not a lead: ${outcome.reason}`);
       break;
     case 'closed':
-      state.places[biz.key] = { status: 'closed', ...base };
-      stats.closed += 1;
-      log('   🚫 Permanently closed on Google Maps');
+      if (outcome.stale) {
+        // Filed as "closed" so the rest of the bot treats it as done; the reason says why.
+        state.places[biz.key] = { status: 'closed', ...base, reason: 'stale' };
+        stats.stale += 1;
+        log(`   💤 Dead lead: newest Google review is about ${Math.round(outcome.months)} months old`);
+      } else {
+        state.places[biz.key] = { status: 'closed', ...base };
+        stats.closed += 1;
+        log('   🚫 Permanently closed on Google Maps');
+      }
       break;
     case 'unverified': {
       const attempts = (prev?.attempts || 0) + 1;
@@ -603,6 +614,7 @@ function summaryText(cfg, stats, warnings, fatal) {
     const bits = [];
     if (stats.hasWebsite && !cfg?.recheck) bits.push(`🌐 ${stats.hasWebsite} already have a website`);
     if (stats.closed) bits.push(`🚫 ${stats.closed} closed`);
+    if (stats.stale) bits.push(`💤 ${stats.stale} dead (no review in ${cfg?.maxReviewAgeMonths || 6}+ months)`);
     if (stats.unverified) bits.push(`⏳ ${stats.unverified} to retry`);
     if (bits.length) lines.push(bits.join(' · '));
     if (stats.ai?.calls) lines.push(`🤖 Gemini: ${stats.ai.calls} questions, ${stats.ai.searches} of them Google searches`);
@@ -621,7 +633,7 @@ function summaryText(cfg, stats, warnings, fatal) {
 export async function run({ config, dataDir, dryRun = false, webhookUrl = process.env.DISCORD_WEBHOOK_URL, log = console.log } = {}) {
   const startedAt = new Date();
   const ep = endpoints();
-  const stats = { candidates: 0, discovered: 0, mapsListed: 0, checked: 0, leads: 0, hasWebsite: 0, closed: 0, unverified: 0, pending: 0 };
+  const stats = { candidates: 0, discovered: 0, mapsListed: 0, checked: 0, leads: 0, hasWebsite: 0, closed: 0, stale: 0, unverified: 0, pending: 0 };
   const warnings = [];
   const leads = [];
   let cfg = null;
