@@ -149,10 +149,52 @@ function readPlace(page) {
 }
 
 /**
- * status: 'found' (listing opened), 'not_found', 'blocked' or 'error'.
- * When found: website, phone, address, rating, reviews, permanentlyClosed, temporarilyClosed, claimable, mapsUrl.
+ * LIVENESS CHECK: how old is the newest review, in months?
+ * Returns null when it can't tell (no reviews tab, layout changed, etc). Callers must treat null as
+ * "unknown" and KEEP the lead, never drop it, so a Google layout change can't wipe out every lead.
  */
-export async function checkMaps(page, biz, { mapsBase, timeoutMs = 20000 }) {
+async function readNewestReviewMonths(page) {
+  try {
+    const tab = page.locator('button[role="tab"][aria-label^="Reviews"]').first();
+    if (!(await tab.count())) return null;
+    await tab.click({ timeout: 3000 });
+    await page.waitForTimeout(1500);
+
+    // Sort by "Newest" so the first review shown is the most recent one.
+    const sort = page.locator('button[aria-label^="Sort"], button[data-value="Sort"]').first();
+    if (await sort.count()) {
+      await sort.click({ timeout: 3000 });
+      await page.waitForTimeout(600);
+      const newest = page.locator('div[role="menuitemradio"]', { hasText: /newest/i }).first();
+      if (await newest.count()) {
+        await newest.click({ timeout: 3000 });
+        await page.waitForTimeout(1500);
+      }
+    }
+
+    const text = await page.evaluate(() => {
+      const first = document.querySelector('div[data-review-id]');
+      return first ? first.innerText : '';
+    });
+    const m = text.match(/\b(a|an|\d+)\s+(day|week|month|year)s?\s+ago\b/i);
+    if (!m) return null;
+    const n = /^an?$/i.test(m[1]) ? 1 : Number(m[1]);
+    const unit = m[2].toLowerCase();
+    if (unit === 'day') return n / 30;
+    if (unit === 'week') return n / 4.3;
+    if (unit === 'month') return n;
+    return n * 12;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * status: 'found' (listing opened), 'not_found', 'blocked' or 'error'.
+ * When found: website, phone, address, rating, reviews, permanentlyClosed, temporarilyClosed, claimable, mapsUrl,
+ * newestReviewMonths (null = unknown) and stale (true = newest review older than maxReviewAgeMonths).
+ */
+export async function checkMaps(page, biz, { mapsBase, timeoutMs = 20000, maxReviewAgeMonths = 6 }) {
   // A place found on Google Maps already has its listing link; others are searched by name near their position.
   const searchUrl = biz.placeUrl ? withEnglish(biz.placeUrl) : mapsSearchUrl(mapsBase, biz);
   try {
@@ -198,7 +240,14 @@ export async function checkMaps(page, biz, { mapsBase, timeoutMs = 20000 }) {
     // When a search opens a listing directly, Maps swaps the address bar from /search/ to the listing's
     // own /place/ link a moment later. Wait for it, so the lead links to the listing, not the search.
     if (!/\/maps\/place\//.test(page.url())) await page.waitForURL(/\/maps\/place\//, { timeout: 5000 }).catch(() => {});
-    return { status: 'found', ...info, mapsUrl: shortMapsUrl(page.url()) };
+    const mapsUrl = shortMapsUrl(page.url());
+
+    // Liveness: only worth the extra clicks when the listing has reviews at all (it runs last, after
+    // everything above was read, because opening the Reviews tab changes the page).
+    info.newestReviewMonths = info.reviews > 0 ? await readNewestReviewMonths(page) : null;
+    info.stale = info.newestReviewMonths !== null && info.newestReviewMonths > maxReviewAgeMonths;
+
+    return { status: 'found', ...info, mapsUrl };
   } catch (err) {
     if (await isBlocked(page).catch(() => false)) return { status: 'blocked' };
     return { status: 'error', reason: String(err.message || err).split('\n')[0] };
