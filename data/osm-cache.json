@@ -5731,7 +5731,7 @@
    {"type":"way","id":892847248,"center":{"lat":43.600384,"lon":-116.228956},"tags":{"addr:city":"Boise","addr:housenumber":"3803","addr:postcode":"83705","addr:state":"ID","addr:street":"West Rose Hill Street","building":"yes","name":"Rudy's Auto Repair","shop":"car_repair","source":"microsoft/BuildingFootprints"}},
    {"type":"way","id":1029461649,"center":{"lat":43.595272,"lon":-116.1938945},"tags":{"addr:city":"Boise","addr:housenumber":"1415","addr:postcode":"83706","addr:state":"ID","addr:street":"South Broadway Avenue","building":"yes","name":"Einstein's Oilery","shop":"car_repair","source":"microsoft/BuildingFootprints"}}
  ]},
- "Nashville|United States|0||no-chains|amenity=restaurant": {"fetched": "2026-10-13T18:07:48.931Z", "elements": [
+ "Nashville|United States|0||no-chains|amenity=restaurant": {"fetched": "2026-10-21T15:55:20.721Z", "elements": [
    {"type":"node","id":587895072,"lat":36.0711702,"lon":-86.68495,"tags":{"amenity":"restaurant","cuisine":"lao;thai","name":"King Market"}},
    {"type":"node","id":660520022,"lat":36.0835679,"lon":-86.6887333,"tags":{"amenity":"restaurant","cuisine":"mexican","name":"Las Palmas"}},
    {"type":"node","id":761667243,"lat":36.0410368,"lon":-86.7423825,"tags":{"amenity":"restaurant","name":"Las Palmas Mexican Restaurant"}},
@@ -5855,7 +5855,6 @@
    {"type":"node","id":10822940649,"lat":36.132236,"lon":-86.6697092,"tags":{"amenity":"restaurant","cuisine":"barbecue","indoor_seating":"yes","name":"Bar-B-Cutie Smokehouse","outdoor_seating":"no"}},
    {"type":"node","id":10822954794,"lat":36.1287928,"lon":-86.6702936,"tags":{"amenity":"restaurant","indoor_seating":"yes","level":"1","name":"Swett's BBQ","outdoor_seating":"no"}},
    {"type":"node","id":10822954796,"lat":36.1288751,"lon":-86.6700545,"tags":{"amenity":"restaurant","check_date:opening_hours":"2024-01-02","indoor_seating":"yes","level":"1","name":"Ole Red","opening_hours:signed":"no","outdoor_seating":"no"}},
-   {"type":"node","id":10822955328,"lat":36.13078,"lon":-86.6688707,"tags":{"amenity":"restaurant","name":"The Green Room"}},
    {"type":"node","id":10856035682,"lat":36.1607828,"lon":-86.7794636,"tags":{"amenity":"restaurant","level":"2","name":"Liege Waffle Company"}},
    {"type":"node","id":10856035683,"lat":36.1607189,"lon":-86.7793724,"tags":{"amenity":"restaurant","cuisine":"seafood","level":"2","name":"Dock Local"}},
    {"type":"node","id":10856035684,"lat":36.1607622,"lon":-86.7792584,"tags":{"amenity":"restaurant","level":"2","name":"Steam Boys"}},
@@ -5954,7 +5953,7 @@
    {"type":"way","id":1355284542,"center":{"lat":36.1296266,"lon":-86.6673787},"tags":{"amenity":"restaurant","building":"yes","name":"Puckett's"}},
    {"type":"way","id":1355284543,"center":{"lat":36.1297603,"lon":-86.6672342},"tags":{"amenity":"restaurant","building":"yes","name":"The Southern Steak & Oyster"}}
  ]},
- "Nashville|United States|0||no-chains|amenity=cafe": {"fetched": "2026-10-13T18:08:18.136Z", "elements": [
+ "Nashville|United States|0||no-chains|amenity=cafe": {"fetched": "2026-10-21T15:56:57.753Z", "elements": [
    {"type":"node","id":823638769,"lat":36.08801,"lon":-86.74259,"tags":{"amenity":"cafe","name":"Zoofari Cafe","source":"survey"}},
    {"type":"node","id":1960587442,"lat":36.1364319,"lon":-86.8007256,"tags":{"addr:city":"Nashville","addr:state":"TN","addr:street":"21st Avenue South","amenity":"cafe","name":"Fido"}},
    {"type":"node","id":2886991164,"lat":36.1053668,"lon":-86.7955353,"tags":{"amenity":"cafe","name":"The Well Coffeehouse"}},
@@ -5985,9 +5984,6 @@
    {"type":"node","id":13302834763,"lat":36.0466946,"lon":-86.6493747,"tags":{"addr:city":"Antioch","addr:housenumber":"5350","addr:postcode":"37013","addr:state":"TN","addr:street":"Mount View Road","amenity":"cafe","check_date":"2025-11-14","currency:XBT":"yes","name":"Sahara Cafe","payment:lightning":"yes","payment:lightning:operator":"square","payment:lightning_contactless":"no","payment:onchain":"no"}},
    {"type":"node","id":13735188276,"lat":36.1607909,"lon":-86.7853404,"tags":{"addr:city":"Nashville","addr:housenumber":"950","addr:postcode":"37203","addr:state":"TN","addr:street":"Signal Xing","amenity":"cafe","internet_access":"yes","name":"The Nix Cafe","phone":"+1-615-528-1224"}},
    {"type":"node","id":13784900201,"lat":36.0407897,"lon":-86.7687757,"tags":{"addr:housenumber":"690 Suite 104","addr:street":"Old Hickory Boulevard","amenity":"cafe","name":"The Well Coffeehouse"}},
-   {"type":"node","id":13918461601,"lat":36.1733513,"lon":-86.7396986,"tags":{"addr:postcode":"37206","addr:street":"Fatherland Street","amenity":"cafe","cuisine":"coffee_shop","internet_access":"wlan","name":"Frothy Monkey East Nashville"}},
-   {"type":"node","id":13950181828,"lat":36.1647375,"lon":-86.795707,"tags":{"addr:housenumber":"1200","addr:street":"Clinton Street","amenity":"cafe","cuisine":"coffee_shop","name":"Just Love Coffee Cafe","opening_hours":"Mo-Fr 08:00-16:00; Sa-Su 08:30-16:00"}},
-   {"type":"node","id":13983823282,"lat":36.1309103,"lon":-86.6692656,"tags":{"amenity":"cafe","cuisine":"coffee_shop","name":"Green Beans Coffee Co"}},
    {"type":"way","id":490529455,"center":{"lat":36.1521597,"lon":-86.8497824},"tags":{"amenity":"cafe","building":"yes","name":"The Café at Thistle Farms"}},
    {"type":"way","id":520049608,"center":{"lat":36.1568426,"lon":-86.7697211},"tags":{"amenity":"cafe","name":"Crema","outdoor_seating":"yes"}},
    {"type":"way","id":544575764,"center":{"lat":36.1318854,"lon":-86.7959374},"tags":{"amenity":"cafe","building":"yes","name":"Proper Bagel"}},
@@ -5997,7 +5993,6 @@
    {"type":"way","id":683962475,"center":{"lat":36.1529368,"lon":-86.7907545},"tags":{"addr:city":"Nashville","addr:housenumber":"1528","addr:postcode":"37203","addr:state":"TN","addr:street":"Demonbreun Street","amenity":"cafe","building":"yes","internet_access":"wlan","name":"Just Love","outdoor_seating":"yes"}},
    {"type":"way","id":684017890,"center":{"lat":36.1169862,"lon":-86.7492754},"tags":{"amenity":"cafe","building":"yes","name":"Mixed Grill Cafe"}},
    {"type":"way","id":689151673,"center":{"lat":36.1432134,"lon":-86.792587},"tags":{"amenity":"cafe","building":"yes","cuisine":"coffee","name":"Osa Coffee Roasters"}},
-   {"type":"way","id":696966053,"center":{"lat":36.1172044,"lon":-86.7487929},"tags":{"addr:city":"Nashville","addr:housenumber":"2601","addr:postcode":"37211","addr:state":"TN","addr:street":"Nolensville Pike","amenity":"cafe","building":"commercial","cuisine":"coffee_shop","internet_access":"yes","internet_access:fee":"no","name":"Primitive Coffee","outdoor_seating":"yes"}},
    {"type":"way","id":707082071,"center":{"lat":36.1519249,"lon":-86.8049049},"tags":{"amenity":"cafe","building":"yes","cuisine":"coffee;coffee_shop","name":"Cafe Coco","wikidata":"Q5017234"}},
    {"type":"way","id":762576438,"center":{"lat":36.2654217,"lon":-86.8309857},"tags":{"amenity":"cafe","building":"yes","cuisine":"coffee_shop;coffee","name":"Coffee Bank"}},
    {"type":"way","id":766592952,"center":{"lat":36.2481292,"lon":-86.7350925},"tags":{"amenity":"cafe","building":"yes","name":"SideKicks Cafe"}},
@@ -6005,10 +6000,9 @@
    {"type":"way","id":1013857852,"center":{"lat":36.146606,"lon":-86.7923015},"tags":{"amenity":"cafe","building":"yes","cuisine":"coffee_shop","layer":"1","name":"The Well Coffeehouse Koinonia","source":"microsoft/BuildingFootprints"}},
    {"type":"way","id":1216898261,"center":{"lat":36.1869208,"lon":-86.7474029},"tags":{"amenity":"cafe","building":"yes","name":"Hearts - Nashville","source":"microsoft/BuildingFootprints"}},
    {"type":"way","id":1295141561,"center":{"lat":36.1265779,"lon":-86.9075738},"tags":{"addr:city":"Nashville","addr:housenumber":"7113","addr:postcode":"37209","addr:state":"TN","addr:street":"Charlotte Pike","addr:unit":"#2","amenity":"cafe","building":"yes","cuisine":"coffee_shop","internet_access":"wlan","name":"Land of A Thousand Hills Coffee","outdoor_seating":"yes"}},
-   {"type":"way","id":1451897055,"center":{"lat":36.2158358,"lon":-86.587858},"tags":{"amenity":"cafe","building":"yes","cuisine":"coffee_shop","name":"Elevate Coffee"}},
-   {"type":"way","id":1533113463,"center":{"lat":36.1952154,"lon":-86.7434096},"tags":{"addr:city":"Nashville","addr:housenumber":"2501","addr:postcode":"37206","addr:state":"TN","addr:street":"Gallatin Avenue","addr:unit":"b","amenity":"cafe","building":"commercial","name":"Doll's Family Cafe"}}
+   {"type":"way","id":1451897055,"center":{"lat":36.2158358,"lon":-86.587858},"tags":{"amenity":"cafe","building":"yes","cuisine":"coffee_shop","name":"Elevate Coffee"}}
  ]},
- "Nashville|United States|0||no-chains|shop=bakery,shop=confectionery,shop=pastry": {"fetched": "2026-10-14T15:50:26.151Z", "elements": [
+ "Nashville|United States|0||no-chains|shop=bakery,shop=confectionery,shop=pastry": {"fetched": "2026-10-21T16:02:58.950Z", "elements": [
    {"type":"node","id":5511703495,"lat":36.151354,"lon":-86.7965171,"tags":{"name":"Gigi's Cupcakes","shop":"bakery"}},
    {"type":"node","id":6391951286,"lat":36.1259507,"lon":-86.7887484,"tags":{"addr:city":"Nashville","addr:housenumber":"1110","addr:postcode":"37204","addr:state":"TN","addr:street":"Caruthers Avenue","contact:email":"admin@fivedaughtersbakery.com","name":"Five daughters bakery","opening_hours":"Mo-Fr 07:00-22:00, Sa-Su 08:00-22:00","phone":"+1-615-490-6554","shop":"bakery"}},
    {"type":"node","id":6540999686,"lat":36.2192538,"lon":-86.6979516,"tags":{"name":"Sweet City USA","shop":"confectionery"}},
@@ -6026,7 +6020,7 @@
    {"type":"node","id":12676794897,"lat":36.1682142,"lon":-86.6666003,"tags":{"check_date":"2025-03-18","name":"Yeast Nashville","name:en":"2713, Lebanon Pike","payment:credit_cards":"yes","shop":"bakery"}},
    {"type":"way","id":1051383172,"center":{"lat":36.2047632,"lon":-86.6930002},"tags":{"name":"Molly's Cupcakes","shop":"bakery"}}
  ]},
- "Nashville|United States|0||no-chains|shop=hairdresser,shop=beauty": {"fetched": "2026-10-13T18:14:21.992Z", "elements": [
+ "Nashville|United States|0||no-chains|shop=hairdresser,shop=beauty": {"fetched": "2026-10-21T16:07:22.142Z", "elements": [
    {"type":"node","id":1945396428,"lat":36.1503484,"lon":-86.6267508,"tags":{"name":"That Hair Place","shop":"hairdresser"}},
    {"type":"node","id":1961227794,"lat":36.1454162,"lon":-86.8129228,"tags":{"name":"Family Barbershop","shop":"hairdresser"}},
    {"type":"node","id":2499776625,"lat":36.0839359,"lon":-86.6891828,"tags":{"name":"Doyle's Barber Shop","shop":"hairdresser"}},
@@ -6059,7 +6053,7 @@
    {"type":"way","id":1051363201,"center":{"lat":36.2007004,"lon":-86.6918558},"tags":{"beauty":"nails","name":"Nail Trix","shop":"beauty"}},
    {"type":"way","id":1419371256,"center":{"lat":36.0341395,"lon":-86.6470982},"tags":{"beauty":"nails","indoor":"room","level":"0","name":"Noire The Nail Bar","room":"shop","shop":"beauty"}}
  ]},
- "Nashville|United States|0||no-chains|amenity=dentist,healthcare=dentist": {"fetched": "2026-10-13T18:15:26.640Z", "elements": [
+ "Nashville|United States|0||no-chains|amenity=dentist,healthcare=dentist": {"fetched": "2026-10-21T16:09:16.326Z", "elements": [
    {"type":"node","id":6312880885,"lat":36.1368766,"lon":-86.8046757,"tags":{"amenity":"dentist","healthcare":"dentist","name":"Thetford dentistry"}},
    {"type":"node","id":11047067507,"lat":36.2553316,"lon":-86.6524836,"tags":{"addr:city":"Old Hickory","addr:housenumber":"1509","addr:postcode":"37138","addr:state":"TN","addr:street":"Robinson Road","amenity":"dentist","healthcare":"dentist","name":"Kirby Leslie"}},
    {"type":"node","id":13795219401,"lat":36.1541499,"lon":-86.7842492,"tags":{"addr:city":"Nashville","addr:housenumber":"224","addr:postcode":"37203","addr:state":"TN","addr:street":"11th Avenue South","amenity":"dentist","healthcare":"dentist","name":"Gulch Dental Studio","opening_hours":"Mo-Th 07:00-15:00; Fr 07:00-12:00","phone":"+1-615-953-3068"}},
