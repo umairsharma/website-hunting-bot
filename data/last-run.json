@@ -1,21 +1,21 @@
 {
-  "startedAt": "2026-10-22T16:01:05.558Z",
-  "finishedAt": "2026-10-22T16:36:11.731Z",
-  "minutes": 35.1,
+  "startedAt": "2026-10-23T15:46:32.418Z",
+  "finishedAt": "2026-10-23T16:17:19.670Z",
+  "minutes": 30.8,
   "place": "Nashville, United States",
   "area": "Nashville, Davidson County, Middle Tennessee, Tennessee, United States",
   "candidates": 408,
   "discovered": 30,
-  "mapsListed": 232,
+  "mapsListed": 288,
   "checked": 30,
   "leads": 2,
-  "hasWebsite": 19,
+  "hasWebsite": 23,
   "closed": 0,
-  "stale": 8,
+  "stale": 5,
   "unverified": 0,
   "pending": 0,
   "ai": {
-    "calls": 8,
+    "calls": 6,
     "searches": 1,
     "off": null,
     "searchOff": "Gemini kept refusing Google searches (over its quota)"
@@ -23,14 +23,14 @@
   "searchEngines": {
     "gemini": "broken",
     "google": "broken",
-    "brave": "blocked",
+    "brave": "ok",
     "startpage": "blocked",
     "bing": "ok",
     "duckduckgo": "blocked"
   },
   "warnings": [
-    "OpenStreetMap servers were busy, so older saved data was used for: Car repair, Clothes / tailor, Real estate agent.",
-    "Web search: Google (via Gemini) didn't work, Google didn't work, Brave blocked the bot, Startpage blocked the bot, DuckDuckGo blocked the bot, so it used Bing.",
+    "OpenStreetMap servers were busy, so older saved data was used for: Clothes / tailor, Real estate agent.",
+    "Web search: Google (via Gemini) didn't work, Google didn't work, Startpage blocked the bot, DuckDuckGo blocked the bot, so it used Brave + Bing.",
     "AI (Gemini): Gemini kept refusing Google searches (over its quota), so web searches used the other engines. The AI still checked Maps listings and websites."
   ],
   "error": null

@@ -6098,7 +6098,7 @@
    {"type":"way","id":670330389,"center":{"lat":36.2080299,"lon":-86.7159848},"tags":{"addr:city":"Nashville","addr:housenumber":"1586","addr:postcode":"37216","addr:state":"TN","addr:street":"McGavock Pike","building":"yes","denomination":"baptist","leisure":"fitness_centre","name":"Dalewood Baptist Church - Christian Life Center","sport":"basketball;walking_track;exercise_room;game_room"}},
    {"type":"way","id":745008871,"center":{"lat":36.1715509,"lon":-86.6731142},"tags":{"building":"yes","leisure":"fitness_centre","name":"CrossFit Donelson"}}
  ]},
- "Nashville|United States|0||no-chains|shop=car_repair,shop=tyres": {"fetched": "2026-10-14T15:53:55.238Z", "elements": [
+ "Nashville|United States|0||no-chains|shop=car_repair,shop=tyres": {"fetched": "2026-10-23T15:48:11.756Z", "elements": [
    {"type":"node","id":2045317247,"lat":36.0927171,"lon":-86.7353815,"tags":{"addr:housenumber":"3730","addr:postcode":"37211","addr:street":"Nolensville Pike","name":"Nashville Auto Service","shop":"car_repair"}},
    {"type":"node","id":2065248043,"lat":36.0976262,"lon":-86.7380048,"tags":{"addr:housenumber":"3600","addr:postcode":"37211","addr:street":"Nolensville Pike","name":"Larry's Auto & Tire Inc.","shop":"car_repair"}},
    {"type":"node","id":2065692079,"lat":36.1114673,"lon":-86.7492704,"tags":{"addr:housenumber":"524","addr:postcode":"37211","addr:street":"Thompson Lane","name":"Alva's Quick lube plus","shop":"car_repair"}},
