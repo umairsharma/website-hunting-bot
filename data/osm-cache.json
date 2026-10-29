@@ -6065,7 +6065,7 @@
    {"type":"way","id":1102616438,"center":{"lat":36.217569,"lon":-86.5995785},"tags":{"amenity":"dentist","building":"yes","healthcare":"dentist","name":"Hermitage Dental Laboratories","source":"microsoft/BuildingFootprints"}},
    {"type":"way","id":1131960642,"center":{"lat":36.2316582,"lon":-86.7252066},"tags":{"amenity":"dentist","building":"yes","healthcare":"dentist","name":"Rolin Hills Dental Care","source":"microsoft/BuildingFootprints"}}
  ]},
- "Nashville|United States|0||no-chains|amenity=clinic,amenity=doctors,healthcare=clinic,healthcare=doctor": {"fetched": "2026-10-22T16:12:05.656Z", "elements": [
+ "Nashville|United States|0||no-chains|amenity=clinic,amenity=doctors,healthcare=clinic,healthcare=doctor": {"fetched": "2026-10-29T17:33:46.279Z", "elements": [
    {"type":"node","id":356901159,"lat":36.2791823,"lon":-86.7085195,"tags":{"amenity":"doctors","gnis:feature_id":"2453951","name":"Madison Minor Medical Center"}},
    {"type":"node","id":356901163,"lat":36.1668039,"lon":-86.8065112,"tags":{"amenity":"clinic","gnis:feature_id":"2453952","healthcare":"clinic","name":"Meharry Clinics"}},
    {"type":"node","id":368157273,"lat":36.1734208,"lon":-86.6025217,"tags":{"addr:state":"TN","amenity":"doctors","ele":"163","gnis:feature_id":"2453519","healthcare":"doctor","name":"Summit Medical Park","source":"USGS Geonames"}},
