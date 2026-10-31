@@ -1,21 +1,21 @@
 {
-  "startedAt": "2026-10-30T16:59:16.082Z",
-  "finishedAt": "2026-10-30T17:21:51.807Z",
-  "minutes": 22.6,
+  "startedAt": "2026-10-31T16:00:23.369Z",
+  "finishedAt": "2026-10-31T16:30:45.223Z",
+  "minutes": 30.4,
   "place": "Nashville, United States",
   "area": "Nashville, Davidson County, Middle Tennessee, Tennessee, United States",
   "candidates": 412,
-  "discovered": 28,
-  "mapsListed": 305,
-  "checked": 28,
-  "leads": 2,
-  "hasWebsite": 16,
+  "discovered": 27,
+  "mapsListed": 542,
+  "checked": 27,
+  "leads": 3,
+  "hasWebsite": 18,
   "closed": 0,
-  "stale": 10,
+  "stale": 6,
   "unverified": 0,
   "pending": 0,
   "ai": {
-    "calls": 8,
+    "calls": 10,
     "searches": 1,
     "off": null,
     "searchOff": "Gemini kept refusing Google searches (over its quota)"
@@ -24,12 +24,12 @@
     "gemini": "broken",
     "google": "broken",
     "brave": "blocked",
-    "startpage": "ok",
-    "bing": "untested",
+    "startpage": "blocked",
+    "bing": "ok",
     "duckduckgo": "untested"
   },
   "warnings": [
-    "Web search: Google (via Gemini) didn't work, Google didn't work, Brave blocked the bot, so it used Startpage.",
+    "Web search: Google (via Gemini) didn't work, Google didn't work, Brave blocked the bot, Startpage blocked the bot, so it used Bing.",
     "AI (Gemini): Gemini kept refusing Google searches (over its quota), so web searches used the other engines. The AI still checked Maps listings and websites."
   ],
   "error": null

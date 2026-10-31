@@ -6123,7 +6123,7 @@
    {"type":"way","id":1102616440,"center":{"lat":36.2175145,"lon":-86.5986555},"tags":{"building":"yes","name":"Gateway Tire & Service Center","shop":"car_repair","source":"microsoft/BuildingFootprints"}},
    {"type":"way","id":1131961347,"center":{"lat":36.2302181,"lon":-86.7246928},"tags":{"building":"yes","name":"Budget Brakes","shop":"car_repair","source":"microsoft/BuildingFootprints"}}
  ]},
- "Nashville|United States|0||no-chains|shop=clothes,shop=boutique,shop=fabric,shop=tailor,craft=tailor": {"fetched": "2026-10-24T14:35:29.398Z", "elements": [
+ "Nashville|United States|0||no-chains|shop=clothes,shop=boutique,shop=fabric,shop=tailor,craft=tailor": {"fetched": "2026-10-31T16:09:10.055Z", "elements": [
    {"type":"node","id":4615517239,"lat":36.1424126,"lon":-86.7918413,"tags":{"addr:city":"Nashville","addr:housenumber":"1200","addr:postcode":"37212","addr:state":"TN","addr:street":"Villa Place","addr:unit":"403","clothes":"fashion","name":"Billy Reid","shop":"clothes"}},
    {"type":"node","id":4796898647,"lat":36.1559981,"lon":-86.8484113,"tags":{"name":"Spell's Dancewear","shop":"clothes"}},
    {"type":"node","id":6541056485,"lat":36.2198069,"lon":-86.6968773,"tags":{"name":"Trail West","shop":"clothes"}},
@@ -6163,7 +6163,7 @@
    {"type":"way","id":1419371259,"center":{"lat":36.0346145,"lon":-86.6479731},"tags":{"clothes":"sports","indoor":"room","level":"0","name":"Ariat","room":"shop","shop":"clothes"}},
    {"type":"way","id":1419371265,"center":{"lat":36.0351712,"lon":-86.6478472},"tags":{"indoor":"room","level":"0","name":"Mountain High Outfitters","room":"shop","shop":"clothes"}}
  ]},
- "Nashville|United States|0||no-chains|office=estate_agent": {"fetched": "2026-10-24T14:36:36.644Z", "elements": [
+ "Nashville|United States|0||no-chains|office=estate_agent": {"fetched": "2026-10-31T16:09:39.607Z", "elements": [
    {"type":"node","id":5525027866,"lat":36.1510477,"lon":-86.7962545,"tags":{"name":"Crye-Leike Realtors","office":"estate_agent"}},
    {"type":"node","id":7044405328,"lat":36.140062,"lon":-86.7694555,"tags":{"name":"Village Real Estate","office":"estate_agent"}},
    {"type":"way","id":573984091,"center":{"lat":36.1503095,"lon":-86.7948133},"tags":{"building":"yes","name":"CHORD Real Estate","office":"estate_agent"}},
