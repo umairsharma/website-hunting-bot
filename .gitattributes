@@ -1,2 +1,0 @@
-# leads.csv only ever gains rows, so when two saves meet, keep the rows from both.
-data/leads.csv merge=union
